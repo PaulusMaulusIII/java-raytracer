@@ -11,14 +11,14 @@ import javafx.stage.Stage;
 import java.util.LinkedList;
 import java.util.List;
 
-import gameboy.math.Vector3;
-import gameboy.math.enums.Axis;
-import gameboy.math.shapes.*;
-import gameboy.rendering.Camera3D;
-import gameboy.rendering.Light;
-import gameboy.rendering.Renderer;
-import gameboy.rendering.Scene3D;
-import gameboy.rendering.Shape3D;
+import gameboy.core.Renderer;
+import gameboy.core.enums.Axis;
+import gameboy.geometries.*;
+import gameboy.lights.Light;
+import gameboy.utilities.Camera3D;
+import gameboy.utilities.Scene3D;
+import gameboy.utilities.Shape3D;
+import gameboy.utilities.math.Vector3;
 
 public class App extends Application {
 
@@ -35,16 +35,13 @@ public class App extends Application {
         VBox root = new VBox();
         root.getChildren().addAll(canvas);
 
-        camera = new Camera3D(new Vector3(0, 40,4), Math.toRadians(30));
+        camera = new Camera3D(new Vector3(0, 40, 4), Math.toRadians(30));
         camera.setPitch(Math.toRadians(90));
         camera.setYaw(Math.toRadians(0));
-        scene = new Scene3D(canvas, camera, new LinkedList<Shape3D>(List.of(
-            new Cube(new Vector3(-5, 0, 0), 4),
-            new Cube(new Vector3(5, 0, 0), 4),
-            new Cube(new Vector3(0, 0, 5), 4),
-            new Cube(new Vector3(0, 0, -5), 4),
-            new Plane(new Vector3(0, -2, 0), Axis.Y, Color.GRAY)
-        )));
+        scene = new Scene3D(canvas, camera,
+                new LinkedList<Shape3D>(List.of(new Cube(new Vector3(-5, 0, 0), 4), new Cube(new Vector3(5, 0, 0), 4),
+                        new Cube(new Vector3(0, 0, 5), 4), new Cube(new Vector3(0, 0, -5), 4),
+                        new Plane(new Vector3(0, -2, 0), Axis.Y, Color.GRAY))));
         scene.getLights().add(new Light(new Vector3(0, 5, 0)));
 
         canvas.setFocusTraversable(true);

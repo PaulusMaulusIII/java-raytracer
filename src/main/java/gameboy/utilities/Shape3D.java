@@ -1,9 +1,10 @@
-package gameboy.rendering;
+package gameboy.utilities;
 
 import java.util.List;
 
-import gameboy.math.Ray;
-import gameboy.math.Vector3;
+import gameboy.materials.Material;
+import gameboy.utilities.math.Ray;
+import gameboy.utilities.math.Vector3;
 
 public abstract class Shape3D {
 

@@ -1,4 +1,4 @@
-package gameboy.math;
+package gameboy.utilities.math;
 
 public class Ray {
     private Vector3 origin;

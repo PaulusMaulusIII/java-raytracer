@@ -1,7 +1,8 @@
-package gameboy.rendering;
+package gameboy.materials;
 
-import gameboy.math.RayHit;
-import gameboy.math.Vector3;
+import gameboy.lights.Light;
+import gameboy.utilities.math.RayHit;
+import gameboy.utilities.math.Vector3;
 import javafx.scene.paint.Color;
 import java.util.List;
 

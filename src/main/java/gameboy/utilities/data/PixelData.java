@@ -1,10 +1,10 @@
-package gameboy.data;
+package gameboy.utilities.data;
 
-import gameboy.math.Ray;
-import gameboy.math.RayHit;
-import gameboy.rendering.Light;
-import gameboy.rendering.Material;
-import gameboy.rendering.Shape3D;
+import gameboy.lights.Light;
+import gameboy.materials.Material;
+import gameboy.utilities.Shape3D;
+import gameboy.utilities.math.Ray;
+import gameboy.utilities.math.RayHit;
 import javafx.scene.paint.Color;
 import java.util.List;
 

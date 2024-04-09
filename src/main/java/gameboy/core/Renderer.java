@@ -1,10 +1,12 @@
-package gameboy.rendering;
+package gameboy.core;
 
-import gameboy.data.PixelBuffer;
-import gameboy.data.PixelData;
-import gameboy.math.Ray;
-import gameboy.math.RayHit;
-import gameboy.math.Vector3;
+import gameboy.utilities.Camera3D;
+import gameboy.utilities.Scene3D;
+import gameboy.utilities.data.PixelBuffer;
+import gameboy.utilities.data.PixelData;
+import gameboy.utilities.math.Ray;
+import gameboy.utilities.math.RayHit;
+import gameboy.utilities.math.Vector3;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 

@@ -1,6 +1,6 @@
-package gameboy.rendering;
+package gameboy.lights;
 
-import gameboy.math.Vector3;
+import gameboy.utilities.math.Vector3;
 import javafx.scene.paint.Color;
 
 public class Light {

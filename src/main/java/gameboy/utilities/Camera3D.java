@@ -1,6 +1,6 @@
-package gameboy.rendering;
+package gameboy.utilities;
 
-import gameboy.math.Vector3;
+import gameboy.utilities.math.Vector3;
 
 public class Camera3D {
     private Vector3 position;

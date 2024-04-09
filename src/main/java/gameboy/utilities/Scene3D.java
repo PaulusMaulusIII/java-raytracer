@@ -1,11 +1,12 @@
-package gameboy.rendering;
+package gameboy.utilities;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import gameboy.math.Ray;
-import gameboy.math.RayHit;
-import gameboy.math.Vector3;
+import gameboy.lights.Light;
+import gameboy.utilities.math.Ray;
+import gameboy.utilities.math.RayHit;
+import gameboy.utilities.math.Vector3;
 import javafx.scene.canvas.Canvas;
 
 public class Scene3D {

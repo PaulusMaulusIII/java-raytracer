@@ -1,12 +1,12 @@
-package gameboy.math.shapes;
+package gameboy.geometries;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import gameboy.math.Ray;
-import gameboy.math.Vector3;
-import gameboy.rendering.Material;
-import gameboy.rendering.Shape3D;
+import gameboy.materials.Material;
+import gameboy.utilities.Shape3D;
+import gameboy.utilities.math.Ray;
+import gameboy.utilities.math.Vector3;
 import javafx.scene.paint.Color;
 
 public class Cube extends Shape3D {

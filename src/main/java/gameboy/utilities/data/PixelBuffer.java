@@ -1,4 +1,4 @@
-package gameboy.data;
+package gameboy.utilities.data;
 
 public class PixelBuffer {
     private PixelData[][] buffer;

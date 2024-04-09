@@ -1,4 +1,4 @@
-package gameboy.math;
+package gameboy.utilities.math;
 
 public class Vector3 {
     public double x, y, z;

@@ -1,6 +1,6 @@
-package gameboy.math;
+package gameboy.utilities.math;
 
-import gameboy.rendering.Shape3D;
+import gameboy.utilities.Shape3D;
 
 public class RayHit {
     private Ray ray;

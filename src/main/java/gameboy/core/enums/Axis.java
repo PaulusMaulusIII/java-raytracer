@@ -1,6 +1,6 @@
-package gameboy.math.enums;
+package gameboy.core.enums;
 
-import gameboy.math.Vector3;
+import gameboy.utilities.math.Vector3;
 
 public enum Axis {
 
