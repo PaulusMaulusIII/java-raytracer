@@ -34,7 +34,7 @@ public abstract class Material {
         for (Light light : lights) {
             Vector3 lightPosition = light.getAnchor();
             double brightnessFactor = normal.dot(lightPosition.subtract(hitPoint).normalize())
-                    / hitPoint.distance(lightPosition) * 16;
+                    / hitPoint.distance(lightPosition) * hitPoint.distance(lightPosition);
             Color shadedColor = baseColor.deriveColor(0, 1, brightnessFactor, 1);
             finalColor = finalColor.interpolate(shadedColor, 1);
         }

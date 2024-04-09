@@ -62,6 +62,10 @@ public class Plane extends Shape3D {
         return (t >= 0 && t < Double.POSITIVE_INFINITY) ? ray.getOrigin().add(ray.getDirection().scale(t)) : null;
     }
 
+    public Axis getAxis() {
+        return axis;
+    }
+
     public class PlaneMaterial extends Material {
 
         public PlaneMaterial() {
@@ -74,8 +78,17 @@ public class Plane extends Shape3D {
 
         @Override
         public Vector3 getNormal(Vector3 point) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'getNormal'");
+            switch (axis) {
+            case X:
+                return new Vector3(1, 0, 0);
+            case Y:
+                return new Vector3(0, 1, 0);
+            case Z:
+                return new Vector3(0, 0, 1);
+
+            default:
+                return null;
+            }
         }
     }
 }
