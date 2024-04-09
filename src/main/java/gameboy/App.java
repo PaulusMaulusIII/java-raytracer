@@ -36,7 +36,7 @@ public class App extends Application {
         camera = new Camera3D(new Vector3(0, 0, -5), Math.toRadians(30));
         camera.setPitch(Math.toRadians(0));
         camera.setYaw(Math.toRadians(0));
-        scene = new Scene3D(canvas, camera, new LinkedList<Shape3D>(List.of(new Cube(new Vector3(0, 0, 0), 6))));
+        scene = new Scene3D(canvas, camera, new LinkedList<Shape3D>(List.of(new Sphere(new Vector3(0, 0, 0), 6))));
         scene.getLights().add(new Light(scene.getCurrentCamera().getPosition()));
 
         canvas.setFocusTraversable(true);

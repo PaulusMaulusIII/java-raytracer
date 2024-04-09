@@ -67,15 +67,8 @@ public class Sphere extends Shape3D {
         }
 
         @Override
-        public Color shade(RayHit rayHit, List<Light> lights) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'shade'");
+        public Vector3 getNormal(Vector3 point) {
+            return point.subtract(getAnchor()).normalize();
         }
-    }
-
-    @Override
-    public Vector3 getNormal(Vector3 point) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getNormal'");
     }
 }

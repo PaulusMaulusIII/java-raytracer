@@ -75,15 +75,9 @@ public class Plane extends Shape3D {
         }
 
         @Override
-        public Color shade(RayHit rayHit, List<Light> lights) {
+        public Vector3 getNormal(Vector3 point) {
             // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'shade'");
+            throw new UnsupportedOperationException("Unimplemented method 'getNormal'");
         }
-    }
-
-    @Override
-    public Vector3 getNormal(Vector3 point) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getNormal'");
     }
 }

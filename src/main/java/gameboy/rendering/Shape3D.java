@@ -46,6 +46,4 @@ public abstract class Shape3D {
     public abstract List<Vector3> getPoints();
 
     public abstract Vector3 getIntersectionPoint(Ray ray);
-
-    public abstract Vector3 getNormal(Vector3 point);
 }

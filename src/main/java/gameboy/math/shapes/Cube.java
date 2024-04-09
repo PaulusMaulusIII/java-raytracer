@@ -103,27 +103,6 @@ public class Cube extends Shape3D {
         }
     }
 
-    @Override
-    public Vector3 getNormal(Vector3 point) {
-        switch (determineCubeSide(point)) {
-        case 0:
-            return new Vector3(1, 0, 0);
-        case 1:
-            return new Vector3(-1, 0, 0);
-        case 2:
-            return new Vector3(0, 1, 0);
-        case 3:
-            return new Vector3(0, -1, 0);
-        case 4:
-            return new Vector3(0, 0, 1);
-        case 5:
-            return new Vector3(0, 0, -1);
-
-        default:
-            return null;
-        }
-    }
-
     public class CubeMaterial extends Material {
 
         public CubeMaterial() {
@@ -145,17 +124,24 @@ public class Cube extends Shape3D {
         }
 
         @Override
-        public Color shade(RayHit rayHit, List<Light> lights) {
-            Vector3 hitPoint = rayHit.getHitPoint();
-            Color baseColor = getColor(hitPoint);
-            Vector3 normal = getNormal(hitPoint);
-            Color finalColor = Color.BLACK;
-            for (Light light : lights) {
-                Color shadedColor = baseColor.deriveColor(0, 1,
-                        normal.dot(light.getAnchor().subtract(hitPoint).normalize()), 1);
-                finalColor = finalColor.interpolate(shadedColor, 1);
+        public Vector3 getNormal(Vector3 point) {
+            switch (determineCubeSide(point)) {
+            case 0:
+                return new Vector3(1, 0, 0);
+            case 1:
+                return new Vector3(-1, 0, 0);
+            case 2:
+                return new Vector3(0, 1, 0);
+            case 3:
+                return new Vector3(0, -1, 0);
+            case 4:
+                return new Vector3(0, 0, 1);
+            case 5:
+                return new Vector3(0, 0, -1);
+
+            default:
+                return null;
             }
-            return finalColor;
         }
     }
 }
