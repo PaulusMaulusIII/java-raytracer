@@ -17,7 +17,7 @@ public class RayHit {
         return ray;
     }
 
-    public Shape3D getShape() {
+    public Shape3D getObject() {
         return shape;
     }
 

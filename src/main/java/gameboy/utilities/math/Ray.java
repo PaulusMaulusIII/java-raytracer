@@ -1,5 +1,10 @@
 package gameboy.utilities.math;
 
+import java.util.List;
+
+import gameboy.lights.Light;
+import gameboy.utilities.Shape3D;
+
 public class Ray {
     private Vector3 origin;
     private Vector3 direction;
@@ -38,4 +43,35 @@ public class Ray {
         return null;
     }
 
+    public Vector3 intersectionPoint(Vector3 point) {
+        double x_p = point.x;
+        double y_p = point.y;
+        double z_p = point.z;
+
+        double x_v = getOrigin().x;
+        double y_v = getOrigin().y;
+        double z_v = getOrigin().z;
+
+        double d_x = getDirection().x;
+        double d_y = getDirection().y;
+        double d_z = getDirection().z;
+
+        double t;
+
+        if (d_x != 0) {
+            t = (x_p - x_v) / d_x;
+        } else if (d_y != 0) {
+            t = (y_p - y_v) / d_y;
+        } else if (d_z != 0) {
+            t = (z_p - z_v) / d_z;
+        } else {
+            return null;
+        }
+
+        if ((x_v + t * d_x) == x_p && (y_v + t * d_y) == y_p && (z_v + t * d_z) == z_p) {
+            return getOrigin().add(getDirection().scale(t));
+        } else {
+            return null;
+        }
+    }
 }

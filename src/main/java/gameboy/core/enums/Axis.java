@@ -4,9 +4,7 @@ import gameboy.utilities.math.Vector3;
 
 public enum Axis {
 
-    X(new Vector3(1, 0, 0)),
-    Y(new Vector3(0, 1, 0)),
-    Z(new Vector3(0, 0, 1));
+    X(new Vector3(1, 0, 0)), Y(new Vector3(0, 1, 0)), Z(new Vector3(0, 0, 1));
 
     private final Vector3 vector;
 

@@ -73,9 +73,9 @@ public class Renderer {
         Vector3 rayDir = new Vector3(u, v, 0).subtract(eyePos).normalize().rotate(cam.getPitch(), cam.getYaw());
         Ray ray = new Ray(eyePos.add(cam.getPosition()), rayDir);
 
-        RayHit hit = scene.castRay(ray);
+        RayHit hit = scene.castRay(ray, scene.getChildren());
         if (hit != null)
-            return new PixelData(hit, scene.getLights());
+            return new PixelData(hit, scene.getLights(), scene.getChildren());
 
         return null;
     }

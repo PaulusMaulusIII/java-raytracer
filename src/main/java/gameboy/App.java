@@ -25,7 +25,7 @@ public class App extends Application {
     private Canvas canvas;
     private Scene3D scene;
     private Camera3D camera;
-    private double resolution = .5;
+    private double resolution = .665;
 
     @Override
     public void start(Stage primaryStage) {
@@ -35,14 +35,12 @@ public class App extends Application {
         VBox root = new VBox();
         root.getChildren().addAll(canvas);
 
-        camera = new Camera3D(new Vector3(0, 40, 4), Math.toRadians(30));
-        camera.setPitch(Math.toRadians(90));
+        camera = new Camera3D(new Vector3(0, 8, -10), Math.toRadians(30));
+        camera.setPitch(Math.toRadians(20));
         camera.setYaw(Math.toRadians(0));
-        scene = new Scene3D(canvas, camera,
-                new LinkedList<Shape3D>(List.of(new Cube(new Vector3(-5, 0, 0), 4), new Cube(new Vector3(5, 0, 0), 4),
-                        new Cube(new Vector3(0, 0, 5), 4), new Cube(new Vector3(0, 0, -5), 4),
-                        new Plane(new Vector3(0, -2, 0), Axis.Y, Color.GRAY))));
-        scene.getLights().add(new Light(new Vector3(0, 5, 0)));
+        scene = new Scene3D(canvas, camera, new LinkedList<Shape3D>(
+                List.of(new Sphere(new Vector3(0, 3, 5), 2), new Plane(new Vector3(0, -2, 0), Axis.Y, Color.GRAY))));
+        scene.getLights().add(new Light(new Vector3(0, 10, 0)));
 
         canvas.setFocusTraversable(true);
         canvas.setOnKeyPressed((KeyEvent event) -> {

@@ -49,9 +49,9 @@ public class Sphere extends Shape3D {
 
     public int getSide(Vector3 point) {
         int side = 0;
-        side |= (point.x >= 0) ? 1 : 0;
-        side |= (point.y >= 0) ? 2 : 0;
-        side |= (point.z >= 0) ? 4 : 0;
+        side |= (point.x - getAnchor().x >= 0) ? 1 : 0;
+        side |= (point.y - getAnchor().y >= 0) ? 2 : 0;
+        side |= (point.z - getAnchor().z >= 0) ? 4 : 0;
         return side;
     }
 

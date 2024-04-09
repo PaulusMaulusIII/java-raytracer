@@ -42,6 +42,10 @@ public class Vector3 {
         return (double) Math.sqrt(x * x + y * y + z * z);
     }
 
+    public double length() {
+        return x + y + z;
+    }
+
     public Vector3 normalize() {
         double magnitude = magnitude();
         return new Vector3(x / magnitude, y / magnitude, z / magnitude);

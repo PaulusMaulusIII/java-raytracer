@@ -16,8 +16,7 @@ public class Scene3D {
     private List<Shape3D> children = new LinkedList<>();
     private List<Light> lights = new LinkedList<>();
 
-    public Scene3D(Canvas canvas, Camera3D camera,
-            List<Shape3D> children) {
+    public Scene3D(Canvas canvas, Camera3D camera, List<Shape3D> children) {
         cameras.add(camera);
         this.children = children;
         this.canvas = canvas;
@@ -44,19 +43,17 @@ public class Scene3D {
         currentCamera++;
     }
 
-    public RayHit castRay(Ray ray) {
+    public RayHit castRay(Ray ray, List<Shape3D> objects) {
         RayHit hit = null;
 
-        for (Shape3D shape3d : getChildren()) {
+        for (Shape3D shape3d : objects) {
             Vector3 hitPos = shape3d.getIntersectionPoint(ray);
-            if (hitPos != null && (hit == null || hit.getHitPoint().distance(
-                    ray.getOrigin()) > hitPos.distance(ray.getOrigin()))) {
+            if (hitPos != null && (hit == null
+                    || hit.getHitPoint().distance(ray.getOrigin()) > hitPos.distance(ray.getOrigin()))) {
                 hit = new RayHit(ray, shape3d, hitPos);
                 // System.out.println(hitPos.toString());
             }
-
         }
-
         return hit;
     }
 
