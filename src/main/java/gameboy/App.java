@@ -25,7 +25,7 @@ public class App extends Application {
     private Canvas canvas;
     private Scene3D scene;
     private Camera3D camera;
-    private double resolution = .665;
+    private double resolution = .5;
 
     @Override
     public void start(Stage primaryStage) {
