@@ -4,9 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import gameboy.math.Ray;
-import gameboy.math.RayHit;
 import gameboy.math.Vector3;
-import gameboy.rendering.Light;
 import gameboy.rendering.Material;
 import gameboy.rendering.Shape3D;
 import javafx.scene.paint.Color;

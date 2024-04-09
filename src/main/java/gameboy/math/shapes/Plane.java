@@ -1,10 +1,8 @@
 package gameboy.math.shapes;
 
 import gameboy.math.Ray;
-import gameboy.math.RayHit;
 import gameboy.math.Vector3;
 import gameboy.math.enums.Axis;
-import gameboy.rendering.Light;
 import gameboy.rendering.Material;
 import gameboy.rendering.Shape3D;
 
