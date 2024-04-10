@@ -39,8 +39,16 @@ public class App extends Application {
         camera.setPitch(Math.toRadians(20));
         camera.setYaw(Math.toRadians(0));
         scene = new Scene3D(canvas, camera, new LinkedList<Shape3D>(
-                List.of(new Sphere(new Vector3(0, 3, 5), 2), new Plane(new Vector3(0, -2, 0), Axis.Y, Color.GRAY))));
-        scene.getLights().add(new Light(new Vector3(0, 10, 0)));
+                List.of(
+                    new Line(new Vector3(-1, 5, 0), new Vector3(1, 5, 0), Color.LIME),
+                    new Line(new Vector3(0, 5, -1), new Vector3(0, 5, 1), Color.RED),
+                    new Sphere(new Vector3(0, 5, 0), 2),
+                    new Plane(new Vector3(0, -2, 0), Axis.Y, Color.GRAY)
+                )));
+        scene.getLights().addAll(new LinkedList<>(
+                List.of(
+                    new Light(new Vector3(0, 10, 0))
+                )));
 
         canvas.setFocusTraversable(true);
         canvas.setOnKeyPressed((KeyEvent event) -> {

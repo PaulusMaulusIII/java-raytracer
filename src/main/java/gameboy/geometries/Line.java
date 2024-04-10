@@ -48,7 +48,7 @@ public class Line extends Shape3D {
 
     @Override
     public Vector3 getIntersectionPoint(Ray ray) {
-        return ray.intersection(this.toRay());
+        return ray.intersection(toRay());
     }
 
     public Ray toRay() {
@@ -67,8 +67,7 @@ public class Line extends Shape3D {
 
         @Override
         public Vector3 getNormal(Vector3 point) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'getNormal'");
+            return point.invert();
         }
     }
 }

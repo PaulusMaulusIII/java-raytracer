@@ -1,10 +1,5 @@
 package gameboy.lights;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import gameboy.utilities.Shape3D;
-import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.Vector3;
 import javafx.scene.paint.Color;
 

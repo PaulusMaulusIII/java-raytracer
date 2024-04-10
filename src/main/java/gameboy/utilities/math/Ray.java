@@ -1,10 +1,5 @@
 package gameboy.utilities.math;
 
-import java.util.List;
-
-import gameboy.lights.Light;
-import gameboy.utilities.Shape3D;
-
 public class Ray {
     private Vector3 origin;
     private Vector3 direction;

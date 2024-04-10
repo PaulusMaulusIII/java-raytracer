@@ -79,4 +79,8 @@ public class Vector3 {
     public boolean isParallel(Vector3 other) {
         return Math.abs(this.dot(other) - 1) < 1e-6 || Math.abs(this.dot(other) + 1) < 1e-6;
     }
+
+    public Vector3 invert() {
+        return new Vector3(-x, -y, -z);
+    }
 }
