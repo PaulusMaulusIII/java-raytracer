@@ -43,7 +43,8 @@ public abstract class Material {
                         / hitPoint.distance(lightPosition) * hitPoint.distance(lightPosition);
                 Color shadedColor = baseColor.deriveColor(0, 1, brightnessFactor, 1);
                 colors.add(shadedColor.interpolate(Color.WHITE, ambient));
-            } else {
+            }
+            else {
                 colors.add(Color.BLACK.interpolate(Color.WHITE, ambient));
             }
         }

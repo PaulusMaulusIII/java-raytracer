@@ -49,7 +49,8 @@ public class Cube extends Shape3D {
                 if (ray.getOrigin().toArray()[i] < getAnchor().toArray()[i] - halfSideLength
                         || ray.getOrigin().toArray()[i] > getAnchor().toArray()[i] + halfSideLength)
                     return null;
-            } else {
+            }
+            else {
                 double t1 = (getAnchor().toArray()[i] - halfSideLength - ray.getOrigin().toArray()[i])
                         / ray.getDirection().toArray()[i];
                 double t2 = (getAnchor().toArray()[i] + halfSideLength - ray.getOrigin().toArray()[i])
@@ -94,9 +95,11 @@ public class Cube extends Shape3D {
 
         if (maxAxis == 0) {
             return pointArray[0] > anchorArray[0] ? 0 : 1;
-        } else if (maxAxis == 1) {
+        }
+        else if (maxAxis == 1) {
             return pointArray[1] > anchorArray[1] ? 2 : 3;
-        } else {
+        }
+        else {
             return pointArray[2] > anchorArray[2] ? 4 : 5;
         }
     }
@@ -111,7 +114,9 @@ public class Cube extends Shape3D {
         public Color getColor(Vector3 point) {
             int side = determineCubeSide(point);
 
-            Color[] colors = { Color.RED, Color.LIME, Color.BLUE, Color.YELLOW, Color.PINK, Color.PURPLE };
+            Color[] colors = {
+                    Color.RED, Color.LIME, Color.BLUE, Color.YELLOW, Color.PINK, Color.PURPLE
+            };
             // { x+, x-, y+, y-, z+, z- }
 
             if (side >= 0 && side < colors.length) {

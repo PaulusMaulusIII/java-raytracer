@@ -1,5 +1,5 @@
 module gameboy {
-    requires javafx.controls;
+    requires transitive javafx.controls;
     requires transitive javafx.graphics;
     requires transitive java.desktop;
 

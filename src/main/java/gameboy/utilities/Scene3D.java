@@ -7,28 +7,26 @@ import gameboy.lights.Light;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
-import javafx.scene.canvas.Canvas;
 
 public class Scene3D {
-    private Canvas canvas;
     private int currentCamera = 0;
     private List<Camera3D> cameras = new LinkedList<>();
     private List<Shape3D> children = new LinkedList<>();
     private List<Light> lights = new LinkedList<>();
 
-    public Scene3D(Canvas canvas, Camera3D camera, List<Shape3D> children) {
+    public Scene3D(Camera3D camera, List<Shape3D> children) {
         cameras.add(camera);
         this.children = children;
-        this.canvas = canvas;
+    }
+    
+    public Scene3D(List<Camera3D> cameras, List<Shape3D> children, List<Light> lights) {
+        this.cameras = cameras;
+        this.children = children;
+        this.lights = lights;
     }
 
-    public Scene3D(Canvas canvas, Camera3D camera) {
+    public Scene3D(Camera3D camera) {
         cameras.add(camera);
-        this.canvas = canvas;
-    }
-
-    public Canvas getCanvas() {
-        return canvas;
     }
 
     public List<Shape3D> getChildren() {

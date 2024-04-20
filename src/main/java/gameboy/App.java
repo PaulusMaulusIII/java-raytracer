@@ -1,135 +1,110 @@
 package gameboy;
 
+import gameboy.utilities.math.Vector3;
+import gameboy.core.Interpreter;
+import gameboy.core.Renderer;
+
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import gameboy.core.Renderer;
-import gameboy.core.enums.Axis;
-import gameboy.geometries.*;
-import gameboy.lights.Light;
-import gameboy.utilities.Camera3D;
-import gameboy.utilities.Scene3D;
-import gameboy.utilities.Shape3D;
-import gameboy.utilities.math.Vector3;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 public class App extends Application {
 
-    private Canvas canvas;
-    private Scene3D scene;
-    private Camera3D camera;
-    private double resolution = .5;
+    Vector3 deltaCamera;
+    int width = 512;
+    int height = 512;
+    double resolution = 1;
+    WritableImage frame = new WritableImage(width, height);
+    ImageView imageView = new ImageView(frame);
 
     @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("3D Projection Mapping");
-        canvas = new Canvas(512, 512);
+    public void start(Stage primaryStage) throws InterruptedException {
+        HBox mainPane = new HBox();
+        ImageView viewPort = imageView;
 
-        VBox root = new VBox();
-        root.getChildren().addAll(canvas);
+        mainPane.getChildren().add(generateSceneCreator());
+        mainPane.getChildren().add(viewPort);
 
-        camera = new Camera3D(new Vector3(0, 8, -10), Math.toRadians(30));
-        camera.setPitch(Math.toRadians(20));
-        camera.setYaw(Math.toRadians(0));
-        scene = new Scene3D(canvas, camera, new LinkedList<Shape3D>(
-                List.of(
-                    new Line(new Vector3(-1, 5, 0), new Vector3(1, 5, 0), Color.LIME),
-                    new Line(new Vector3(0, 5, -1), new Vector3(0, 5, 1), Color.RED),
-                    new Sphere(new Vector3(0, 5, 0), 2),
-                    new Plane(new Vector3(0, -2, 0), Axis.Y, Color.GRAY)
-                )));
-        scene.getLights().addAll(new LinkedList<>(
-                List.of(
-                    new Light(new Vector3(0, 10, 0))
-                )));
+        Scene scene = new Scene(mainPane);
 
-        canvas.setFocusTraversable(true);
-        canvas.setOnKeyPressed((KeyEvent event) -> {
-            double moveSpeed = 1;
-            switch (event.getCode()) {
-            case W:
-                camera.translate(new Vector3(0, 0, moveSpeed).rotate(camera.getPitch(), camera.getYaw()));
-                break;
-            case A:
-                camera.translate(new Vector3(-moveSpeed, 0, 0).rotate(camera.getPitch(), camera.getYaw()));
-                break;
-            case S:
-                camera.translate(new Vector3(0, 0, -moveSpeed).rotate(camera.getPitch(), camera.getYaw()));
-                break;
-            case D:
-                camera.translate(new Vector3(moveSpeed, 0, 0).rotate(camera.getPitch(), camera.getYaw()));
-                break;
-            case SPACE:
-                camera.translate(new Vector3(0, moveSpeed, 0).rotate(camera.getPitch(), camera.getYaw()));
-                break;
-            case SHIFT:
-                camera.translate(new Vector3(0, -moveSpeed, 0).rotate(camera.getPitch(), camera.getYaw()));
-                break;
-            case LEFT:
-                camera.setYaw(camera.getYaw() - moveSpeed / (moveSpeed * 100));
-                break;
-            case F:
-                camera.setYaw(camera.getYaw() - moveSpeed / (moveSpeed * 10));
-                break;
-            case RIGHT:
-                camera.setYaw(camera.getYaw() + moveSpeed / (moveSpeed * 100));
-                break;
-            case H:
-                camera.setYaw(camera.getYaw() + moveSpeed / (moveSpeed * 10));
-                break;
-            case UP:
-                camera.setPitch(camera.getPitch() - moveSpeed / 100);
-                break;
-            case T:
-                camera.setPitch(camera.getPitch() - moveSpeed / 10);
-                break;
-            case DOWN:
-                camera.setPitch(camera.getPitch() + moveSpeed / 100);
-                break;
-            case G:
-                camera.setPitch(camera.getPitch() + moveSpeed / 10);
-                break;
-            case Q:
-                camera.setFOV(camera.getFOV() - Math.toRadians(1));
-                break;
-            case E:
-                camera.setFOV(camera.getFOV() + Math.toRadians(1));
-                break;
-            case R:
-                resolution /= 1.1;
-                break;
-            case Z:
-                resolution *= 1.1;
-                if (resolution > 1)
-                    resolution = 1;
-                break;
-            case ESCAPE:
-                System.exit(1);
-                break;
-
-            default:
-
-                break;
-            }
-            redrawCanvas(resolution);
-        });
-
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setTitle("Java RayTracer");
+        primaryStage.setScene(scene);
         primaryStage.show();
-        redrawCanvas(resolution);
     }
 
-    private void redrawCanvas(double resolution) {
-        new Renderer().render(scene, canvas.getGraphicsContext2D(), ((int) canvas.getWidth()),
-                ((int) canvas.getHeight()), resolution);
+    public VBox generateSceneCreator() {
+        VBox inputFieldBox = new VBox();
 
+        TextArea inputField = new TextArea("Camera {\r\n" + //
+                "\tposition : {45,5,-3}\r\n" + //
+                "\tfov : 10°\r\n" + //
+                "\tpitch : 3.5°\r\n" + //
+                "\tyaw: -69°\r\n" + //
+                "}\r\n" + //
+                "\r\n" + //
+                "Light {\r\n" + //
+                "\tposition : {45, .5, -5}\r\n" + //
+                "}\r\n" + //
+                "\r\n" + //
+                "Sphere {\r\n" + //
+                "\tposition : {0,1.5,0}\r\n" + //
+                "\tradius: 1\r\n" + //
+                "}\r\n" + //
+                "\r\n" + //
+                "Cube {\r\n" + //
+                "\tposition : {0,1,6}\r\n" + //
+                "\tsidelength: 2 \r\n" + //
+                "}\r\n" + //
+                "\r\n" + //
+                "Plane {\r\n" + //
+                "\tposition : {0,0,0}\r\n" + //
+                "\taxis : y\r\n" + //
+                "\tcolor : {255,255,255}\r\n" + //
+                "}\r\n" + //
+                "\r\n" + //
+                "Plane {\r\n" + //
+                "\tposition : {-10,0,0}\r\n" + //
+                "\taxis: x\r\n" + //
+                "\tcolor : {255,255,255}\r\n" + //
+                "}");
+        inputField.setPrefHeight((height / 3) * 2);
+
+        TextArea logField = new TextArea();
+        logField.setPrefHeight(height / 3);
+        logField.setEditable(false);
+
+        Button button = new Button("Run");
+        button.setOnAction((evt) -> {
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                PrintStream ps = new PrintStream(baos);
+                PrintStream old = System.out;
+
+                System.setOut(ps);
+
+                frame = new Renderer(new Interpreter().interpret(inputField.getText()), width, height).render();
+                imageView.setImage(frame);
+
+                System.out.flush();
+                System.setOut(old);
+                logField.setText(baos.toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        inputFieldBox.getChildren().addAll(inputField, logField, button);
+
+        return inputFieldBox;
     }
 
     public static void main(String[] args) {

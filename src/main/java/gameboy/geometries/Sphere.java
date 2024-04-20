@@ -59,8 +59,9 @@ public class Sphere extends Shape3D {
 
         @Override
         public Color getColor(Vector3 point) {
-            Color[] colors = { Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.BEIGE,
-                    Color.PINK };
+            Color[] colors = {
+                    Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.BEIGE, Color.PINK
+            };
             return colors[getSide(point)];
         }
 

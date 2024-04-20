@@ -11,7 +11,7 @@ public class PixelBuffer {
         this.width = width;
     }
 
-    public void SetPixelData(int x, int y, PixelData data) {
+    public void setPixelData(int x, int y, PixelData data) {
         buffer[y][x] = data;
     }
 

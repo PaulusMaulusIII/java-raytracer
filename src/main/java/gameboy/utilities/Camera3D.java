@@ -13,6 +13,12 @@ public class Camera3D {
         this.fov = (double) fov;
     }
 
+    public Camera3D(Vector3 position, double fov, double pitch, double yaw) {
+        this(position, fov);
+        setPitch(pitch);
+        setYaw(yaw);
+    }
+
     public double getYaw() {
         return yaw;
     }
