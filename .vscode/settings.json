@@ -5,5 +5,8 @@
         "editor.insertSpaces": false,
         "editor.tabSize": 4
     },
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "cSpell.words": [
+        "gameboy"
+    ]
 }
