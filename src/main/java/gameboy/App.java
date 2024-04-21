@@ -20,14 +20,13 @@ import java.io.PrintStream;
 public class App extends Application {
 
     Vector3 deltaCamera;
-    int width = 512;
-    int height = 512;
-    double resolution = 1;
-    WritableImage frame = new WritableImage(width, height);
+    int width = 1280;
+    int height = 720;
+    WritableImage frame = new WritableImage((width / 4) * 3, height);
     ImageView imageView = new ImageView(frame);
 
     @Override
-    public void start(Stage primaryStage) throws InterruptedException {
+    public void start(Stage stage) throws InterruptedException {
         HBox mainPane = new HBox();
         ImageView viewPort = imageView;
 
@@ -36,54 +35,87 @@ public class App extends Application {
 
         Scene scene = new Scene(mainPane);
 
-        primaryStage.setTitle("Java RayTracer");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        stage.setTitle("Java RayTracer");
+        stage.setScene(scene);
+        stage.heightProperty().addListener((evt) -> resize(stage));
+        stage.widthProperty().addListener((evt) -> resize(stage));
+        stage.show();
+    }
+
+    public void resize(Stage stage) {
+        width = (int) stage.getWidth();
+        height = (int) stage.getHeight();
     }
 
     public VBox generateSceneCreator() {
         VBox inputFieldBox = new VBox();
 
         TextArea inputField = new TextArea("Camera {\r\n" + //
-                "\tposition : {45,5,-3}\r\n" + //
-                "\tfov : 10°\r\n" + //
-                "\tpitch : 3.5°\r\n" + //
-                "\tyaw: -69°\r\n" + //
-                "}\r\n" + //
-                "\r\n" + //
-                "Light {\r\n" + //
-                "\tposition : {45, .5, -5}\r\n" + //
-                "}\r\n" + //
-                "\r\n" + //
-                "Sphere {\r\n" + //
-                "\tposition : {0,1.5,0}\r\n" + //
-                "\tradius: 1\r\n" + //
+                "\tposition : {0, 5, -10}\r\n" + //
+                "\tfov : 1\r\n" + //
                 "}\r\n" + //
                 "\r\n" + //
                 "Cube {\r\n" + //
-                "\tposition : {0,1,6}\r\n" + //
-                "\tsidelength: 2 \r\n" + //
+                "\tposition : {2.5,2,0}\r\n" + //
+                "\tsidelength : 4\r\n" + //
+                "}\r\n" + //
+                "\r\n" + //
+                "Sphere {\r\n" + //
+                "\tposition : {-2.5,2,0}\r\n" + //
+                "\tradius : 2\r\n" + //
                 "}\r\n" + //
                 "\r\n" + //
                 "Plane {\r\n" + //
-                "\tposition : {0,0,0}\r\n" + //
+                "\tposition: {0,0,0}\r\n" + //
                 "\taxis : y\r\n" + //
-                "\tcolor : {255,255,255}\r\n" + //
+                "\tcolor: {255,255,255}\r\n" + //
+                "}\r\n" + //
+                "\r\n" + //
+                "Plane {\r\n" + //
+                "\tposition: {0,10,0}\r\n" + //
+                "\taxis : y\r\n" + //
+                "\tcolor: {255,255,255}\r\n" + //
+                "}\r\n" + //
+                "\r\n" + //
+                "Plane {\r\n" + //
+                "\tposition: {0,0,10}\r\n" + //
+                "\taxis : z\r\n" + //
+                "\tcolor: {255,255,255}\r\n" + //
+                "}\r\n" + //
+                "\r\n" + //
+                "Plane {\r\n" + //
+                "\tposition : {10,0,0}\r\n" + //
+                " \taxis : x\r\n" + //
+                "\tcolor: {255,255,255}\r\n" + //
                 "}\r\n" + //
                 "\r\n" + //
                 "Plane {\r\n" + //
                 "\tposition : {-10,0,0}\r\n" + //
-                "\taxis: x\r\n" + //
-                "\tcolor : {255,255,255}\r\n" + //
+                " \taxis : x\r\n" + //
+                "\tcolor: {255,255,255}\r\n" + //
+                "}\r\n" + //
+                "\r\n" + //
+                "Light {\r\n" + //
+                "\tposition: {0,5,-5}\r\n" + //
                 "}");
         inputField.setPrefHeight((height / 3) * 2);
+        inputField.setPrefWidth(width / 4);
 
         TextArea logField = new TextArea();
-        logField.setPrefHeight(height / 3);
+        logField.setPrefHeight((height / 3) - height / 10);
+        logField.setPrefWidth(width / 4);
         logField.setEditable(false);
 
         Button button = new Button("Run");
+        button.setPrefHeight(height / 10);
+        button.setPrefWidth(width / 4);
         button.setOnAction((evt) -> {
+            inputField.setPrefHeight((height / 3) * 2);
+            inputField.setPrefWidth(width / 4);
+            logField.setPrefHeight((height / 3) - height / 10);
+            logField.setPrefWidth(width / 4);
+            button.setPrefHeight(height / 10);
+            button.setPrefWidth(width / 4);
             try {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 PrintStream ps = new PrintStream(baos);
@@ -91,7 +123,8 @@ public class App extends Application {
 
                 System.setOut(ps);
 
-                frame = new Renderer(new Interpreter().interpret(inputField.getText()), width, height).render();
+                frame = new Renderer(new Interpreter().interpret(inputField.getText()), (width / 4) * 3, height)
+                        .render();
                 imageView.setImage(frame);
 
                 System.out.flush();
@@ -101,6 +134,7 @@ public class App extends Application {
                 e.printStackTrace();
             }
         });
+        button.fire();
 
         inputFieldBox.getChildren().addAll(inputField, logField, button);
 

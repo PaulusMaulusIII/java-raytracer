@@ -80,13 +80,13 @@ public class Interpreter {
 
 	private Shape3D createCube(HashMap<Token, String> properties) {
 		Vector3 center = parseVector(properties.get(Token.POSITION));
-		int sideLength = Integer.parseInt(properties.get(Token.SIDELENGTH));
+		double sideLength = Double.parseDouble(properties.get(Token.SIDELENGTH));
 		return new Cube(center, sideLength);
 	}
 
 	private Shape3D createSphere(HashMap<Token, String> properties) {
 		Vector3 center = parseVector(properties.get(Token.POSITION));
-		int radius = Integer.parseInt(properties.get(Token.RADIUS));
+		double radius = Double.parseDouble(properties.get(Token.RADIUS));
 		return new Sphere(center, radius);
 	}
 
@@ -97,7 +97,7 @@ public class Interpreter {
 
 	private Camera3D createCamera(HashMap<Token, String> properties) {
 		Vector3 position = parseVector(properties.get(Token.POSITION));
-		double fov = parseAngle(properties.getOrDefault(Token.FOV, "40"));
+		double fov = parseAngle(properties.getOrDefault(Token.FOV, "40°"));
 		double pitch = parseAngle(properties.getOrDefault(Token.PITCH, "0"));
 		double yaw = parseAngle(properties.getOrDefault(Token.YAW, "0"));
 		return new Camera3D(position, fov, pitch, yaw);

@@ -6,6 +6,7 @@ import java.util.List;
 import gameboy.materials.Material;
 import gameboy.utilities.Shape3D;
 import gameboy.utilities.math.Ray;
+import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 import javafx.scene.paint.Color;
 
@@ -127,8 +128,8 @@ public class Cube extends Shape3D {
         }
 
         @Override
-        public Vector3 getNormal(Vector3 point) {
-            switch (determineCubeSide(point)) {
+        public Vector3 getNormal(RayHit rayHit) {
+            switch (determineCubeSide(rayHit.getHitPoint())) {
             case 0:
                 return new Vector3(1, 0, 0);
             case 1:

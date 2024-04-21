@@ -4,6 +4,7 @@ import gameboy.core.enums.Axis;
 import gameboy.materials.Material;
 import gameboy.utilities.Shape3D;
 import gameboy.utilities.math.Ray;
+import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 import javafx.scene.paint.Color;
 import java.util.List;
@@ -76,14 +77,14 @@ public class Plane extends Shape3D {
         }
 
         @Override
-        public Vector3 getNormal(Vector3 point) {
+        public Vector3 getNormal(RayHit rayHit) {
             switch (axis) {
             case X:
-                return new Vector3(1, 0, 0);
+                return (rayHit.getRay().getDirection().x > 0) ? new Vector3(-1, 0, 0) : new Vector3(1, 0, 0);
             case Y:
-                return new Vector3(0, 1, 0);
+                return (rayHit.getRay().getDirection().y > 0) ? new Vector3(0, -1, 0) : new Vector3(0, 1, 0);
             case Z:
-                return new Vector3(0, 0, 1);
+                return (rayHit.getRay().getDirection().z > 0) ? new Vector3(0, 0, -1) : new Vector3(0, 0, 1);
 
             default:
                 return null;

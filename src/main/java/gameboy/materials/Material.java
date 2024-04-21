@@ -30,9 +30,9 @@ public abstract class Material {
     }
 
     public Color shade(RayHit rayHit, List<Light> lights, List<Shape3D> objects) {
+        Vector3 normal = getNormal(rayHit);
         Vector3 hitPoint = rayHit.getHitPoint();
         Color baseColor = getColor(hitPoint);
-        Vector3 normal = getNormal(hitPoint);
         Color finalColor = Color.BLACK;
 
         LinkedList<Color> colors = new LinkedList<>();
@@ -76,5 +76,5 @@ public abstract class Material {
         return inShadow;
     }
 
-    public abstract Vector3 getNormal(Vector3 point);
+    public abstract Vector3 getNormal(RayHit hit);
 }

@@ -3,6 +3,7 @@ package gameboy.geometries;
 import gameboy.materials.Material;
 import gameboy.utilities.Shape3D;
 import gameboy.utilities.math.Ray;
+import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 import javafx.scene.paint.Color;
 
@@ -66,8 +67,8 @@ public class Line extends Shape3D {
         }
 
         @Override
-        public Vector3 getNormal(Vector3 point) {
-            return point.invert();
+        public Vector3 getNormal(RayHit rayHit) {
+            return rayHit.getHitPoint().invert();
         }
     }
 }
