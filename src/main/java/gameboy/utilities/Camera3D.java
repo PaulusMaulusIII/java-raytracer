@@ -19,6 +19,12 @@ public class Camera3D {
         setYaw(yaw);
     }
 
+    /**
+     * Gets {@code double} yaw property in {@code Radians}
+     * 
+     * @return {@code double} yaw in {@code Radians}
+     */
+
     public double getYaw() {
         return yaw;
     }

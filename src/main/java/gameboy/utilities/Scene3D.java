@@ -1,8 +1,10 @@
 package gameboy.utilities;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import gameboy.core.enums.Token;
 import gameboy.lights.Light;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
@@ -13,16 +15,24 @@ public class Scene3D {
     private List<Camera3D> cameras = new LinkedList<>();
     private List<Shape3D> children = new LinkedList<>();
     private List<Light> lights = new LinkedList<>();
+    private HashMap<Token, String> options;
 
     public Scene3D(Camera3D camera, List<Shape3D> children) {
         cameras.add(camera);
         this.children = children;
     }
-    
+
     public Scene3D(List<Camera3D> cameras, List<Shape3D> children, List<Light> lights) {
         this.cameras = cameras;
         this.children = children;
         this.lights = lights;
+    }
+
+    public Scene3D(List<Camera3D> cameras, List<Shape3D> children, List<Light> lights, HashMap<Token, String> options) {
+        this.cameras = cameras;
+        this.children = children;
+        this.lights = lights;
+        this.options = options;
     }
 
     public Scene3D(Camera3D camera) {
@@ -57,5 +67,9 @@ public class Scene3D {
 
     public List<Light> getLights() {
         return lights;
+    }
+
+    public HashMap<Token, String> getOptions() {
+        return options;
     }
 }

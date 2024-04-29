@@ -15,16 +15,23 @@ public enum Token {
 	RADIUS("radius"),
 	PITCH("pitch"),
 	YAW("yaw"),
+	SIDE("side"),
+	ANGLE("angle"),
+
+	//Options
+	SHADE("shade"),
 
 	//Assets
 	CAMERA("Camera"),
 	LIGHT("Light"),
 
 	//Shapes
+	OPTIONS("Options"),
 	CUBE("Cube"),
 	LINE("Line"),
 	PLANE("Plane"),
-	SPHERE("Sphere");
+	SPHERE("Sphere"),
+	CONE("Cone");
 
 	private final String tokenString;
 
@@ -38,13 +45,13 @@ public enum Token {
 
 	public static final List<Token> SHAPES = new LinkedList<>(
 		List.of(
-			CUBE, LINE, PLANE, SPHERE
+			CUBE, LINE, PLANE, SPHERE, CONE
 		)
 	);
 
 	public static final List<Token> PROPERTIES = new LinkedList<>(
 		List.of(
-			POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW
+			POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW, SHADE, SIDE, ANGLE
 		)
 	);
 
@@ -56,7 +63,7 @@ public enum Token {
 
 	public static final List<Token> INITIALIZERS = new LinkedList<>(
 		List.of(	
-			CUBE, LINE, PLANE, SPHERE,CAMERA,LIGHT
+			CUBE, LINE, PLANE, SPHERE, CONE, CAMERA, LIGHT, OPTIONS
 		)
 	);
 }

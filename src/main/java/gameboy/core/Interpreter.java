@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import gameboy.core.enums.Axis;
 import gameboy.core.enums.Token;
+import gameboy.geometries.Cone;
 import gameboy.geometries.Cube;
 import gameboy.geometries.Plane;
 import gameboy.geometries.Sphere;
@@ -22,13 +23,14 @@ public class Interpreter {
 		List<Light> lights = new LinkedList<>();
 		List<Shape3D> shapes = new LinkedList<>();
 		String[] lines = code.split("\n");
+		HashMap<Token, String> options = new HashMap<>();
 
 		for (int i = 0; i < lines.length; i++) {
 			String line = lines[i].trim();
 
 			for (Token initializer : Token.INITIALIZERS) {
 				if (line.startsWith(initializer.getTokenString())) {
-					HashMap<Token, String> properties = extractProperties(lines, i);
+					HashMap<Token, String> properties = extractTokenValues(lines, i);
 					switch (initializer) {
 					case CAMERA:
 						cameras.add(createCamera(properties));
@@ -45,30 +47,36 @@ public class Interpreter {
 					case PLANE:
 						shapes.add(createPlane(properties));
 						break;
+					case CONE:
+						shapes.add(createCone(properties));
+						break;
+					case OPTIONS:
+						options.putAll(properties);
+						break;
 					default:
 						System.err.println("Not an initializer");
 					}
 				}
 			}
 		}
-		return new Scene3D(cameras, shapes, lights);
+		return new Scene3D(cameras, shapes, lights, options);
 	}
 
-	private HashMap<Token, String> extractProperties(String[] lines, int index) {
-		HashMap<Token, String> properties = new HashMap<>();
+	private HashMap<Token, String> extractTokenValues(String[] lines, int index) {
+		HashMap<Token, String> tokenVals = new HashMap<>();
 		for (int i = index + 1; i < lines.length; i++) {
 			String line = lines[i].trim();
 			if (line.equals("}"))
 				break;
-			String[] propertyString = line.split(":");
-			if (propertyString.length == 2) {
-				for (Token property : Token.PROPERTIES) {
-					if (propertyString[0].trim().equals(property.getTokenString()))
-						properties.put(property, propertyString[1].trim());
+			String[] valString = line.split(":");
+			if (valString.length == 2) {
+				for (Token token : Token.PROPERTIES) {
+					if (valString[0].trim().equals(token.getTokenString()))
+						tokenVals.put(token, valString[1].trim());
 				}
 			}
 		}
-		return properties;
+		return tokenVals;
 	}
 
 	private Shape3D createPlane(HashMap<Token, String> properties) {
@@ -88,6 +96,13 @@ public class Interpreter {
 		Vector3 center = parseVector(properties.get(Token.POSITION));
 		double radius = Double.parseDouble(properties.get(Token.RADIUS));
 		return new Sphere(center, radius);
+	}
+
+	private Shape3D createCone(HashMap<Token, String> properties) {
+		Vector3 center = parseVector(properties.get(Token.POSITION));
+		Vector3 axis = parseVector(properties.get(Token.SIDE));
+		double angle = parseAngle(properties.get(Token.ANGLE));
+		return new Cone(center, axis, angle);
 	}
 
 	private Light createLight(HashMap<Token, String> properties) {

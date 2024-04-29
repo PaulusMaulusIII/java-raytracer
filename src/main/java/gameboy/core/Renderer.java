@@ -34,7 +34,8 @@ public class Renderer {
                 PixelData pixelData = getPixelData(screenUV[0], screenUV[1]);
                 if (pixelData != null) {
                     pixelWriter.setColor(x, y, pixelData.getColor());
-                } else {
+                }
+                else {
                     pixelWriter.setColor(x, y, Color.BLACK.interpolate(Color.WHITE, 0.1));
                 }
             }
@@ -43,6 +44,7 @@ public class Renderer {
         long deltaTime = System.currentTimeMillis() - time;
 
         System.out.println("Rendered Scene:");
+        System.out.println("At: " + width + "px x " + height + "px");
         System.out.println("Camera at: " + scene.getCurrentCamera().getPosition().toString());
         System.out.println("With " + Math.toDegrees(scene.getCurrentCamera().getPitch()) + "° of Pitch");
         System.out.println("And " + Math.toDegrees(scene.getCurrentCamera().getYaw()) + "° of Yaw");
@@ -73,6 +75,7 @@ public class Renderer {
         long deltaTime = System.currentTimeMillis() - time;
 
         System.out.println("Rendered Scene:");
+        System.out.println("At: " + width + "px x " + height + "px");
         System.out.println("Camera at: " + scene.getCurrentCamera().getPosition().toString());
         System.out.println("With " + Math.toDegrees(scene.getCurrentCamera().getPitch()) + "° of Pitch");
         System.out.println("And " + Math.toDegrees(scene.getCurrentCamera().getYaw()) + "° of Yaw");
@@ -87,24 +90,27 @@ public class Renderer {
         if (width > height) {
             u = (double) (x - width / 2 + height / 2) / height * 2 - 1;
             v = -((double) y / height * 2 - 1);
-        } else {
+        }
+        else {
             u = (double) x / width * 2 - 1;
             v = -((double) (y - height / 2 + width / 2) / width * 2 - 1);
         }
 
-        return new double[] { u, v };
+        return new double[] {
+                u, v
+        };
     }
 
     public PixelData getPixelData(double u, double v) {
         Camera3D cam = scene.getCurrentCamera();
         Vector3 eyePos = new Vector3(0, 0, (-1 / Math.tan(cam.getFOV() / 2)));
-        Vector3 rayDir = new Vector3(u, v, 0).subtract(eyePos).normalize().rotate(cam.getPitch(), cam.getYaw());
+        Vector3 rayDir = new Vector3(u, v, 0).subtract(eyePos).rotate(cam.getPitch(), cam.getYaw()).normalize();
         Ray ray = new Ray(eyePos.add(cam.getPosition()), rayDir);
 
         RayHit hit = scene.castRay(ray, scene.getChildren());
-        if (hit != null)
-            return new PixelData(hit, scene.getLights(), scene.getChildren());
+        if (hit == null)
+            return null;
 
-        return null;
+        return new PixelData(hit, scene.getLights(), scene.getChildren(), scene.getOptions());
     }
 }
