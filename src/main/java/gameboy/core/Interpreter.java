@@ -102,7 +102,9 @@ public class Interpreter {
 		Vector3 center = parseVector(properties.get(Token.POSITION));
 		Vector3 axis = parseVector(properties.get(Token.SIDE));
 		double angle = parseAngle(properties.get(Token.ANGLE));
-		return new Cone(center, axis, angle);
+		double height = Double.parseDouble(properties.get(Token.HEIGHT));
+		Color color = parseColor(properties.get(Token.COLOR));
+		return new Cone(center, axis, angle, height, color);
 	}
 
 	private Light createLight(HashMap<Token, String> properties) {

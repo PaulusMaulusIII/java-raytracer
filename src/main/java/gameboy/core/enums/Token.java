@@ -17,6 +17,7 @@ public enum Token {
 	YAW("yaw"),
 	SIDE("side"),
 	ANGLE("angle"),
+	HEIGHT("height"),
 
 	//Options
 	SHADE("shade"),
@@ -51,7 +52,7 @@ public enum Token {
 
 	public static final List<Token> PROPERTIES = new LinkedList<>(
 		List.of(
-			POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW, SHADE, SIDE, ANGLE
+			POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW, SHADE, SIDE, ANGLE, HEIGHT
 		)
 	);
 

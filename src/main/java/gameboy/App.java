@@ -50,20 +50,22 @@ public class App extends Application {
     public VBox generateSceneCreator() {
         VBox inputFieldBox = new VBox();
 
-        TextArea inputField = new TextArea("Options {\r\n" + //
-                "\tshade : false\r\n" + //
-                "}\r\n" + //
-                "\r\n" + //
-                "Camera {\r\n" + //
-                "\tposition : {0, 0, -10}\r\n" + //
-                "\tfov : 90°\r\n" + //
-                "}\r\n" + //
-                "\r\n" + //
-                "Cone {\r\n" + //
-                "\tposition : {0,-2.5,0}\r\n" + //
-                "\tside : {0,5,0}\r\n" + //
-                "\tangle : 10°\r\n" + //
-                "}");
+        TextArea inputField = new TextArea("Camera {\r\n" + //
+                        "\tposition : {0, 0, -10}\r\n" + //
+                        "\tfov : 90°\r\n" + //
+                        "}\r\n" + //
+                        "\r\n" + //
+                        "Cone {\r\n" + //
+                        "\tposition : {0,5,0}\r\n" + //
+                        "\tside : {0,-1,0}\r\n" + //
+                        "\tcolor : {255,255,0}\r\n" + //
+                        "\tangle : 20°\r\n" + //
+                        "\theight : 10\r\n" + //
+                        "}\r\n" + //
+                        "\r\n" + //
+                        "Light {\r\n" + //
+                        "\tposition : {0,0,-10}\r\n" + //
+                        "}");
         inputField.setPrefHeight((height / 3) * 2);
         inputField.setPrefWidth(width / 4);
 

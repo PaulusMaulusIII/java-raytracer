@@ -14,12 +14,14 @@ public class Cone extends Shape3D {
 
 	Vector3 axis;
 	double angle;
+	double height;
 
-	public Cone(Vector3 anchor, Vector3 axis, double angle) {
+	public Cone(Vector3 anchor, Vector3 axis, double angle, double height, Color color) {
 		super(anchor);
-		setMaterial(new ConeMaterial(Color.WHITE));
+		setMaterial(new ConeMaterial(color));
 		this.axis = axis;
 		this.angle = angle;
+		this.height = height;
 	}
 
 	@Override
@@ -29,51 +31,34 @@ public class Cone extends Shape3D {
 
 	@Override
 	public Vector3 getIntersectionPoint(Ray ray) {
-		Vector3 anchor = getAnchor();
-		// Parameter für den Kegel
-		double cosTheta = Math.cos(angle); // Kosinus des Öffnungswinkels
+		Vector3 co = ray.getOrigin().subtract(getAnchor());
 
-		// Richtungsvektor des Strahls
-		Vector3 rayDirection = ray.getDirection().normalize(); // Normalisiere den Richtungsvektor
+		double a = ray.getDirection().dot(axis) * ray.getDirection().dot(axis) - Math.cos(angle) * Math.cos(angle);
+		double b = 2. * (ray.getDirection().dot(axis) * co.dot(axis)
+				- ray.getDirection().dot(co) * Math.cos(angle) * Math.cos(angle));
+		double c = co.dot(axis) * co.dot(axis) - co.dot(co) * Math.cos(angle) * Math.cos(angle);
 
-		// Vektor vom Strahlursprung zum Mittelpunkt der Basis des Kegels
-		Vector3 toAnchor = anchor.subtract(ray.getOrigin());
+		double det = b * b - 4. * a * c;
+		if (det < 0.)
+			return null;
 
-		// Projektion des Vektors "toAnchor" auf die Kegelachse
-		double projection = toAnchor.dot(axis);
+		det = Math.sqrt(det);
+		double t1 = (-b - det) / (2. * a);
+		double t2 = (-b + det) / (2. * a);
 
-		// Vektor von der Basis des Kegels zur Projektion des Strahlursprungs auf die
-		// Kegelachse
-		Vector3 projectionPoint = anchor.add(axis.scale(projection));
+		// This is a bit messy; there ought to be a more elegant solution.
+		double t = t1;
+		if (t < 0. || t2 > 0. && t2 < t)
+			t = t2;
+		if (t < 0.)
+			return null;
 
-		// Vektor vom Strahlursprung zur Projektion des Strahlursprungs auf die
-		// Kegelachse
-		Vector3 toProjection = projectionPoint.subtract(ray.getOrigin());
+		Vector3 cp = ray.getOrigin().add(ray.getDirection().scale(t)).subtract(getAnchor());
+		double h = cp.dot(axis);
+		if (h < 0. || h > height)
+			return null;
 
-		// Abstand von der Projektion des Strahlursprungs zum Mittelpunkt der Basis des
-		// Kegels
-		double distanceToAxis = toProjection.magnitude();
-
-		// Abstand von der Projektion des Strahlursprungs zur Basis des Kegels
-		double distanceToBase = Math.sqrt((toAnchor.magnitude() * toAnchor.magnitude()) - projection * projection);
-
-		// Winkel zwischen dem Vektor "toAnchor" und der Kegelachse
-		double angleToAxis = Math.acos(projection / toAnchor.magnitude());
-
-		// Überprüfung, ob der Strahl den Kegel schneidet
-		if (angleToAxis <= angle && distanceToAxis <= distanceToBase * cosTheta) {
-			// Berechne den Schnittpunkt
-			// Entfernungsanteil entlang des Strahls, um den Schnittpunkt zu finden
-			double t = projection / rayDirection.dot(axis);
-
-			// Berechne den Schnittpunkt
-			Vector3 intersectionPoint = ray.getOrigin().add(rayDirection.scale(t));
-
-			return intersectionPoint;
-		}
-
-		// Wenn kein Schnittpunkt gefunden wurde
-		return null;
+		return cp;
 	}
 
 	public class ConeMaterial extends Material {
@@ -88,8 +73,9 @@ public class Cone extends Shape3D {
 
 		@Override
 		public Vector3 getNormal(RayHit hit) {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException("Unimplemented method 'getNormal'");
+			Vector3 cp = hit.getHitPoint();
+			Vector3 n = cp.scale(axis.dot(cp) / cp.dot(cp)).subtract(axis).normalize();
+			return n;
 		}
 
 	}
