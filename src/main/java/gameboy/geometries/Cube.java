@@ -1,5 +1,6 @@
 package gameboy.geometries;
 
+import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,7 +9,6 @@ import gameboy.utilities.Shape3D;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
-import javafx.scene.paint.Color;
 
 public class Cube extends Shape3D {
 
@@ -116,7 +116,7 @@ public class Cube extends Shape3D {
             int side = determineCubeSide(point);
 
             Color[] colors = {
-                    Color.RED, Color.LIME, Color.BLUE, Color.YELLOW, Color.PINK, Color.PURPLE
+                    Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PINK, Color.MAGENTA
             };
             // { x+, x-, y+, y-, z+, z- }
 

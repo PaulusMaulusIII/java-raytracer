@@ -1,8 +1,10 @@
 package gameboy.core;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
 import gameboy.core.enums.Axis;
 import gameboy.core.enums.Token;
 import gameboy.geometries.Cone;
@@ -11,14 +13,13 @@ import gameboy.geometries.Plane;
 import gameboy.geometries.Sphere;
 import gameboy.lights.Light;
 import gameboy.utilities.Camera3D;
-import gameboy.utilities.Scene3D;
+import gameboy.utilities.Scene;
 import gameboy.utilities.Shape3D;
 import gameboy.utilities.math.Vector3;
-import javafx.scene.paint.Color;
 
 public class Interpreter {
 
-	public Scene3D interpret(String code) {
+	public Scene interpret(String code) {
 		List<Camera3D> cameras = new LinkedList<>();
 		List<Light> lights = new LinkedList<>();
 		List<Shape3D> shapes = new LinkedList<>();
@@ -59,7 +60,7 @@ public class Interpreter {
 				}
 			}
 		}
-		return new Scene3D(cameras, shapes, lights, options);
+		return new Scene(cameras, shapes, lights, options);
 	}
 
 	private HashMap<Token, String> extractTokenValues(String[] lines, int index) {
@@ -109,7 +110,8 @@ public class Interpreter {
 
 	private Light createLight(HashMap<Token, String> properties) {
 		Vector3 position = parseVector(properties.get(Token.POSITION));
-		return new Light(position);
+		Color color = parseColor(properties.getOrDefault(Token.COLOR, "{255,255,255}"));
+		return new Light(position, color);
 	}
 
 	private Camera3D createCamera(HashMap<Token, String> properties) {
@@ -129,10 +131,10 @@ public class Interpreter {
 		if (colorString == null)
 			return null;
 		String[] values = colorString.replaceAll("[{}]", "").split(",");
-		double red = Integer.parseInt(values[0].trim()) / 255.0;
-		double green = Integer.parseInt(values[1].trim()) / 255.0;
-		double blue = Integer.parseInt(values[2].trim()) / 255.0;
-		return new Color(red, green, blue, 1);
+		int red = Integer.parseInt(values[0].trim());
+		int green = Integer.parseInt(values[1].trim());
+		int blue = Integer.parseInt(values[2].trim());
+		return new Color(red, green, blue);
 	}
 
 	private double parseAngle(String angleString) {

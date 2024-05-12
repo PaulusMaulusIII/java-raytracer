@@ -1,16 +1,16 @@
 package gameboy.utilities.data;
 
+import java.awt.Color;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
 import gameboy.core.enums.Token;
 import gameboy.lights.Light;
 import gameboy.materials.Material;
 import gameboy.utilities.Shape3D;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
-import javafx.scene.paint.Color;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 public class PixelData {
     private RayHit hit;
@@ -23,6 +23,8 @@ public class PixelData {
     private List<Light> lights;
 
     public PixelData(RayHit hit, List<Light> lights, List<Shape3D> objects, HashMap<Token, String> options) {
+        objectsExcl = new LinkedList<>(objects);
+        objectsExcl.remove(hit.getObject());
         this.ray = hit.getRay();
         this.shape = hit.getObject();
         this.material = shape.getMaterial();
@@ -30,8 +32,6 @@ public class PixelData {
         this.hit = hit;
         this.lights = lights;
         this.options = options;
-        objectsExcl = new LinkedList<>(objects);
-        objectsExcl.remove(hit.getObject());
     }
 
     public RayHit getHit() {

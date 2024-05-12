@@ -1,131 +1,21 @@
 package gameboy;
 
-import gameboy.utilities.math.Vector3;
-import gameboy.core.Interpreter;
-import gameboy.core.Renderer;
+import javax.swing.*;
 
-import javafx.application.Application;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.stage.Stage;
+import gameboy.core.Viewport;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
-public class App extends Application {
-
-    Vector3 deltaCamera;
-    int width = 1280;
-    int height = 720;
-    WritableImage frame = new WritableImage((width / 4) * 3, height);
-    ImageView imageView = new ImageView(frame);
-
-    @Override
-    public void start(Stage stage) throws InterruptedException {
-        HBox mainPane = new HBox();
-        ImageView viewPort = imageView;
-
-        mainPane.getChildren().add(generateSceneCreator());
-        mainPane.getChildren().add(viewPort);
-
-        Scene scene = new Scene(mainPane);
-
-        stage.setTitle("Java RayTracer");
-        stage.setScene(scene);
-        stage.heightProperty().addListener((evt) -> resize(stage));
-        stage.widthProperty().addListener((evt) -> resize(stage));
-        stage.show();
-    }
-
-    public void resize(Stage stage) {
-        width = (int) stage.getWidth();
-        height = (int) stage.getHeight();
-    }
-
-    public VBox generateSceneCreator() {
-        VBox inputFieldBox = new VBox();
-
-        TextArea inputField = new TextArea("Options {\r\n" + //
-                        "\tshade : false\r\n" + //
-                        "}\r\n" + //
-                        "\r\n" + //
-                        "Camera {\r\n" + //
-                        "\tposition : {0, 0, -10}\r\n" + //
-                        "\tfov : 90°\r\n" + //
-                        "}\r\n" + //
-                        "\r\n" + //
-                        "Cone {\r\n" + //
-                        "\tposition : {-5,5,0}\r\n" + //
-                        "\tside : {0,-1,0}\r\n" + //
-                        "\tcolor : {255,0,0}\r\n" + //
-                        "\tangle : 10°\r\n" + //
-                        "\theight : 10\r\n" + //
-                        "}\r\n" + //
-                        "\r\n" + //
-                        "Cone {\r\n" + //
-                        "\tposition : {0,5,0}\r\n" + //
-                        "\tside : {0,-1,0}\r\n" + //
-                        "\tcolor : {0,255,0}\r\n" + //
-                        "\tangle : 10°\r\n" + //
-                        "\theight : 10\r\n" + //
-                        "}\r\n" + //
-                        "\r\n" + //
-                        "Cone {\r\n" + //
-                        "\tposition : {5,5,0}\r\n" + //
-                        "\tside : {0,-1,0}\r\n" + //
-                        "\tcolor : {0,0,255}\r\n" + //
-                        "\tangle : 10°\r\n" + //
-                        "\theight : 10\r\n" + //
-                        "}");
-        inputField.setPrefHeight((height / 3) * 2);
-        inputField.setPrefWidth(width / 4);
-
-        TextArea logField = new TextArea();
-        logField.setPrefHeight((height / 3) - height / 10);
-        logField.setPrefWidth(width / 4);
-        logField.setEditable(false);
-
-        Button button = new Button("Run");
-        button.setPrefHeight(height / 10);
-        button.setPrefWidth(width / 4);
-        button.setOnAction((evt) -> {
-            inputField.setPrefHeight((height / 3) * 2);
-            inputField.setPrefWidth(width / 4);
-            logField.setPrefHeight((height / 3) - height / 10);
-            logField.setPrefWidth(width / 4);
-            button.setPrefHeight(height / 10);
-            button.setPrefWidth(width / 4);
-            try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                PrintStream ps = new PrintStream(baos);
-                PrintStream old = System.out;
-
-                System.setOut(ps);
-
-                frame = new Renderer(new Interpreter().interpret(inputField.getText()), (width / 4) * 3, height)
-                        .render();
-                imageView.setImage(frame);
-
-                System.out.flush();
-                System.setOut(old);
-                logField.setText(baos.toString());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        button.fire();
-
-        inputFieldBox.getChildren().addAll(inputField, logField, button);
-
-        return inputFieldBox;
-    }
+public class App {
 
     public static void main(String[] args) {
-        launch(args);
+        JFrame frame = new JFrame();
+        frame.setSize(1280, 720);
+        Viewport viewport = new Viewport(1280, 720,
+                "Camera {\n" + "position:{0,0,-10}\n" + "}\n" + "Cube {\n" + "position:{0,0,0}\n" + "sidelength:2.5\n"
+                        + "}\n" + "Light {\n" + "position:{0,5,-5}\n" + "}\n" + "Plane {\n" + "position:{0,-5,0}\n"
+                        + "axis:y\n" + "color:{255,255,255}\n" + "}");
+        frame.add(viewport);
+        frame.setVisible(true);
+        viewport.run();
     }
+
 }

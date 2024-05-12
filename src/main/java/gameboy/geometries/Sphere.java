@@ -1,5 +1,7 @@
 package gameboy.geometries;
 
+import java.awt.Color;
+import java.util.LinkedList;
 import java.util.List;
 
 import gameboy.materials.Material;
@@ -7,9 +9,6 @@ import gameboy.utilities.Shape3D;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
-import javafx.scene.paint.Color;
-
-import java.util.LinkedList;
 
 public class Sphere extends Shape3D {
 
@@ -68,7 +67,8 @@ public class Sphere extends Shape3D {
         @Override
         public Color getColor(Vector3 point) {
             Color[] colors = {
-                    Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.BEIGE, Color.PINK
+                    Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.LIGHT_GRAY,
+                    Color.PINK
             };
             return colors[getSide(point)];
         }

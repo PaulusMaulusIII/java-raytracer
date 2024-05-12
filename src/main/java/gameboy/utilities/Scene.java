@@ -10,32 +10,32 @@ import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 
-public class Scene3D {
+public class Scene {
     private int currentCamera = 0;
     private List<Camera3D> cameras = new LinkedList<>();
     private List<Shape3D> children = new LinkedList<>();
     private List<Light> lights = new LinkedList<>();
     private HashMap<Token, String> options;
 
-    public Scene3D(Camera3D camera, List<Shape3D> children) {
+    public Scene(Camera3D camera, List<Shape3D> children) {
         cameras.add(camera);
         this.children = children;
     }
 
-    public Scene3D(List<Camera3D> cameras, List<Shape3D> children, List<Light> lights) {
+    public Scene(List<Camera3D> cameras, List<Shape3D> children, List<Light> lights) {
         this.cameras = cameras;
         this.children = children;
         this.lights = lights;
     }
 
-    public Scene3D(List<Camera3D> cameras, List<Shape3D> children, List<Light> lights, HashMap<Token, String> options) {
+    public Scene(List<Camera3D> cameras, List<Shape3D> children, List<Light> lights, HashMap<Token, String> options) {
         this.cameras = cameras;
         this.children = children;
         this.lights = lights;
         this.options = options;
     }
 
-    public Scene3D(Camera3D camera) {
+    public Scene(Camera3D camera) {
         cameras.add(camera);
     }
 

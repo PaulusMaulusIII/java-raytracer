@@ -2,7 +2,6 @@ package gameboy.utilities.math;
 
 public class Vector3 {
     public double x, y, z;
-    double[] axis = { x, y, z };
 
     public Vector3(double x, double y, double z) {
         this.x = x;
@@ -64,16 +63,14 @@ public class Vector3 {
     }
 
     public double[] toArray() {
-        return new double[] { x, y, z };
+        return new double[] {
+                x, y, z
+        };
     }
 
     @Override
     public String toString() {
         return "[" + x + ", " + y + ", " + z + "]";
-    }
-
-    public double[] getAxis() {
-        return axis;
     }
 
     public boolean isParallel(Vector3 other) {
@@ -82,5 +79,17 @@ public class Vector3 {
 
     public Vector3 invert() {
         return new Vector3(-x, -y, -z);
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public void setZ(double z) {
+        this.z = z;
     }
 }

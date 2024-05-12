@@ -24,4 +24,9 @@ public class RayHit {
     public Vector3 getHitPoint() {
         return hitPoint;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ":\n" + ray.toString() + "\n" + shape.toString() + "\n" + hitPoint.toString();
+    }
 }

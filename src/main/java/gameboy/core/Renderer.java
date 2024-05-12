@@ -1,50 +1,52 @@
 package gameboy.core;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+
+import java.io.IOException;
+
 import gameboy.utilities.Camera3D;
-import gameboy.utilities.Scene3D;
+import gameboy.utilities.Scene;
 import gameboy.utilities.data.PixelData;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
-import javafx.scene.paint.Color;
 
 public class Renderer {
 
-    Scene3D scene;
+    Scene scene;
     int height;
     int width;
 
-    public Renderer(Scene3D scene, int width, int height) {
+    public Renderer(Scene scene, int width, int height) {
         this.scene = scene;
         this.height = height;
         this.width = width;
     }
 
-    public WritableImage render() {
+    public BufferedImage render(double resolution) {
         long time = System.currentTimeMillis();
-        WritableImage temp = new WritableImage(width, height);
-        PixelWriter pixelWriter = temp.getPixelWriter();
+        BufferedImage temp = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics gfx = temp.getGraphics();
+        int blockSize = (int) (1 / resolution);
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y += blockSize) {
+            for (int x = 0; x < width; x += blockSize) {
                 double[] screenUV = getNormalizedScreenCoordinates(x, y, width, height);
                 PixelData pixelData = getPixelData(screenUV[0], screenUV[1]);
+                gfx.setColor(new Color(25, 25, 25));
                 if (pixelData != null) {
-                    pixelWriter.setColor(x, y, pixelData.getColor());
+                    gfx.setColor(pixelData.getColor());
                 }
-                else {
-                    pixelWriter.setColor(x, y, Color.BLACK.interpolate(Color.WHITE, 0.1));
-                }
+                gfx.fillRect(x, y, blockSize, blockSize);
             }
         }
 
         long deltaTime = System.currentTimeMillis() - time;
 
         System.out.println("Rendered Scene:");
-        System.out.println("At: " + width + "px x " + height + "px");
+        System.out.println("At: " + width + "px x " + height + "px and " + resolution * 100 + "% Resolution");
         System.out.println("Camera at: " + scene.getCurrentCamera().getPosition().toString());
         System.out.println("With " + Math.toDegrees(scene.getCurrentCamera().getPitch()) + "° of Pitch");
         System.out.println("And " + Math.toDegrees(scene.getCurrentCamera().getYaw()) + "° of Yaw");
@@ -54,35 +56,8 @@ public class Renderer {
         return temp;
     }
 
-    public void render(GraphicsContext graphicsContext, double resolution) {
-        long time = System.currentTimeMillis();
-        int blockSize = (int) (1 / resolution);
+    public void renderToImage(Scene scene3d, int i, int j) throws IOException {
 
-        for (int x = 0; x < width; x += blockSize) {
-            for (int y = 0; y < height; y += blockSize) {
-                double[] uv = getNormalizedScreenCoordinates(x, y, width, height);
-                PixelData pixelData = getPixelData(uv[0], uv[1]);
-
-                graphicsContext.setFill(Color.BLACK.interpolate(Color.WHITE, 0.1));
-                graphicsContext.fillRect(x, y, blockSize, blockSize);
-                if (pixelData != null)
-                    graphicsContext.setFill(pixelData.getColor());
-
-                graphicsContext.fillRect(x, y, blockSize, blockSize);
-            }
-        }
-
-        long deltaTime = System.currentTimeMillis() - time;
-
-        System.out.println("Rendered Scene:");
-        System.out.println("At: " + width + "px x " + height + "px");
-        System.out.println("Camera at: " + scene.getCurrentCamera().getPosition().toString());
-        System.out.println("With " + Math.toDegrees(scene.getCurrentCamera().getPitch()) + "° of Pitch");
-        System.out.println("And " + Math.toDegrees(scene.getCurrentCamera().getYaw()) + "° of Yaw");
-        System.out.println("With a FOV of: " + Math.toDegrees(scene.getCurrentCamera().getFOV()) + "°");
-        System.out.println("At an Resolution of " + resolution * 100 + "%");
-        System.out.println("Took " + deltaTime + "ms");
-        System.out.println("Done @ " + System.currentTimeMillis());
     }
 
     public double[] getNormalizedScreenCoordinates(int x, int y, double width, double height) {

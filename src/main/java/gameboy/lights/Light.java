@@ -1,7 +1,8 @@
 package gameboy.lights;
 
+import java.awt.Color;
+
 import gameboy.utilities.math.Vector3;
-import javafx.scene.paint.Color;
 
 public class Light {
     private Vector3 anchor;
