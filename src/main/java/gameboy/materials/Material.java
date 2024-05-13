@@ -13,7 +13,7 @@ import gameboy.utilities.math.Vector3;
 public abstract class Material {
 
     protected Color color;
-    protected double ambient = .1;
+    protected double ambient = .05;
     protected double diffuse = .1;
     protected double specular = .1;
     protected double shininess = 32;
@@ -37,6 +37,7 @@ public abstract class Material {
         Vector3 normal = rayHit.getObject().getNormal(rayHit); // Get object surface normal vector
         Vector3 hitPoint = rayHit.getHitPoint(); // Get hitpoint
         Color baseColor = getColor(hitPoint); // Get the specified base color at point on shape
+        Color shadowColor = interpolateColors(Color.BLACK, baseColor, ambient);
 
         LinkedList<Color> colors = new LinkedList<>();
         for (Light light : lights) {
@@ -45,12 +46,16 @@ public abstract class Material {
                 Vector3 lightPosition = light.getAnchor();
                 double brightnessFactor = normal.dot(lightPosition.subtract(hitPoint).normalize())
                         / hitPoint.distance(lightPosition) * hitPoint.distance(lightPosition);
-                Color shadedColor = multiplyColors(baseColor, light.getColor());
+                Color shadedColor = interpolateColors(Color.BLACK, baseColor, ambient);
+                shadedColor = multiplyColors(baseColor, light.getColor());
                 shadedColor = brighten(shadedColor, brightnessFactor);
-                colors.add(brighten(shadedColor, ambient));
+                if (shadedColor.getRGB() <= shadowColor.getRGB())
+                    colors.add(shadowColor);
+                else
+                    colors.add(shadedColor);
             }
             else {
-                colors.add(brighten(new Color(1, 1, 1), ambient));
+                colors.add(shadowColor);
             }
         }
 
@@ -89,6 +94,18 @@ public abstract class Material {
         int red = (int) (color.getRed() * (factor + 1));
         int green = (int) (color.getGreen() * (factor + 1));
         int blue = (int) (color.getBlue() * (factor + 1));
+
+        red = (red > 255) ? 255 : red;
+        green = (green > 255) ? 255 : green;
+        blue = (blue > 255) ? 255 : blue;
+
+        return new Color(red, green, blue);
+    }
+
+    private Color interpolateColors(Color color1, Color color2, double ratio) {
+        int red = (int) (color1.getRed() * (1 - ratio) + color2.getRed() * ratio);
+        int green = (int) (color1.getGreen() * (1 - ratio) + color2.getGreen() * ratio);
+        int blue = (int) (color1.getBlue() * (1 - ratio) + color2.getBlue() * ratio);
 
         red = (red > 255) ? 255 : red;
         green = (green > 255) ? 255 : green;
