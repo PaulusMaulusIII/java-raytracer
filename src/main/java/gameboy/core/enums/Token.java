@@ -18,6 +18,7 @@ public enum Token {
 	SIDE("side"),
 	ANGLE("angle"),
 	HEIGHT("height"),
+	GRIDSIZE("gridsize"),
 
 	//Options
 	SHADE("shade"),
@@ -32,7 +33,13 @@ public enum Token {
 	LINE("Line"),
 	PLANE("Plane"),
 	SPHERE("Sphere"),
-	CONE("Cone");
+	CONE("Cone"),
+
+	//Materials
+	CHECKER("checker"),
+	CUBEMAT("cube"),
+	SPHEREMAT("sphere"),
+	BASIC("basic");
 
 	private final String tokenString;
 
@@ -52,7 +59,7 @@ public enum Token {
 
 	public static final List<Token> PROPERTIES = new LinkedList<>(
 		List.of(
-			POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW, SHADE, SIDE, ANGLE, HEIGHT
+			POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW, SHADE, SIDE, ANGLE, HEIGHT, GRIDSIZE
 		)
 	);
 
@@ -65,6 +72,12 @@ public enum Token {
 	public static final List<Token> INITIALIZERS = new LinkedList<>(
 		List.of(	
 			CUBE, LINE, PLANE, SPHERE, CONE, CAMERA, LIGHT, OPTIONS
+		)
+	);
+
+	public static final List<Token> MATERIALS = new LinkedList<>(
+		List.of(	
+			CHECKER, CUBEMAT, SPHEREMAT, BASIC
 		)
 	);
 }

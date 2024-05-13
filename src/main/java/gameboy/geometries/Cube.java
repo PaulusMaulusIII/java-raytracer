@@ -1,6 +1,5 @@
 package gameboy.geometries;
 
-import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,9 +15,9 @@ public class Cube extends Shape {
 
     double sideLength;
 
-    public Cube(Vector3 anchor, double sideLength) {
-        super(anchor);
-        setMaterial(new CubeMaterial());
+    public Cube(Vector3 anchor, Material material, double sideLength) {
+        super(anchor, material);
+        setMaterial(material);
         this.sideLength = sideLength;
 
         double radius = sideLength / 2.0;
@@ -80,7 +79,7 @@ public class Cube extends Shape {
         return null;
     }
 
-    private int determineCubeSide(Vector3 point) {
+    public int determineCubeSide(Vector3 point) {
         double[] pointArray = point.toArray();
         double[] anchorArray = getAnchor().toArray();
 
@@ -105,47 +104,24 @@ public class Cube extends Shape {
         }
     }
 
-    public class CubeMaterial extends Material {
+    @Override
+    public Vector3 getNormal(RayHit rayHit) {
+        switch (determineCubeSide(rayHit.getHitPoint())) {
+        case 0:
+            return new Vector3(1, 0, 0);
+        case 1:
+            return new Vector3(-1, 0, 0);
+        case 2:
+            return new Vector3(0, 1, 0);
+        case 3:
+            return new Vector3(0, -1, 0);
+        case 4:
+            return new Vector3(0, 0, 1);
+        case 5:
+            return new Vector3(0, 0, -1);
 
-        public CubeMaterial() {
-            super();
-        }
-
-        @Override
-        public Color getColor(Vector3 point) {
-            int side = determineCubeSide(point);
-
-            Color[] colors = {
-                    Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.PINK, Color.MAGENTA
-            };
-            // { x+, x-, y+, y-, z+, z- }
-
-            if (side >= 0 && side < colors.length) {
-                return colors[side];
-            }
-
+        default:
             return null;
-        }
-
-        @Override
-        public Vector3 getNormal(RayHit rayHit) {
-            switch (determineCubeSide(rayHit.getHitPoint())) {
-            case 0:
-                return new Vector3(1, 0, 0);
-            case 1:
-                return new Vector3(-1, 0, 0);
-            case 2:
-                return new Vector3(0, 1, 0);
-            case 3:
-                return new Vector3(0, -1, 0);
-            case 4:
-                return new Vector3(0, 0, 1);
-            case 5:
-                return new Vector3(0, 0, -1);
-
-            default:
-                return null;
-            }
         }
     }
 }

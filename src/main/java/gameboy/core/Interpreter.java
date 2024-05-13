@@ -12,6 +12,11 @@ import gameboy.geometries.Cube;
 import gameboy.geometries.Plane;
 import gameboy.geometries.Sphere;
 import gameboy.lights.Light;
+import gameboy.materials.BasicMaterial;
+import gameboy.materials.CheckerMaterial;
+import gameboy.materials.CubeMaterial;
+import gameboy.materials.Material;
+import gameboy.materials.SphereMaterial;
 import gameboy.utilities.Camera;
 import gameboy.utilities.Scene;
 import gameboy.utilities.Shape;
@@ -84,19 +89,27 @@ public class Interpreter {
 		Vector3 anchor = parseVector(properties.get(Token.POSITION));
 		Axis axis = Axis.valueOf(properties.get(Token.AXIS).toUpperCase());
 		Color color = parseColor(properties.get(Token.COLOR));
-		return new Plane(anchor, axis, color);
+		double gridsize = Double.parseDouble(properties.getOrDefault(Token.GRIDSIZE, "2"));
+		Material material = parseMaterial(properties.get(Token.MATERIAL), color, gridsize);
+		return new Plane(anchor, material, axis);
 	}
 
 	private Shape createCube(HashMap<Token, String> properties) {
 		Vector3 center = parseVector(properties.get(Token.POSITION));
 		double sideLength = Double.parseDouble(properties.get(Token.SIDELENGTH));
-		return new Cube(center, sideLength);
+		Color color = parseColor(properties.get(Token.COLOR));
+		double gridsize = Double.parseDouble(properties.getOrDefault(Token.GRIDSIZE, "2"));
+		Material material = parseMaterial(properties.get(Token.MATERIAL), color, gridsize);
+		return new Cube(center, material, sideLength);
 	}
 
 	private Shape createSphere(HashMap<Token, String> properties) {
 		Vector3 center = parseVector(properties.get(Token.POSITION));
 		double radius = Double.parseDouble(properties.get(Token.RADIUS));
-		return new Sphere(center, radius);
+		Color color = parseColor(properties.get(Token.COLOR));
+		double gridsize = Double.parseDouble(properties.getOrDefault(Token.GRIDSIZE, "2"));
+		Material material = parseMaterial(properties.get(Token.MATERIAL), color, gridsize);
+		return new Sphere(center, material, radius);
 	}
 
 	private Shape createCone(HashMap<Token, String> properties) {
@@ -105,7 +118,9 @@ public class Interpreter {
 		double angle = parseAngle(properties.get(Token.ANGLE));
 		double height = Double.parseDouble(properties.get(Token.HEIGHT));
 		Color color = parseColor(properties.get(Token.COLOR));
-		return new Cone(center, axis, angle, height, color);
+		double gridsize = Double.parseDouble(properties.getOrDefault(Token.GRIDSIZE, "2"));
+		Material material = parseMaterial(properties.get(Token.MATERIAL), color, gridsize);
+		return new Cone(center, material, axis, angle, height);
 	}
 
 	private Light createLight(HashMap<Token, String> properties) {
@@ -140,5 +155,26 @@ public class Interpreter {
 	private double parseAngle(String angleString) {
 		return angleString.endsWith("°") ? Math.toRadians(Double.parseDouble(angleString.replace("°", "")))
 				: Double.parseDouble(angleString);
+	}
+
+	private Material parseMaterial(String matString, Color color, double gridsize) {
+		Token finalMat = Token.BASIC;
+		for (Token material : Token.MATERIALS) {
+			if (matString.equals(material.getTokenString())) {
+				finalMat = material;
+			}
+		}
+		switch (finalMat) {
+		case CHECKER:
+			return new CheckerMaterial(color, gridsize);
+		case SPHEREMAT:
+			return new SphereMaterial();
+		case CUBEMAT:
+			return new CubeMaterial();
+		case BASIC:
+			return new BasicMaterial(color);
+		default:
+			return new BasicMaterial(Color.WHITE);
+		}
 	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import gameboy.materials.Material;
 import gameboy.utilities.math.Ray;
+import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 
 public abstract class Shape {
@@ -11,17 +12,15 @@ public abstract class Shape {
     Vector3 anchor;
     Material material;
 
-    public Shape(Vector3 anchor) {
-        setAnchor(anchor);
-    }
-
     public Shape(Material material) {
         setMaterial(material);
+        this.material.setShape(this);
     }
 
     public Shape(Vector3 anchor, Material material) {
         setAnchor(anchor);
         setMaterial(material);
+        this.material.setShape(this);
     }
 
     /**
@@ -85,4 +84,6 @@ public abstract class Shape {
      *         {@code Vector3} intersection point with {@code Shape3D}
      */
     public abstract Vector3 getIntersectionPoint(Ray ray);
+
+    public abstract Vector3 getNormal(RayHit hit);
 }

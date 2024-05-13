@@ -1,6 +1,5 @@
 package gameboy.geometries;
 
-import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,9 +15,8 @@ public class Cone extends Shape {
 	double angle;
 	double height;
 
-	public Cone(Vector3 anchor, Vector3 axis, double angle, double height, Color color) {
-		super(anchor);
-		setMaterial(new ConeMaterial(color));
+	public Cone(Vector3 anchor, Material material, Vector3 axis, double angle, double height) {
+		super(anchor, material);
 		this.axis = axis.normalize();
 		this.angle = angle;
 		this.height = height;
@@ -63,26 +61,15 @@ public class Cone extends Shape {
 		return hitPoint;
 	}
 
-	public class ConeMaterial extends Material {
-
-		public ConeMaterial() {
-			super();
-		}
-
-		public ConeMaterial(Color color) {
-			super(color);
-		}
-
-		@Override
-		public Vector3 getNormal(RayHit hit) {
-			Vector3 cp = hit.getHitPoint();
-			Vector3 n = cp.scale(axis.dot(cp) / cp.dot(cp)).subtract(axis).normalize();
-			return n;
-		}
-	}
-
 	@Override
 	public String toString() {
 		return super.toString() + " | " + getMaterial().getColor(getAnchor()).toString();
+	}
+
+	@Override
+	public Vector3 getNormal(RayHit hit) {
+		Vector3 cp = hit.getHitPoint();
+		Vector3 n = cp.scale(axis.dot(cp) / cp.dot(cp)).subtract(axis).normalize();
+		return n;
 	}
 }

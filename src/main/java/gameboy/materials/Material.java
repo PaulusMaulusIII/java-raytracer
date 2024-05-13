@@ -11,16 +11,15 @@ import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 
 public abstract class Material {
+
     protected Color color;
     protected double ambient = .1;
     protected double diffuse = .1;
     protected double specular = .1;
     protected double shininess = 32;
+    protected Shape shape;
 
-    public Material() {
-        super();
-        this.color = Color.BLACK;
-    }
+    public Material() {}
 
     public Material(Color color) {
         this.color = color;
@@ -30,9 +29,12 @@ public abstract class Material {
         return this.color;
     }
 
+    public void setShape(Shape shape) {
+        this.shape = shape;
+    }
+
     public Color shade(RayHit rayHit, List<Light> lights, List<Shape> objects) {
-        // Vector3 normal = rayHit.getRay().getDirection().invert();
-        Vector3 normal = getNormal(rayHit); // Get object surface normal vector
+        Vector3 normal = rayHit.getObject().getNormal(rayHit); // Get object surface normal vector
         Vector3 hitPoint = rayHit.getHitPoint(); // Get hitpoint
         Color baseColor = getColor(hitPoint); // Get the specified base color at point on shape
 
@@ -52,17 +54,12 @@ public abstract class Material {
             }
         }
 
-        int red = 0;
-        int green = 0;
-        int blue = 0;
-        double colorFactor = 1.0 / colors.size();
+        Color finalColor = Color.BLACK;
         for (Color color : colors) {
-            red += (color.getRed() * colorFactor);
-            green += (color.getGreen() * colorFactor);
-            blue += (color.getBlue() * colorFactor);
+            finalColor = add(finalColor, color);
         }
 
-        return new Color(red, green, blue);
+        return finalColor;
     }
 
     public boolean inShadow(Ray ray, Light light, List<Shape> objects) {
@@ -100,7 +97,18 @@ public abstract class Material {
         return new Color(red, green, blue);
     }
 
-    public abstract Vector3 getNormal(RayHit hit);
+    private Color add(Color color1, Color color2) {
+
+        int red = color1.getRed() + color2.getRed();
+        int green = color1.getGreen() + color2.getGreen();
+        int blue = color1.getBlue() + color2.getBlue();
+
+        red = (red > 255) ? 255 : red;
+        green = (green > 255) ? 255 : green;
+        blue = (blue > 255) ? 255 : blue;
+
+        return new Color(red, green, blue);
+    }
 
     @Override
     public String toString() {

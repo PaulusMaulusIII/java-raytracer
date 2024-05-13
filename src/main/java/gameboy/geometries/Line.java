@@ -1,6 +1,5 @@
 package gameboy.geometries;
 
-import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,18 +15,8 @@ public class Line extends Shape {
     private Vector3 anchor2;
     private Vector3 direction;
 
-    public Line(Vector3 anchor, Vector3 anchor2) {
-        super(anchor);
-        setMaterial(new LineMaterial());
-        points[0] = anchor;
-        points[1] = anchor2;
-        this.anchor2 = anchor2;
-        this.direction = anchor2.subtract(anchor).normalize();
-    }
-
-    public Line(Vector3 anchor, Vector3 anchor2, Color color) {
-        super(anchor);
-        setMaterial(new LineMaterial(color));
+    public Line(Vector3 anchor, Vector3 anchor2, Material material) {
+        super(anchor, material);
         points[0] = anchor;
         points[1] = anchor2;
         this.anchor2 = anchor2;
@@ -56,19 +45,8 @@ public class Line extends Shape {
         return new Ray(getAnchor(), direction);
     }
 
-    public class LineMaterial extends Material {
-
-        public LineMaterial() {
-            super();
-        }
-
-        public LineMaterial(Color color) {
-            super(color);
-        }
-
-        @Override
-        public Vector3 getNormal(RayHit rayHit) {
-            return rayHit.getHitPoint().invert();
-        }
+    @Override
+    public Vector3 getNormal(RayHit rayHit) {
+        return rayHit.getHitPoint().invert();
     }
 }

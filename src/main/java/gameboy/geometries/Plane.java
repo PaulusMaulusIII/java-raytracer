@@ -1,6 +1,5 @@
 package gameboy.geometries;
 
-import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,15 +14,8 @@ public class Plane extends Shape {
 
     Axis axis;
 
-    public Plane(Vector3 anchor, Axis axis) {
-        super(anchor);
-        setMaterial(new PlaneMaterial());
-        this.axis = axis;
-    }
-
-    public Plane(Vector3 anchor, Axis axis, Color color) {
-        super(anchor);
-        setMaterial(new PlaneMaterial(color));
+    public Plane(Vector3 anchor, Material material, Axis axis) {
+        super(anchor, material);
         this.axis = axis;
     }
 
@@ -67,29 +59,18 @@ public class Plane extends Shape {
         return axis;
     }
 
-    public class PlaneMaterial extends Material {
+    @Override
+    public Vector3 getNormal(RayHit rayHit) {
+        switch (axis) {
+        case X:
+            return (rayHit.getRay().getDirection().x > 0) ? new Vector3(-1, 0, 0) : new Vector3(1, 0, 0);
+        case Y:
+            return (rayHit.getRay().getDirection().y > 0) ? new Vector3(0, -1, 0) : new Vector3(0, 1, 0);
+        case Z:
+            return (rayHit.getRay().getDirection().z > 0) ? new Vector3(0, 0, -1) : new Vector3(0, 0, 1);
 
-        public PlaneMaterial() {
-            super();
-        }
-
-        public PlaneMaterial(Color color) {
-            super(color);
-        }
-
-        @Override
-        public Vector3 getNormal(RayHit rayHit) {
-            switch (axis) {
-            case X:
-                return (rayHit.getRay().getDirection().x > 0) ? new Vector3(-1, 0, 0) : new Vector3(1, 0, 0);
-            case Y:
-                return (rayHit.getRay().getDirection().y > 0) ? new Vector3(0, -1, 0) : new Vector3(0, 1, 0);
-            case Z:
-                return (rayHit.getRay().getDirection().z > 0) ? new Vector3(0, 0, -1) : new Vector3(0, 0, 1);
-
-            default:
-                return null;
-            }
+        default:
+            return null;
         }
     }
 }
