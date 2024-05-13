@@ -3,7 +3,7 @@ package gameboy.core.enums;
 import java.util.LinkedList;
 import java.util.List;
 
-public enum Token {
+public enum Tokens {
 
 	//Properties
 	POSITION("position"),
@@ -20,6 +20,7 @@ public enum Token {
 	HEIGHT("height"),
 	GRIDSIZE("gridsize"),
 	SEC_COLOR("color2"),
+	REFLECTIVENESS("refl"),
 
 	//Options
 	SHADE("shade"),
@@ -38,13 +39,14 @@ public enum Token {
 
 	//Materials
 	CHECKER("checker"),
+	MIRROR("mirror"),
 	CUBEMAT("cube"),
 	SPHEREMAT("sphere"),
 	BASIC("basic");
 
 	private final String tokenString;
 
-	private Token(String tokenString) {
+	private Tokens(String tokenString) {
 		this.tokenString = tokenString;
 	}
 
@@ -52,33 +54,33 @@ public enum Token {
 		return tokenString;
 	}
 
-	public static final List<Token> SHAPES = new LinkedList<>(
+	public static final List<Tokens> SHAPES = new LinkedList<>(
 		List.of(
 			CUBE, LINE, PLANE, SPHERE, CONE
 		)
 	);
 
-	public static final List<Token> PROPERTIES = new LinkedList<>(
+	public static final List<Tokens> PROPERTIES = new LinkedList<>(
 		List.of(
-			POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW, SHADE, SIDE, ANGLE, HEIGHT, GRIDSIZE, SEC_COLOR
+			POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW, SHADE, SIDE, ANGLE, HEIGHT, GRIDSIZE, SEC_COLOR, REFLECTIVENESS
 		)
 	);
 
-	public static final List<Token> ASSETS = new LinkedList<>(
+	public static final List<Tokens> ASSETS = new LinkedList<>(
 		List.of(
 			CAMERA,LIGHT
 		)
 	);
 
-	public static final List<Token> INITIALIZERS = new LinkedList<>(
+	public static final List<Tokens> INITIALIZERS = new LinkedList<>(
 		List.of(	
 			CUBE, LINE, PLANE, SPHERE, CONE, CAMERA, LIGHT, OPTIONS
 		)
 	);
 
-	public static final List<Token> MATERIALS = new LinkedList<>(
+	public static final List<Tokens> MATERIALS = new LinkedList<>(
 		List.of(	
-			CHECKER, CUBEMAT, SPHEREMAT, BASIC
+			CHECKER, MIRROR, CUBEMAT, SPHEREMAT, BASIC
 		)
 	);
 }

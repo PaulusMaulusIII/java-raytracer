@@ -2,12 +2,13 @@ package gameboy.materials;
 
 import java.awt.Color;
 
+import gameboy.utilities.Material;
 import gameboy.utilities.math.Vector3;
 
 public class SphereMaterial extends Material {
 
 	public SphereMaterial() {
-		super();
+		super(Color.WHITE);
 	}
 
 	/**

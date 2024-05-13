@@ -1,5 +1,9 @@
 package gameboy.utilities.math;
 
+import java.util.List;
+
+import gameboy.utilities.Shape;
+
 public class Ray {
     private Vector3 origin;
     private Vector3 direction;
@@ -55,18 +59,39 @@ public class Ray {
 
         if (d_x != 0) {
             t = (x_p - x_v) / d_x;
-        } else if (d_y != 0) {
+        }
+        else if (d_y != 0) {
             t = (y_p - y_v) / d_y;
-        } else if (d_z != 0) {
+        }
+        else if (d_z != 0) {
             t = (z_p - z_v) / d_z;
-        } else {
+        }
+        else {
             return null;
         }
 
         if ((x_v + t * d_x) == x_p && (y_v + t * d_y) == y_p && (z_v + t * d_z) == z_p) {
             return getOrigin().add(getDirection().scale(t));
-        } else {
+        }
+        else {
             return null;
         }
+    }
+
+    public RayHit castRay(List<Shape> objects) {
+        RayHit hit = null;
+        for (Shape shape : objects) {
+            Vector3 hitPoint = shape.getIntersectionPoint(this);
+            if (hitPoint != null) {
+                RayHit hit2 = new RayHit(this, shape, hitPoint);
+                if (hit == null) {
+                    hit = hit2;
+                }
+                else if (getOrigin().distance(hit.getHitPoint()) > getOrigin().distance(hitPoint)) {
+                    hit = hit2;
+                }
+            }
+        }
+        return hit;
     }
 }

@@ -2,7 +2,6 @@ package gameboy.utilities;
 
 import java.util.List;
 
-import gameboy.materials.Material;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;

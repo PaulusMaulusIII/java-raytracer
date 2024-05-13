@@ -3,7 +3,7 @@ package gameboy.geometries;
 import java.util.LinkedList;
 import java.util.List;
 
-import gameboy.materials.Material;
+import gameboy.utilities.Material;
 import gameboy.utilities.Shape;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;

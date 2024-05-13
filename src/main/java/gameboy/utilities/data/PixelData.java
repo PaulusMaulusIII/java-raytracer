@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import gameboy.core.enums.Token;
+import gameboy.core.enums.Tokens;
 import gameboy.lights.Light;
-import gameboy.materials.Material;
+import gameboy.utilities.Material;
 import gameboy.utilities.Shape;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
@@ -18,15 +18,15 @@ public class PixelData {
     private Shape shape;
     private Material material;
     private Color color;
-    private HashMap<Token, String> options;
+    private HashMap<Tokens, String> options;
     private LinkedList<Shape> objectsExcl;
     private List<Light> lights;
 
-    public PixelData(RayHit hit, List<Light> lights, List<Shape> objects, HashMap<Token, String> options) {
+    public PixelData(RayHit hit, List<Light> lights, List<Shape> objects, HashMap<Tokens, String> options) {
         objectsExcl = new LinkedList<>(objects);
-        objectsExcl.remove(hit.getObject());
+        objectsExcl.remove(hit.getShape());
         this.ray = hit.getRay();
-        this.shape = hit.getObject();
+        this.shape = hit.getShape();
         this.material = shape.getMaterial();
         this.color = material.getColor(hit.getHitPoint());
         this.hit = hit;
@@ -39,7 +39,7 @@ public class PixelData {
     }
 
     public Color getColor() {
-        if (options.get(Token.SHADE) != null && options.get(Token.SHADE).equals("false"))
+        if (options.get(Tokens.SHADE) != null && options.get(Tokens.SHADE).equals("false"))
             return color;
 
         return material.shade(hit, lights, objectsExcl);

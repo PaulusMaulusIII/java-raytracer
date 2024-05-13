@@ -2,6 +2,7 @@ package gameboy.materials;
 
 import java.awt.Color;
 
+import gameboy.utilities.Material;
 import gameboy.utilities.math.Vector3;
 
 public class CheckerMaterial extends Material {
@@ -10,9 +11,8 @@ public class CheckerMaterial extends Material {
 	Color color2;
 
 	public CheckerMaterial(Color color, Color color2, double gridsize) {
-		super();
+		super(color);
 		this.gridsize = gridsize;
-		this.color = color;
 		this.color2 = color2;
 	}
 

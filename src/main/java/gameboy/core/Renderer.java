@@ -84,7 +84,7 @@ public class Renderer {
         Vector3 rayDir = new Vector3(u, v, 0).subtract(eyePos).rotate(cam.getPitch(), cam.getYaw()).normalize();
         Ray ray = new Ray(eyePos.add(cam.getPosition()), rayDir);
 
-        RayHit hit = scene.castRay(ray, scene.getChildren());
+        RayHit hit = ray.castRay(scene.getChildren());
         if (hit == null)
             return null;
 

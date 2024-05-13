@@ -3,12 +3,13 @@ package gameboy.materials;
 import java.awt.Color;
 
 import gameboy.geometries.Cube;
+import gameboy.utilities.Material;
 import gameboy.utilities.math.Vector3;
 
 public class CubeMaterial extends Material {
 
 	public CubeMaterial() {
-		super();
+		super(Color.WHITE);
 	}
 
 	@Override
