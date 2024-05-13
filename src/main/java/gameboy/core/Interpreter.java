@@ -89,8 +89,9 @@ public class Interpreter {
 		Vector3 anchor = parseVector(properties.get(Token.POSITION));
 		Axis axis = Axis.valueOf(properties.get(Token.AXIS).toUpperCase());
 		Color color = parseColor(properties.get(Token.COLOR));
+		Color color2 = parseColor(properties.getOrDefault(Token.SEC_COLOR, "{50,50,50}"));
 		double gridsize = Double.parseDouble(properties.getOrDefault(Token.GRIDSIZE, "2"));
-		Material material = parseMaterial(properties.get(Token.MATERIAL), color, gridsize);
+		Material material = parseMaterial(properties.get(Token.MATERIAL), color, color2, gridsize);
 		return new Plane(anchor, material, axis);
 	}
 
@@ -98,8 +99,9 @@ public class Interpreter {
 		Vector3 center = parseVector(properties.get(Token.POSITION));
 		double sideLength = Double.parseDouble(properties.get(Token.SIDELENGTH));
 		Color color = parseColor(properties.get(Token.COLOR));
+		Color color2 = parseColor(properties.getOrDefault(Token.SEC_COLOR, "{50,50,50}"));
 		double gridsize = Double.parseDouble(properties.getOrDefault(Token.GRIDSIZE, "2"));
-		Material material = parseMaterial(properties.get(Token.MATERIAL), color, gridsize);
+		Material material = parseMaterial(properties.get(Token.MATERIAL), color, color2, gridsize);
 		return new Cube(center, material, sideLength);
 	}
 
@@ -107,8 +109,9 @@ public class Interpreter {
 		Vector3 center = parseVector(properties.get(Token.POSITION));
 		double radius = Double.parseDouble(properties.get(Token.RADIUS));
 		Color color = parseColor(properties.get(Token.COLOR));
+		Color color2 = parseColor(properties.getOrDefault(Token.SEC_COLOR, "{50,50,50}"));
 		double gridsize = Double.parseDouble(properties.getOrDefault(Token.GRIDSIZE, "2"));
-		Material material = parseMaterial(properties.get(Token.MATERIAL), color, gridsize);
+		Material material = parseMaterial(properties.get(Token.MATERIAL), color, color2, gridsize);
 		return new Sphere(center, material, radius);
 	}
 
@@ -118,8 +121,9 @@ public class Interpreter {
 		double angle = parseAngle(properties.get(Token.ANGLE));
 		double height = Double.parseDouble(properties.get(Token.HEIGHT));
 		Color color = parseColor(properties.get(Token.COLOR));
+		Color color2 = parseColor(properties.getOrDefault(Token.SEC_COLOR, "{50,50,50}"));
 		double gridsize = Double.parseDouble(properties.getOrDefault(Token.GRIDSIZE, "2"));
-		Material material = parseMaterial(properties.get(Token.MATERIAL), color, gridsize);
+		Material material = parseMaterial(properties.get(Token.MATERIAL), color, color2, gridsize);
 		return new Cone(center, material, axis, angle, height);
 	}
 
@@ -157,7 +161,7 @@ public class Interpreter {
 				: Double.parseDouble(angleString);
 	}
 
-	private Material parseMaterial(String matString, Color color, double gridsize) {
+	private Material parseMaterial(String matString, Color color, Color color2, double gridsize) {
 		Token finalMat = Token.BASIC;
 		for (Token material : Token.MATERIALS) {
 			if (matString.equals(material.getTokenString())) {
@@ -166,7 +170,7 @@ public class Interpreter {
 		}
 		switch (finalMat) {
 		case CHECKER:
-			return new CheckerMaterial(color, gridsize);
+			return new CheckerMaterial(color, color2, gridsize);
 		case SPHEREMAT:
 			return new SphereMaterial();
 		case CUBEMAT:

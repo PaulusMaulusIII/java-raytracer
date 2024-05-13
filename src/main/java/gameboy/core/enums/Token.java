@@ -19,6 +19,7 @@ public enum Token {
 	ANGLE("angle"),
 	HEIGHT("height"),
 	GRIDSIZE("gridsize"),
+	SEC_COLOR("color2"),
 
 	//Options
 	SHADE("shade"),
@@ -59,7 +60,7 @@ public enum Token {
 
 	public static final List<Token> PROPERTIES = new LinkedList<>(
 		List.of(
-			POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW, SHADE, SIDE, ANGLE, HEIGHT, GRIDSIZE
+			POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW, SHADE, SIDE, ANGLE, HEIGHT, GRIDSIZE, SEC_COLOR
 		)
 	);
 

@@ -38,6 +38,7 @@ public class App extends JFrame {
                 "\r\n" + //
                 "Light {\r\n" + //
                 "\tposition : {0, 0, -5}\r\n" + //
+                "\tcolor : {255, 255, 255}\r\n" + //
                 "}", this);
         add(viewport);
         setVisible(true);

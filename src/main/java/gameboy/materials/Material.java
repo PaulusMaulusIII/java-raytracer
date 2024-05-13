@@ -50,7 +50,7 @@ public abstract class Material {
                 colors.add(brighten(shadedColor, ambient));
             }
             else {
-                colors.add(brighten(new Color(1, 1, 1), ambient * 2));
+                colors.add(brighten(new Color(1, 1, 1), ambient));
             }
         }
 
@@ -78,11 +78,11 @@ public abstract class Material {
     }
 
     private Color multiplyColors(Color color1, Color color2) {
-        int red = ((color1.getRed() / 255) * (color2.getRed() / 255) * 255) / 2;
-        int green = ((color1.getGreen() / 255) * (color2.getGreen() / 255) * 255) / 2;
-        int blue = ((color1.getBlue() / 255) * (color2.getBlue() / 255) * 255) / 2;
+        float red = ((color1.getRed() / 255f) * (color2.getRed() / 255f) * 255) / 2;
+        float green = ((color1.getGreen() / 255f) * (color2.getGreen() / 255f) * 255) / 2;
+        float blue = ((color1.getBlue() / 255f) * (color2.getBlue() / 255f) * 255) / 2;
 
-        return new Color(red, green, blue);
+        return new Color((int) red, (int) green, (int) blue);
     }
 
     private Color brighten(Color color, double factor) {
