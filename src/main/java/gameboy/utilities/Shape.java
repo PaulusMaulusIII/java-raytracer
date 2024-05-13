@@ -6,20 +6,20 @@ import gameboy.materials.Material;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.Vector3;
 
-public abstract class Shape3D {
+public abstract class Shape {
 
     Vector3 anchor;
     Material material;
 
-    public Shape3D(Vector3 anchor) {
+    public Shape(Vector3 anchor) {
         setAnchor(anchor);
     }
 
-    public Shape3D(Material material) {
+    public Shape(Material material) {
         setMaterial(material);
     }
 
-    public Shape3D(Vector3 anchor, Material material) {
+    public Shape(Vector3 anchor, Material material) {
         setAnchor(anchor);
         setMaterial(material);
     }

@@ -1,12 +1,16 @@
 package gameboy.core;
 
+import java.awt.Desktop;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
-import gameboy.utilities.Camera3D;
+import javax.imageio.ImageIO;
+
+import gameboy.utilities.Camera;
 import gameboy.utilities.Scene;
 import gameboy.utilities.data.PixelData;
 import gameboy.utilities.math.Ray;
@@ -26,7 +30,6 @@ public class Renderer {
     }
 
     public BufferedImage render(double resolution) {
-        long time = System.currentTimeMillis();
         BufferedImage temp = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics gfx = temp.getGraphics();
         int blockSize = (int) (1 / resolution);
@@ -43,21 +46,20 @@ public class Renderer {
             }
         }
 
-        long deltaTime = System.currentTimeMillis() - time;
-
-        System.out.println("Rendered Scene:");
-        System.out.println("At: " + width + "px x " + height + "px and " + resolution * 100 + "% Resolution");
-        System.out.println("Camera at: " + scene.getCurrentCamera().getPosition().toString());
-        System.out.println("With " + Math.toDegrees(scene.getCurrentCamera().getPitch()) + "° of Pitch");
-        System.out.println("And " + Math.toDegrees(scene.getCurrentCamera().getYaw()) + "° of Yaw");
-        System.out.println("With a FOV of: " + Math.toDegrees(scene.getCurrentCamera().getFOV()) + "°");
-        System.out.println("Took " + deltaTime + "ms");
-
         return temp;
     }
 
-    public void renderToImage(Scene scene3d, int i, int j) throws IOException {
+    public void renderToImage(Scene scene, int i, int j) throws IOException {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        System.out.println("Rendering to image...");
 
+        image = new Renderer(scene, i, j).render(1);
+
+        File imgFile = new File("output.png");
+        ImageIO.write(image, "PNG", new FileOutputStream(imgFile));
+        System.out.println("Image saved.");
+
+        Desktop.getDesktop().open(imgFile);
     }
 
     public double[] getNormalizedScreenCoordinates(int x, int y, double width, double height) {
@@ -77,7 +79,7 @@ public class Renderer {
     }
 
     public PixelData getPixelData(double u, double v) {
-        Camera3D cam = scene.getCurrentCamera();
+        Camera cam = scene.getCurrentCamera();
         Vector3 eyePos = new Vector3(0, 0, (-1 / Math.tan(cam.getFOV() / 2)));
         Vector3 rayDir = new Vector3(u, v, 0).subtract(eyePos).rotate(cam.getPitch(), cam.getYaw()).normalize();
         Ray ray = new Ray(eyePos.add(cam.getPosition()), rayDir);

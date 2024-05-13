@@ -12,17 +12,17 @@ import gameboy.geometries.Cube;
 import gameboy.geometries.Plane;
 import gameboy.geometries.Sphere;
 import gameboy.lights.Light;
-import gameboy.utilities.Camera3D;
+import gameboy.utilities.Camera;
 import gameboy.utilities.Scene;
-import gameboy.utilities.Shape3D;
+import gameboy.utilities.Shape;
 import gameboy.utilities.math.Vector3;
 
 public class Interpreter {
 
 	public Scene interpret(String code) {
-		List<Camera3D> cameras = new LinkedList<>();
+		List<Camera> cameras = new LinkedList<>();
 		List<Light> lights = new LinkedList<>();
-		List<Shape3D> shapes = new LinkedList<>();
+		List<Shape> shapes = new LinkedList<>();
 		String[] lines = code.split("\n");
 		HashMap<Token, String> options = new HashMap<>();
 
@@ -80,26 +80,26 @@ public class Interpreter {
 		return tokenVals;
 	}
 
-	private Shape3D createPlane(HashMap<Token, String> properties) {
+	private Shape createPlane(HashMap<Token, String> properties) {
 		Vector3 anchor = parseVector(properties.get(Token.POSITION));
 		Axis axis = Axis.valueOf(properties.get(Token.AXIS).toUpperCase());
 		Color color = parseColor(properties.get(Token.COLOR));
 		return new Plane(anchor, axis, color);
 	}
 
-	private Shape3D createCube(HashMap<Token, String> properties) {
+	private Shape createCube(HashMap<Token, String> properties) {
 		Vector3 center = parseVector(properties.get(Token.POSITION));
 		double sideLength = Double.parseDouble(properties.get(Token.SIDELENGTH));
 		return new Cube(center, sideLength);
 	}
 
-	private Shape3D createSphere(HashMap<Token, String> properties) {
+	private Shape createSphere(HashMap<Token, String> properties) {
 		Vector3 center = parseVector(properties.get(Token.POSITION));
 		double radius = Double.parseDouble(properties.get(Token.RADIUS));
 		return new Sphere(center, radius);
 	}
 
-	private Shape3D createCone(HashMap<Token, String> properties) {
+	private Shape createCone(HashMap<Token, String> properties) {
 		Vector3 center = parseVector(properties.get(Token.POSITION));
 		Vector3 axis = parseVector(properties.get(Token.SIDE));
 		double angle = parseAngle(properties.get(Token.ANGLE));
@@ -114,12 +114,12 @@ public class Interpreter {
 		return new Light(position, color);
 	}
 
-	private Camera3D createCamera(HashMap<Token, String> properties) {
+	private Camera createCamera(HashMap<Token, String> properties) {
 		Vector3 position = parseVector(properties.get(Token.POSITION));
 		double fov = parseAngle(properties.getOrDefault(Token.FOV, "40°"));
 		double pitch = parseAngle(properties.getOrDefault(Token.PITCH, "0"));
 		double yaw = parseAngle(properties.getOrDefault(Token.YAW, "0"));
-		return new Camera3D(position, fov, pitch, yaw);
+		return new Camera(position, fov, pitch, yaw);
 	}
 
 	private Vector3 parseVector(String vectorString) {

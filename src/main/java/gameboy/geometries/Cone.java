@@ -5,12 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import gameboy.materials.Material;
-import gameboy.utilities.Shape3D;
+import gameboy.utilities.Shape;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 
-public class Cone extends Shape3D {
+public class Cone extends Shape {
 
 	Vector3 axis;
 	double angle;

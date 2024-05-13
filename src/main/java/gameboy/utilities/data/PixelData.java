@@ -8,21 +8,21 @@ import java.util.List;
 import gameboy.core.enums.Token;
 import gameboy.lights.Light;
 import gameboy.materials.Material;
-import gameboy.utilities.Shape3D;
+import gameboy.utilities.Shape;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
 
 public class PixelData {
     private RayHit hit;
     private Ray ray;
-    private Shape3D shape;
+    private Shape shape;
     private Material material;
     private Color color;
     private HashMap<Token, String> options;
-    private LinkedList<Shape3D> objectsExcl;
+    private LinkedList<Shape> objectsExcl;
     private List<Light> lights;
 
-    public PixelData(RayHit hit, List<Light> lights, List<Shape3D> objects, HashMap<Token, String> options) {
+    public PixelData(RayHit hit, List<Light> lights, List<Shape> objects, HashMap<Token, String> options) {
         objectsExcl = new LinkedList<>(objects);
         objectsExcl.remove(hit.getObject());
         this.ray = hit.getRay();
@@ -53,7 +53,7 @@ public class PixelData {
         return ray;
     }
 
-    public Shape3D getShape() {
+    public Shape getShape() {
         return shape;
     }
 }

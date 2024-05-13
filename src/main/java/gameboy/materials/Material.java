@@ -4,9 +4,8 @@ import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
-import gameboy.geometries.Cone;
 import gameboy.lights.Light;
-import gameboy.utilities.Shape3D;
+import gameboy.utilities.Shape;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
@@ -31,7 +30,7 @@ public abstract class Material {
         return this.color;
     }
 
-    public Color shade(RayHit rayHit, List<Light> lights, List<Shape3D> objects) {
+    public Color shade(RayHit rayHit, List<Light> lights, List<Shape> objects) {
         // Vector3 normal = rayHit.getRay().getDirection().invert();
         Vector3 normal = getNormal(rayHit); // Get object surface normal vector
         Vector3 hitPoint = rayHit.getHitPoint(); // Get hitpoint
@@ -66,8 +65,8 @@ public abstract class Material {
         return new Color(red, green, blue);
     }
 
-    public boolean inShadow(Ray ray, Light light, List<Shape3D> objects) {
-        for (Shape3D shape3d : objects) {
+    public boolean inShadow(Ray ray, Light light, List<Shape> objects) {
+        for (Shape shape3d : objects) {
             Vector3 intersectionPoint = shape3d.getIntersectionPoint(ray);
             if (intersectionPoint != null) {
                 double distanceToIntersection = intersectionPoint.subtract(ray.getOrigin()).magnitude();

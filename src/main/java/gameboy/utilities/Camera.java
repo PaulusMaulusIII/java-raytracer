@@ -2,18 +2,18 @@ package gameboy.utilities;
 
 import gameboy.utilities.math.Vector3;
 
-public class Camera3D {
+public class Camera {
     private Vector3 position;
     private double pitch;
     private double yaw = 0;
     private double fov = 0;
 
-    public Camera3D(Vector3 position, double fov) {
+    public Camera(Vector3 position, double fov) {
         this.position = position;
         this.fov = (double) fov;
     }
 
-    public Camera3D(Vector3 position, double fov, double pitch, double yaw) {
+    public Camera(Vector3 position, double fov, double pitch, double yaw) {
         this(position, fov);
         setPitch(pitch);
         setYaw(yaw);

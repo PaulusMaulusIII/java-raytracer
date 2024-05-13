@@ -1,13 +1,13 @@
 package gameboy.utilities.math;
 
-import gameboy.utilities.Shape3D;
+import gameboy.utilities.Shape;
 
 public class RayHit {
     private Ray ray;
-    private Shape3D shape;
+    private Shape shape;
     private Vector3 hitPoint;
 
-    public RayHit(Ray ray, Shape3D shape, Vector3 hitPoint) {
+    public RayHit(Ray ray, Shape shape, Vector3 hitPoint) {
         this.ray = ray;
         this.shape = shape;
         this.hitPoint = hitPoint;
@@ -17,7 +17,7 @@ public class RayHit {
         return ray;
     }
 
-    public Shape3D getObject() {
+    public Shape getObject() {
         return shape;
     }
 
