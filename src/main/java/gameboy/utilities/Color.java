@@ -1,7 +1,6 @@
 package gameboy.utilities;
 
 public class Color {
-	private static final double FACTOR = 0.1;
 
 	int red;
 	int green;
