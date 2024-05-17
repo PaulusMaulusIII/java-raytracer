@@ -1,6 +1,6 @@
 package gameboy.materials;
 
-import java.awt.Color;
+import gameboy.utilities.Color;
 
 import gameboy.geometries.Cube;
 import gameboy.utilities.Material;
@@ -14,7 +14,7 @@ public class CubeMaterial extends Material {
 
 	@Override
 	public Color getColor(Vector3 point) {
-		int side = ((Cube) shape).determineCubeSide(point); // RISKYYYY TODO
+		int side = ((Cube) shape).determineCubeSide(point); // TODO RISKYYYY
 
 		Color[] colors = {
 				// x+, x-, y+, y-, z+, z-

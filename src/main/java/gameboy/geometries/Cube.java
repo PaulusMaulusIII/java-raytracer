@@ -38,7 +38,7 @@ public class Cube extends Shape {
 
     @Override
     public Vector3 getIntersectionPoint(Ray ray) {
-        double tMin = Double.NEGATIVE_INFINITY;
+        double tMin = 0;
         double tMax = Double.POSITIVE_INFINITY;
         double halfSideLength = sideLength / 2.0;
 

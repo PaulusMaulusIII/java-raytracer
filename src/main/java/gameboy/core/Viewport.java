@@ -59,7 +59,7 @@ public class Viewport extends JPanel {
 				} else if (e.getKeyCode() == KeyEvent.VK_F12 || e.getKeyCode() == KeyEvent.VK_PRINTSCREEN
 						|| e.getKeyCode() == KeyEvent.VK_F2) {
 					try {
-						renderer.renderToImage(scene, 7680, 4320);
+						renderer.renderToImage(scene, 3840, 2160);
 					} catch (IOException ex) {
 						ex.printStackTrace();
 					}

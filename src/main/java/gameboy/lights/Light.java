@@ -1,6 +1,6 @@
 package gameboy.lights;
 
-import java.awt.Color;
+import gameboy.utilities.Color;
 
 import gameboy.utilities.math.Vector3;
 

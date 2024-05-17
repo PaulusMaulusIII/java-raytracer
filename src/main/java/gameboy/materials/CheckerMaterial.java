@@ -1,6 +1,6 @@
 package gameboy.materials;
 
-import java.awt.Color;
+import gameboy.utilities.Color;
 
 import gameboy.utilities.Material;
 import gameboy.utilities.math.Vector3;
@@ -12,15 +12,15 @@ public class CheckerMaterial extends Material {
 
 	public CheckerMaterial(Color color, Color color2, double gridsize) {
 		super(color);
-		this.gridsize = gridsize;
 		this.color2 = color2;
+		this.gridsize = gridsize;
 	}
 
 	@Override
 	public Color getColor(Vector3 point) {
-		int x = (int) Math.floor(point.x / gridsize);
-		int y = (int) Math.floor(point.y / gridsize);
-		int z = (int) Math.floor(point.z / gridsize);
+		double x = (int) Math.floor(point.x * (1 / gridsize) - 1e-6);
+		double y = (int) Math.floor(point.y * (1 / gridsize) - 1e-6);
+		double z = (int) Math.floor(point.z * (1 / gridsize) - 1e-6);
 
 		boolean isEven = (x + y + z) % 2 == 0;
 

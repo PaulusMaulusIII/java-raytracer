@@ -1,6 +1,5 @@
 package gameboy.utilities;
 
-import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public abstract class Material {
         Vector3 normal = rayHit.getShape().getNormal(rayHit); // Get object surface normal vector
         Vector3 hitPoint = rayHit.getHitPoint(); // Get hitpoint
         Color baseColor = getColor(hitPoint); // Get the specified base color at point on shape
-        Color shadowColor = interpolate(Color.BLACK, baseColor, AMBIENT);
+        Color shadowColor = Color.BLACK.interpolate(baseColor, AMBIENT);
 
         LinkedList<Color> colors = new LinkedList<>();
         for (Light light : lights) {
@@ -47,16 +46,15 @@ public abstract class Material {
             if (!inShadow(shadowRay, light, objects)) {
                 if (reflectiveness > 0) {
                     objects.add(shape);
-                    colors.add(calculateReflection(new Ray(hitPoint, reflectionDirection), light, objects, 1000));
+                    baseColor = calculateReflection(new Ray(hitPoint, reflectionDirection), light, objects, 10);
                 }
-                else
-                    colors.add(calculateShadedColor(light, normal, baseColor, hitPoint, shadowColor));
+                colors.add(calculateShadedColor(light, normal, baseColor, hitPoint, shadowColor));
             }
             else {
                 if (reflectiveness > 0) {
                     objects.add(shape);
-                    colors.add(interpolate(shadowColor,
-                            calculateReflection(new Ray(hitPoint, reflectionDirection), light, objects, 1000),
+                    colors.add(shadowColor.interpolate(
+                            calculateReflection(new Ray(hitPoint, reflectionDirection), light, objects, 10),
                             1 - reflectiveness));
                 }
                 else
@@ -66,7 +64,7 @@ public abstract class Material {
 
         Color finalColor = Color.BLACK;
         for (Color color : colors) {
-            finalColor = add(finalColor, color);
+            finalColor = finalColor.add(color);
         }
 
         return finalColor;
@@ -79,28 +77,42 @@ public abstract class Material {
 
         RayHit hit = ray.castRay(objects);
 
-        if (hit != null) {
+        if (hit != null) { // TODO WAAAAAAY TO HEAVY
+            Vector3 hitPoint = hit.getHitPoint();
+            Material hitMaterial = hit.getShape().getMaterial();
+            Color colorAtHit = hitMaterial.getColor(hitPoint);
+            Color shadowColorAtHit = Color.BLACK.interpolate(colorAtHit, AMBIENT);
             Vector3 incidentDirection = ray.getDirection().normalize();
             Vector3 normal = hit.getShape().getNormal(hit);
-            if (hit.getShape().getMaterial().reflectiveness > 0) {
-                Vector3 reflectedDirection = incidentDirection.subtract(normal.scale(2 * incidentDirection.dot(normal)))
-                        .normalize();
-                Ray reflectedRay = new Ray(hit.getHitPoint(), reflectedDirection);
-                Color reflectedColor = calculateReflection(reflectedRay, light, objects, depth - 1);
-                return interpolate(hit.getShape().getMaterial().getColor(hit.getHitPoint()), reflectedColor,
-                        hit.getShape().getMaterial().reflectiveness);
+            Ray shadowRay = new Ray(hitPoint.add(new Vector3(1e-6, 1e-6, 1e-6)), light.getAnchor().subtract(hitPoint));
+            Vector3 reflectedDirection = incidentDirection.subtract(normal.scale(2 * incidentDirection.dot(normal)))
+                    .normalize();
+            Ray reflectedRay = new Ray(hitPoint, reflectedDirection);
+
+            if (!inShadow(shadowRay, light, objects)) {
+                if (hitMaterial.reflectiveness > 0) {
+                    Color reflectedColor = calculateReflection(reflectedRay, light, objects, depth - 1);
+                    return colorAtHit.interpolate(reflectedColor, hitMaterial.reflectiveness);
+                }
+                else {
+                    Color shadedColor = calculateShadedColor(light, normal, colorAtHit, hitPoint, shadowColorAtHit);
+                    return getColor(ray.getOrigin()).interpolate(shadedColor, reflectiveness);
+                }
             }
             else {
-                Vector3 hitPoint = hit.getHitPoint();
-                Shape shapeHit = hit.getShape();
-                Color baseColor = shapeHit.getMaterial().getColor(hitPoint);
-                Color shadowColor = interpolate(Color.BLACK, baseColor, AMBIENT);
-                Color shadedColor = calculateShadedColor(light, normal, baseColor, hitPoint, shadowColor);
-                return interpolate(getColor(ray.getOrigin()), shadedColor, reflectiveness);
+                if (hitMaterial.reflectiveness > 0) {
+                    objects.add(shape);
+                    return shadowColorAtHit.interpolate(calculateReflection(reflectedRay, light, objects, depth - 1),
+                            1 - reflectiveness);
+                }
+                else
+                    return (Color.BLACK.interpolate(colorAtHit, AMBIENT));
+
             }
+
         }
         else {
-            return interpolate(getColor(ray.getOrigin()), new Color(25, 25, 25), reflectiveness);
+            return getColor(ray.getOrigin()).interpolate(new Color(25, 25, 25), reflectiveness);
         }
     }
 
@@ -109,10 +121,10 @@ public abstract class Material {
         Vector3 lightPosition = light.getAnchor();
         double brightnessFactor = normal.dot(lightPosition.subtract(hitPoint).normalize())
                 / hitPoint.distance(lightPosition) * hitPoint.distance(lightPosition);
-        Color shadedColor = interpolate(Color.BLACK, baseColor, AMBIENT);
-        shadedColor = multiply(baseColor, light.getColor());
-        shadedColor = brighten(shadedColor, brightnessFactor);
-        if (shadedColor.getRGB() <= shadowColor.getRGB())
+        Color shadedColor = Color.BLACK.interpolate(baseColor, AMBIENT);
+        shadedColor = baseColor.multiply(light.getColor());
+        shadedColor = shadedColor.brighten(brightnessFactor);
+        if (shadedColor.toAWT().getRGB() <= shadowColor.toAWT().getRGB())
             return (shadowColor);
         else
             return (shadedColor);
@@ -131,50 +143,5 @@ public abstract class Material {
         }
         return false;
 
-    }
-
-    private Color multiply(Color color1, Color color2) {
-        float red = ((color1.getRed() / 255f) * (color2.getRed() / 255f) * 255) / 2;
-        float green = ((color1.getGreen() / 255f) * (color2.getGreen() / 255f) * 255) / 2;
-        float blue = ((color1.getBlue() / 255f) * (color2.getBlue() / 255f) * 255) / 2;
-
-        return new Color((int) red, (int) green, (int) blue);
-    }
-
-    private Color brighten(Color color, double factor) {
-        int red = (int) (color.getRed() * (factor + 1));
-        int green = (int) (color.getGreen() * (factor + 1));
-        int blue = (int) (color.getBlue() * (factor + 1));
-
-        red = (red > 255) ? 255 : red;
-        green = (green > 255) ? 255 : green;
-        blue = (blue > 255) ? 255 : blue;
-
-        return new Color(red, green, blue);
-    }
-
-    private Color interpolate(Color color1, Color color2, double ratio) {
-        int red = (int) (color1.getRed() * (1 - ratio) + color2.getRed() * ratio);
-        int green = (int) (color1.getGreen() * (1 - ratio) + color2.getGreen() * ratio);
-        int blue = (int) (color1.getBlue() * (1 - ratio) + color2.getBlue() * ratio);
-
-        red = (red > 255) ? 255 : red;
-        green = (green > 255) ? 255 : green;
-        blue = (blue > 255) ? 255 : blue;
-
-        return new Color(red, green, blue);
-    }
-
-    private Color add(Color color1, Color color2) {
-
-        int red = color1.getRed() + color2.getRed();
-        int green = color1.getGreen() + color2.getGreen();
-        int blue = color1.getBlue() + color2.getBlue();
-
-        red = (red > 255) ? 255 : red;
-        green = (green > 255) ? 255 : green;
-        blue = (blue > 255) ? 255 : blue;
-
-        return new Color(red, green, blue);
     }
 }

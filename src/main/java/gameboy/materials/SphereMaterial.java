@@ -1,6 +1,6 @@
 package gameboy.materials;
 
-import java.awt.Color;
+import gameboy.utilities.Color;
 
 import gameboy.utilities.Material;
 import gameboy.utilities.math.Vector3;

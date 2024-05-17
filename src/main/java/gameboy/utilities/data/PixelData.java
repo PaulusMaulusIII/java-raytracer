@@ -1,6 +1,6 @@
 package gameboy.utilities.data;
 
-import java.awt.Color;
+import gameboy.utilities.Color;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;

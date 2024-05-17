@@ -1,6 +1,6 @@
 package gameboy.core;
 
-import java.awt.Color;
+import gameboy.utilities.Color;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -90,8 +90,8 @@ public class Interpreter {
 		Vector3 anchor = parseVector(properties.get(Tokens.POSITION));
 		Axis axis = Axis.valueOf(properties.get(Tokens.AXIS).toUpperCase());
 		Color color = parseColor(properties.getOrDefault((Tokens.COLOR), "{255,255,255}"));
-		Color color2 = parseColor(properties.getOrDefault(Tokens.SEC_COLOR, "{" + color.darker().getRed() + ","
-				+ color.darker().getGreen() + "," + color.darker().getBlue() + "}"));
+		Color color2 = parseColor(properties.getOrDefault(Tokens.SEC_COLOR, "{" + color.toAWT().darker().getRed() + ","
+				+ color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
 		double gridsize = Double.parseDouble(properties.getOrDefault(Tokens.GRIDSIZE, "2"));
 		double reflectiveness = Double.parseDouble(properties.getOrDefault(Tokens.REFLECTIVENESS, "0"));
 		Material material = parseMaterial(properties.get(Tokens.MATERIAL), color, color2, gridsize, reflectiveness);
@@ -102,8 +102,8 @@ public class Interpreter {
 		Vector3 center = parseVector(properties.get(Tokens.POSITION));
 		double sideLength = Double.parseDouble(properties.get(Tokens.SIDELENGTH));
 		Color color = parseColor(properties.getOrDefault((Tokens.COLOR), "{255,255,255}"));
-		Color color2 = parseColor(properties.getOrDefault(Tokens.SEC_COLOR, "{" + color.darker().getRed() + ","
-				+ color.darker().getGreen() + "," + color.darker().getBlue() + "}"));
+		Color color2 = parseColor(properties.getOrDefault(Tokens.SEC_COLOR, "{" + color.toAWT().darker().getRed() + ","
+				+ color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
 		double gridsize = Double.parseDouble(properties.getOrDefault(Tokens.GRIDSIZE, "2"));
 		double reflectiveness = Double.parseDouble(properties.getOrDefault(Tokens.REFLECTIVENESS, "0"));
 		Material material = parseMaterial(properties.get(Tokens.MATERIAL), color, color2, gridsize, reflectiveness);
@@ -114,8 +114,8 @@ public class Interpreter {
 		Vector3 center = parseVector(properties.get(Tokens.POSITION));
 		double radius = Double.parseDouble(properties.get(Tokens.RADIUS));
 		Color color = parseColor(properties.getOrDefault((Tokens.COLOR), "{255,255,255}"));
-		Color color2 = parseColor(properties.getOrDefault(Tokens.SEC_COLOR, "{" + color.darker().getRed() + ","
-				+ color.darker().getGreen() + "," + color.darker().getBlue() + "}"));
+		Color color2 = parseColor(properties.getOrDefault(Tokens.SEC_COLOR, "{" + color.toAWT().darker().getRed() + ","
+				+ color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
 		double gridsize = Double.parseDouble(properties.getOrDefault(Tokens.GRIDSIZE, "2"));
 		double reflectiveness = Double.parseDouble(properties.getOrDefault(Tokens.REFLECTIVENESS, "0"));
 		Material material = parseMaterial(properties.get(Tokens.MATERIAL), color, color2, gridsize, reflectiveness);
@@ -128,8 +128,8 @@ public class Interpreter {
 		double angle = parseAngle(properties.get(Tokens.ANGLE));
 		double height = Double.parseDouble(properties.get(Tokens.HEIGHT));
 		Color color = parseColor(properties.getOrDefault((Tokens.COLOR), "{255,255,255}"));
-		Color color2 = parseColor(properties.getOrDefault(Tokens.SEC_COLOR, "{" + color.darker().getRed() + ","
-				+ color.darker().getGreen() + "," + color.darker().getBlue() + "}"));
+		Color color2 = parseColor(properties.getOrDefault(Tokens.SEC_COLOR, "{" + color.toAWT().darker().getRed() + ","
+				+ color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
 		double gridsize = Double.parseDouble(properties.getOrDefault(Tokens.GRIDSIZE, "2"));
 		double reflectiveness = Double.parseDouble(properties.getOrDefault(Tokens.REFLECTIVENESS, "0"));
 		Material material = parseMaterial(properties.get(Tokens.MATERIAL), color, color2, gridsize, reflectiveness);
