@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import gameboy.core.enums.Tokens;
+import gameboy.core.enums.Properties;
 import gameboy.lights.Light;
 
 public class Scene {
@@ -12,7 +12,7 @@ public class Scene {
     private List<Camera> cameras = new LinkedList<>();
     private List<Shape> children = new LinkedList<>();
     private List<Light> lights = new LinkedList<>();
-    private HashMap<Tokens, String> options;
+    private HashMap<Properties, String> options;
 
     public Scene(Camera camera, List<Shape> children) {
         cameras.add(camera);
@@ -25,7 +25,7 @@ public class Scene {
         this.lights = lights;
     }
 
-    public Scene(List<Camera> cameras, List<Shape> children, List<Light> lights, HashMap<Tokens, String> options) {
+    public Scene(List<Camera> cameras, List<Shape> children, List<Light> lights, HashMap<Properties, String> options) {
         this.cameras = cameras;
         this.children = children;
         this.lights = lights;
@@ -52,7 +52,7 @@ public class Scene {
         return lights;
     }
 
-    public HashMap<Tokens, String> getOptions() {
+    public HashMap<Properties, String> getOptions() {
         return options;
     }
 }

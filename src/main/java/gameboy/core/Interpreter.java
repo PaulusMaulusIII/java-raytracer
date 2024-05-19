@@ -6,7 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import gameboy.core.enums.Axis;
-import gameboy.core.enums.Tokens;
+import gameboy.core.enums.Initializers;
+import gameboy.core.enums.Materials;
+import gameboy.core.enums.Properties;
 import gameboy.geometries.Cone;
 import gameboy.geometries.Cube;
 import gameboy.geometries.Plane;
@@ -30,14 +32,14 @@ public class Interpreter {
 		List<Light> lights = new LinkedList<>();
 		List<Shape> shapes = new LinkedList<>();
 		String[] lines = code.split("\n");
-		HashMap<Tokens, String> options = new HashMap<>();
+		HashMap<Properties, String> options = new HashMap<>();
 
 		for (int i = 0; i < lines.length; i++) {
 			String line = lines[i].trim();
 
-			for (Tokens initializer : Tokens.INITIALIZERS) {
-				if (line.startsWith(initializer.getTokenString())) {
-					HashMap<Tokens, String> properties = extractTokenValues(lines, i);
+			for (Initializers initializer : Initializers.INITIALIZERS) {
+				if (line.startsWith(initializer.getPropertiestring())) {
+					HashMap<Properties, String> properties = extractTokenValues(lines, i);
 					switch (initializer) {
 					case CAMERA:
 						cameras.add(createCamera(properties));
@@ -69,84 +71,84 @@ public class Interpreter {
 		return new Scene(cameras, shapes, lights, options);
 	}
 
-	private HashMap<Tokens, String> extractTokenValues(String[] lines, int index) {
-		HashMap<Tokens, String> tokenVals = new HashMap<>();
+	private HashMap<Properties, String> extractTokenValues(String[] lines, int index) {
+		HashMap<Properties, String> properties = new HashMap<>();
 		for (int i = index + 1; i < lines.length; i++) {
 			String line = lines[i].trim();
 			if (line.equals("}"))
 				break;
 			String[] valString = line.split(":");
 			if (valString.length == 2) {
-				for (Tokens token : Tokens.PROPERTIES) {
+				for (Properties token : Properties.PROPERTIES) {
 					if (valString[0].trim().equals(token.getTokenString()))
-						tokenVals.put(token, valString[1].trim());
+						properties.put(token, valString[1].trim());
 				}
 			}
 		}
-		return tokenVals;
+		return properties;
 	}
 
-	private Shape createPlane(HashMap<Tokens, String> properties) {
-		Vector3 anchor = parseVector(properties.get(Tokens.POSITION));
-		Axis axis = Axis.valueOf(properties.get(Tokens.AXIS).toUpperCase());
-		Color color = parseColor(properties.getOrDefault((Tokens.COLOR), "{255,255,255}"));
-		Color color2 = parseColor(properties.getOrDefault(Tokens.SEC_COLOR, "{" + color.toAWT().darker().getRed() + ","
-				+ color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
-		double gridsize = Double.parseDouble(properties.getOrDefault(Tokens.GRIDSIZE, "2"));
-		double reflectiveness = Double.parseDouble(properties.getOrDefault(Tokens.REFLECTIVENESS, "0"));
-		Material material = parseMaterial(properties.get(Tokens.MATERIAL), color, color2, gridsize, reflectiveness);
+	private Shape createPlane(HashMap<Properties, String> properties) {
+		Vector3 anchor = parseVector(properties.get(Properties.POSITION));
+		Axis axis = Axis.valueOf(properties.get(Properties.AXIS).toUpperCase());
+		Color color = parseColor(properties.getOrDefault((Properties.COLOR), "{255,255,255}"));
+		Color color2 = parseColor(properties.getOrDefault(Properties.SEC_COLOR, "{" + color.toAWT().darker().getRed()
+				+ "," + color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
+		double gridsize = Double.parseDouble(properties.getOrDefault(Properties.GRIDSIZE, "2"));
+		double reflectiveness = Double.parseDouble(properties.getOrDefault(Properties.REFLECTIVENESS, "0"));
+		Material material = parseMaterial(properties.get(Properties.MATERIAL), color, color2, gridsize, reflectiveness);
 		return new Plane(anchor, material, axis);
 	}
 
-	private Shape createCube(HashMap<Tokens, String> properties) {
-		Vector3 center = parseVector(properties.get(Tokens.POSITION));
-		double sideLength = Double.parseDouble(properties.get(Tokens.SIDELENGTH));
-		Color color = parseColor(properties.getOrDefault((Tokens.COLOR), "{255,255,255}"));
-		Color color2 = parseColor(properties.getOrDefault(Tokens.SEC_COLOR, "{" + color.toAWT().darker().getRed() + ","
-				+ color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
-		double gridsize = Double.parseDouble(properties.getOrDefault(Tokens.GRIDSIZE, "2"));
-		double reflectiveness = Double.parseDouble(properties.getOrDefault(Tokens.REFLECTIVENESS, "0"));
-		Material material = parseMaterial(properties.get(Tokens.MATERIAL), color, color2, gridsize, reflectiveness);
+	private Shape createCube(HashMap<Properties, String> properties) {
+		Vector3 center = parseVector(properties.get(Properties.POSITION));
+		double sideLength = Double.parseDouble(properties.get(Properties.SIDELENGTH));
+		Color color = parseColor(properties.getOrDefault((Properties.COLOR), "{255,255,255}"));
+		Color color2 = parseColor(properties.getOrDefault(Properties.SEC_COLOR, "{" + color.toAWT().darker().getRed()
+				+ "," + color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
+		double gridsize = Double.parseDouble(properties.getOrDefault(Properties.GRIDSIZE, "2"));
+		double reflectiveness = Double.parseDouble(properties.getOrDefault(Properties.REFLECTIVENESS, "0"));
+		Material material = parseMaterial(properties.get(Properties.MATERIAL), color, color2, gridsize, reflectiveness);
 		return new Cube(center, material, sideLength);
 	}
 
-	private Shape createSphere(HashMap<Tokens, String> properties) {
-		Vector3 center = parseVector(properties.get(Tokens.POSITION));
-		double radius = Double.parseDouble(properties.get(Tokens.RADIUS));
-		Color color = parseColor(properties.getOrDefault((Tokens.COLOR), "{255,255,255}"));
-		Color color2 = parseColor(properties.getOrDefault(Tokens.SEC_COLOR, "{" + color.toAWT().darker().getRed() + ","
-				+ color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
-		double gridsize = Double.parseDouble(properties.getOrDefault(Tokens.GRIDSIZE, "2"));
-		double reflectiveness = Double.parseDouble(properties.getOrDefault(Tokens.REFLECTIVENESS, "0"));
-		Material material = parseMaterial(properties.get(Tokens.MATERIAL), color, color2, gridsize, reflectiveness);
+	private Shape createSphere(HashMap<Properties, String> properties) {
+		Vector3 center = parseVector(properties.get(Properties.POSITION));
+		double radius = Double.parseDouble(properties.get(Properties.RADIUS));
+		Color color = parseColor(properties.getOrDefault((Properties.COLOR), "{255,255,255}"));
+		Color color2 = parseColor(properties.getOrDefault(Properties.SEC_COLOR, "{" + color.toAWT().darker().getRed()
+				+ "," + color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
+		double gridsize = Double.parseDouble(properties.getOrDefault(Properties.GRIDSIZE, "2"));
+		double reflectiveness = Double.parseDouble(properties.getOrDefault(Properties.REFLECTIVENESS, "0"));
+		Material material = parseMaterial(properties.get(Properties.MATERIAL), color, color2, gridsize, reflectiveness);
 		return new Sphere(center, material, radius);
 	}
 
-	private Shape createCone(HashMap<Tokens, String> properties) {
-		Vector3 center = parseVector(properties.get(Tokens.POSITION));
-		Vector3 axis = parseVector(properties.get(Tokens.SIDE));
-		double angle = parseAngle(properties.get(Tokens.ANGLE));
-		double height = Double.parseDouble(properties.get(Tokens.HEIGHT));
-		Color color = parseColor(properties.getOrDefault((Tokens.COLOR), "{255,255,255}"));
-		Color color2 = parseColor(properties.getOrDefault(Tokens.SEC_COLOR, "{" + color.toAWT().darker().getRed() + ","
-				+ color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
-		double gridsize = Double.parseDouble(properties.getOrDefault(Tokens.GRIDSIZE, "2"));
-		double reflectiveness = Double.parseDouble(properties.getOrDefault(Tokens.REFLECTIVENESS, "0"));
-		Material material = parseMaterial(properties.get(Tokens.MATERIAL), color, color2, gridsize, reflectiveness);
+	private Shape createCone(HashMap<Properties, String> properties) {
+		Vector3 center = parseVector(properties.get(Properties.POSITION));
+		Vector3 axis = parseVector(properties.get(Properties.SIDE));
+		double angle = parseAngle(properties.get(Properties.ANGLE));
+		double height = Double.parseDouble(properties.get(Properties.HEIGHT));
+		Color color = parseColor(properties.getOrDefault((Properties.COLOR), "{255,255,255}"));
+		Color color2 = parseColor(properties.getOrDefault(Properties.SEC_COLOR, "{" + color.toAWT().darker().getRed()
+				+ "," + color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
+		double gridsize = Double.parseDouble(properties.getOrDefault(Properties.GRIDSIZE, "2"));
+		double reflectiveness = Double.parseDouble(properties.getOrDefault(Properties.REFLECTIVENESS, "0"));
+		Material material = parseMaterial(properties.get(Properties.MATERIAL), color, color2, gridsize, reflectiveness);
 		return new Cone(center, material, axis, angle, height);
 	}
 
-	private Light createLight(HashMap<Tokens, String> properties) {
-		Vector3 position = parseVector(properties.get(Tokens.POSITION));
-		Color color = parseColor(properties.getOrDefault(Tokens.COLOR, "{255,255,255}"));
+	private Light createLight(HashMap<Properties, String> properties) {
+		Vector3 position = parseVector(properties.get(Properties.POSITION));
+		Color color = parseColor(properties.getOrDefault(Properties.COLOR, "{255,255,255}"));
 		return new Light(position, color);
 	}
 
-	private Camera createCamera(HashMap<Tokens, String> properties) {
-		Vector3 position = parseVector(properties.get(Tokens.POSITION));
-		double fov = parseAngle(properties.getOrDefault(Tokens.FOV, "40°"));
-		double pitch = parseAngle(properties.getOrDefault(Tokens.PITCH, "0"));
-		double yaw = parseAngle(properties.getOrDefault(Tokens.YAW, "0"));
+	private Camera createCamera(HashMap<Properties, String> properties) {
+		Vector3 position = parseVector(properties.get(Properties.POSITION));
+		double fov = parseAngle(properties.getOrDefault(Properties.FOV, "40°"));
+		double pitch = parseAngle(properties.getOrDefault(Properties.PITCH, "0"));
+		double yaw = parseAngle(properties.getOrDefault(Properties.YAW, "0"));
 		return new Camera(position, fov, pitch, yaw);
 	}
 
@@ -172,9 +174,9 @@ public class Interpreter {
 
 	private Material parseMaterial(String matString, Color color, Color color2, double gridsize,
 			double reflectiveness) {
-		Tokens finalMat = Tokens.BASIC;
-		for (Tokens material : Tokens.MATERIALS) {
-			if (matString.equals(material.getTokenString())) {
+		Materials finalMat = Materials.BASIC;
+		for (Materials material : Materials.MATERIALS) {
+			if (matString.equals(material.getPropertiestring())) {
 				finalMat = material;
 			}
 		}

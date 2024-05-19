@@ -71,6 +71,11 @@ public class Color {
 		return new java.awt.Color(red, green, blue);
 	}
 
+	@Override
+	public String toString() {
+		return "[" + red + ", " + green + ", " + blue + "]";
+	}
+
 	public static final Color WHITE = new Color(1d, 1d, 1d);
 	public static final Color LIGHT_GRAY = new Color(.75, .75, .75);
 	public static final Color GRAY = new Color(.5, .5, .5);

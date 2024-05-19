@@ -88,28 +88,24 @@ public abstract class Material {
             Vector3 reflectedDirection = incidentDirection.subtract(normal.scale(2 * incidentDirection.dot(normal)))
                     .normalize();
             Ray reflectedRay = new Ray(hitPoint, reflectedDirection);
+            Color reflectedColor = calculateReflection(reflectedRay, light, objects, depth - 1);
+            Color shadedColor = calculateShadedColor(light, normal, colorAtHit, hitPoint, shadowColorAtHit);
 
             if (!inShadow(shadowRay, light, objects)) {
-                if (hitMaterial.reflectiveness > 0) {
-                    Color reflectedColor = calculateReflection(reflectedRay, light, objects, depth - 1);
+                if (hitMaterial.reflectiveness > 0)
                     return colorAtHit.interpolate(reflectedColor, hitMaterial.reflectiveness);
-                }
-                else {
-                    Color shadedColor = calculateShadedColor(light, normal, colorAtHit, hitPoint, shadowColorAtHit);
+                else
                     return getColor(ray.getOrigin()).interpolate(shadedColor, reflectiveness);
-                }
             }
             else {
-                if (hitMaterial.reflectiveness > 0) {
-                    objects.add(shape);
+                objects.add(shape);
+                if (hitMaterial.reflectiveness > 0)
                     return shadowColorAtHit.interpolate(calculateReflection(reflectedRay, light, objects, depth - 1),
                             1 - reflectiveness);
-                }
                 else
-                    return (Color.BLACK.interpolate(colorAtHit, AMBIENT));
+                    return shadowColorAtHit;
 
             }
-
         }
         else {
             return getColor(ray.getOrigin()).interpolate(new Color(25, 25, 25), reflectiveness);
