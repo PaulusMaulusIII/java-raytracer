@@ -37,11 +37,11 @@ public class App extends JFrame {
                 "\r\n" + //
                 "Sphere {\r\n" + //
                 "\tposition : {0, 0, 3}\r\n" + //
-                "\tmaterial : mirror\r\n" + //
+                "\tmaterial : basic\r\n" + //
                 "\tcolor : {255, 255, 255}\r\n" + //
                 "\tgridsize : 2.5\r\n" + //
                 "\tradius : 2.5\r\n" + //
-                "\trefl : 1\r\n" + // }\r\n" + //
+                "\trefl : .5\r\n" + // }\r\n" + //
                 "}\r\n" + //
                 "\r\n" + //
                 "Cube {\r\n" + //

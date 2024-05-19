@@ -1,7 +1,8 @@
 package gameboy.core;
 
 import java.awt.Desktop;
-import gameboy.utilities.Color;
+import gameboy.utilities.GlobalSettings;
+
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -38,7 +39,7 @@ public class Renderer {
             for (int x = 0; x < width; x += blockSize) {
                 double[] screenUV = getNormalizedScreenCoordinates(x, y, width, height);
                 PixelData pixelData = getPixelData(screenUV[0], screenUV[1]);
-                gfx.setColor(new Color(25, 25, 25).toAWT());
+                gfx.setColor(GlobalSettings.SKY_BOX_COLOR.toAWT());
                 if (pixelData != null) {
                     gfx.setColor(pixelData.getColor().toAWT());
                 }
