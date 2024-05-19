@@ -36,28 +36,30 @@ public abstract class Material {
         Vector3 normal = rayHit.getShape().getNormal(rayHit); // Get object surface normal vector
         Vector3 hitPoint = rayHit.getHitPoint(); // Get hitpoint
         Color baseColor = getColor(hitPoint); // Get the specified base color at point on shape
-        Color shadowColor = Color.BLACK.interpolate(baseColor, GlobalSettings.AMBIENT_BRIGHTNESS);
 
         LinkedList<Color> colors = new LinkedList<>();
         for (Light light : lights) {
             Ray shadowRay = new Ray(hitPoint, light.getAnchor().subtract(hitPoint));
             Vector3 reflectionDirection = incidentDirection.subtract(normal.scale(2 * incidentDirection.dot(normal)));
             if (!inShadow(shadowRay, light, objects)) {
-                Color shadedColor = calculateShadedColor(light, normal, baseColor, hitPoint, shadowColor);
+                Color shadedColor = calculateShadedColor(light, normal, baseColor, hitPoint);
                 if (reflectiveness > 0) {
                     objects.add(shape);
-                    baseColor = calculateReflection(new Ray(hitPoint, reflectionDirection), light, objects, 10);
+                    baseColor = calculateReflection(new Ray(hitPoint, reflectionDirection), light, objects,
+                            GlobalSettings.MAX_REFLECTION_DEPTH);
                     colors.add(shadedColor.interpolate(baseColor, reflectiveness));
                 }
                 else
                     colors.add(shadedColor);
+
             }
             else {
+                Color shadowColor = Color.BLACK.interpolate(baseColor, GlobalSettings.AMBIENT_BRIGHTNESS);
                 if (reflectiveness > 0) {
                     objects.add(shape);
-                    colors.add(shadowColor.interpolate(
-                            calculateReflection(new Ray(hitPoint, reflectionDirection), light, objects, 10),
-                            1 - reflectiveness));
+                    colors.add(shadowColor.interpolate(calculateReflection(
+                            new Ray(hitPoint.add(new Vector3(1e-6, 1e-6, 1e-6)), reflectionDirection), light, objects,
+                            GlobalSettings.MAX_REFLECTION_DEPTH), 1 - reflectiveness));
                 }
                 else
                     colors.add(shadowColor);
@@ -82,31 +84,37 @@ public abstract class Material {
         if (hit != null) { // TODO WAAAAAAY TO HEAVY
             Vector3 hitPoint = hit.getHitPoint();
             Material hitMaterial = hit.getShape().getMaterial();
-            Color colorAtHit = hitMaterial.getColor(hitPoint);
-            Color shadowColorAtHit = Color.BLACK.interpolate(colorAtHit, GlobalSettings.AMBIENT_BRIGHTNESS);
             Vector3 incidentDirection = ray.getDirection().normalize();
             Vector3 normal = hit.getShape().getNormal(hit);
+            Color colorAtHit = hitMaterial.getColor(hitPoint);
             Ray shadowRay = new Ray(hitPoint.add(new Vector3(1e-6, 1e-6, 1e-6)), light.getAnchor().subtract(hitPoint));
-            Vector3 reflectedDirection = incidentDirection.subtract(normal.scale(2 * incidentDirection.dot(normal)))
-                    .normalize();
-            Ray reflectedRay = new Ray(hitPoint, reflectedDirection);
-            Color reflectedColor = calculateReflection(reflectedRay, light, objects, depth - 1);
-            // Color shadedColor = calculateShadedColor(light, normal, colorAtHit, hitPoint,
-            // shadowColorAtHit);
 
             if (!inShadow(shadowRay, light, objects)) {
-                if (hitMaterial.reflectiveness > 0)
+                if (hitMaterial.reflectiveness > 0) {
+                    Vector3 reflectedDirection = incidentDirection
+                            .subtract(normal.scale(2 * incidentDirection.dot(normal))).normalize();
+                    Ray reflectedRay = new Ray(hitPoint, reflectedDirection);
+                    Color reflectedColor = calculateReflection(reflectedRay, light, objects, depth - 1);
                     return colorAtHit.interpolate(reflectedColor, hitMaterial.reflectiveness);
-                else
-                    return getColor(ray.getOrigin()).interpolate(colorAtHit, reflectiveness);
+                }
+                else {
+                    Color shadedColor = calculateShadedColor(light, normal, colorAtHit, hitPoint);
+                    return shadedColor;
+                }
             }
             else {
+                Color shadowColorAtHit = Color.BLACK.interpolate(colorAtHit, GlobalSettings.AMBIENT_BRIGHTNESS);
                 objects.add(shape);
-                if (hitMaterial.reflectiveness > 0)
+                if (hitMaterial.reflectiveness > 0) {
+                    Vector3 reflectedDirection = incidentDirection
+                            .subtract(normal.scale(2 * incidentDirection.dot(normal))).normalize();
+                    Ray reflectedRay = new Ray(hitPoint, reflectedDirection);
                     return shadowColorAtHit.interpolate(calculateReflection(reflectedRay, light, objects, depth - 1),
                             1 - reflectiveness);
-                else
+                }
+                else {
                     return shadowColorAtHit;
+                }
 
             }
         }
@@ -115,12 +123,13 @@ public abstract class Material {
         }
     }
 
-    private Color calculateShadedColor(Light light, Vector3 normal, Color baseColor, Vector3 hitPoint,
-            Color shadowColor) {
+    private Color calculateShadedColor(Light light, Vector3 normal, Color baseColor, Vector3 hitPoint) {
         Vector3 lightPosition = light.getAnchor();
         double brightnessFactor = normal.dot(lightPosition.subtract(hitPoint).normalize())
                 / hitPoint.distance(lightPosition) * hitPoint.distance(lightPosition);
-        Color shadedColor = Color.BLACK.interpolate(baseColor, GlobalSettings.AMBIENT_BRIGHTNESS);
+        Color shadowColor = Color.BLACK.interpolate(baseColor, GlobalSettings.AMBIENT_BRIGHTNESS);
+        Color shadedColor = shadowColor;
+
         shadedColor = baseColor.multiply(light.getColor());
         shadedColor = shadedColor.brighten(brightnessFactor);
         if (shadedColor.toAWT().getRGB() <= shadowColor.toAWT().getRGB())

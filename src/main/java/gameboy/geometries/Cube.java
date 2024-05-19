@@ -40,7 +40,7 @@ public class Cube extends Shape {
     public Vector3 getIntersectionPoint(Ray ray) {
         double tMin = 0;
         double tMax = Double.POSITIVE_INFINITY;
-        double halfSideLength = sideLength / 2.0;
+        double halfSideLength = sideLength / 2d;
 
         boolean hit = false;
 
@@ -70,7 +70,7 @@ public class Cube extends Shape {
 
             }
 
-            if (tMax >= 0 && tMin <= tMax)
+            if (tMin > 0)
                 hit = true;
         }
 
