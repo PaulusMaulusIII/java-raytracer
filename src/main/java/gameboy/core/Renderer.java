@@ -88,6 +88,8 @@ public class Renderer {
         RayHit hit = ray.castRay(scene.getChildren());
         if (hit == null)
             return null;
+        if (ray.getOrigin().distance(hit.getHitPoint()) > GlobalSettings.MAX_RENDER_DISTANCE)
+            return null;
 
         return new PixelData(hit, scene.getLights(), scene.getChildren(), scene.getOptions());
     }

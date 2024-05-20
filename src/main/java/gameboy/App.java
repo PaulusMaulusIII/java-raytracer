@@ -23,7 +23,7 @@ public class App extends JFrame {
                 "}\r\n" + //
                 "\r\n" + //
                 "Light {\r\n" + //
-                "\tposition : {3, 1, 1}\r\n" + //
+                "\tposition : {0, 10, -5}\r\n" + //
                 "}\r\n" + //
                 "\r\n" + //
                 "Plane {\r\n" + //
@@ -37,18 +37,9 @@ public class App extends JFrame {
                 "}\r\n" + //
                 "\r\n" + //
                 "Sphere {\r\n" + //
-                "\tposition : {0, 0, 3}\r\n" + //
+                "\tposition : {0, 4, 3}\r\n" + //
                 "\tmaterial : mirror\r\n" + //
                 "\tradius : 2.5\r\n" + //
-                "}\r\n" + //
-                "\r\n" + //
-                "Cube {\r\n" + //
-                "\tposition : {0, 0, -3}\r\n" + //
-                "\tmaterial : checker\r\n" + //
-                "\tcolor : {255, 200, 255}\r\n" + //
-                "\tgridsize : 1\r\n" + //
-                "\tsidelength : 2\r\n" + //
-                "\trefl : .05\r\n" + //
                 "}\r\n" + //
                 "\r\n" + //
                 "Sphere {\r\n" + //

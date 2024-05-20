@@ -87,13 +87,14 @@ public abstract class Material {
             Vector3 incidentDirection = ray.getDirection().normalize();
             Vector3 normal = hit.getShape().getNormal(hit);
             Color colorAtHit = hitMaterial.getColor(hitPoint);
-            Ray shadowRay = new Ray(hitPoint.add(new Vector3(1e-6, 1e-6, 1e-6)), light.getAnchor().subtract(hitPoint));
+            Vector3 shadowRayDirection = light.getAnchor().subtract(hitPoint);
+            Ray shadowRay = new Ray(hitPoint.add(shadowRayDirection.scale(0.001)), shadowRayDirection);
 
             if (!inShadow(shadowRay, light, objects)) {
                 if (hitMaterial.reflectiveness > 0) {
                     Vector3 reflectedDirection = incidentDirection
                             .subtract(normal.scale(2 * incidentDirection.dot(normal))).normalize();
-                    Ray reflectedRay = new Ray(hitPoint, reflectedDirection);
+                    Ray reflectedRay = new Ray(hitPoint.add(reflectedDirection.scale(0.001)), reflectedDirection);
                     Color reflectedColor = calculateReflection(reflectedRay, light, objects, depth - 1);
                     return colorAtHit.interpolate(reflectedColor, hitMaterial.reflectiveness);
                 }
@@ -104,11 +105,11 @@ public abstract class Material {
             }
             else {
                 Color shadowColorAtHit = Color.BLACK.interpolate(colorAtHit, GlobalSettings.AMBIENT_BRIGHTNESS);
-                objects.add(shape);
                 if (hitMaterial.reflectiveness > 0) {
+                    objects.add(shape);
                     Vector3 reflectedDirection = incidentDirection
                             .subtract(normal.scale(2 * incidentDirection.dot(normal))).normalize();
-                    Ray reflectedRay = new Ray(hitPoint, reflectedDirection);
+                    Ray reflectedRay = new Ray(hitPoint.add(reflectedDirection.scale(0.001)), reflectedDirection);
                     return shadowColorAtHit.interpolate(calculateReflection(reflectedRay, light, objects, depth - 1),
                             1 - reflectiveness);
                 }
