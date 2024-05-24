@@ -32,7 +32,6 @@ public class Interpreter {
 		List<Light> lights = new LinkedList<>();
 		List<Shape> shapes = new LinkedList<>();
 		String[] lines = code.split("\n");
-		HashMap<Properties, String> options = new HashMap<>();
 
 		for (int i = 0; i < lines.length; i++) {
 			String line = lines[i].trim();
@@ -59,16 +58,13 @@ public class Interpreter {
 					case CONE:
 						shapes.add(createCone(properties));
 						break;
-					case OPTIONS:
-						options.putAll(properties);
-						break;
 					default:
 						System.err.println("Not an initializer");
 					}
 				}
 			}
 		}
-		Scene scene = new Scene(cameras, shapes, lights, options);
+		Scene scene = new Scene(cameras, shapes, lights);
 		for (Shape shape : shapes) {
 			shape.setScene(scene);
 		}

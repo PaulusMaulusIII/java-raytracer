@@ -7,7 +7,7 @@ public enum Properties {
 	// Properties
 	POSITION("position"), SIDELENGTH("sidelength"), COLOR("color"), MATERIAL("material"), AXIS("axis"), FOV("fov"),
 	RADIUS("radius"), PITCH("pitch"), YAW("yaw"), SIDE("side"), ANGLE("angle"), HEIGHT("height"), GRIDSIZE("gridsize"),
-	SEC_COLOR("color2"), REFELECTIVITY("refl"), SHADE("shade"), EMISSION("emis"), SHININESS("shiny");
+	SEC_COLOR("color2"), REFELECTIVITY("refl"), EMISSION("emis"), SHININESS("shiny");
 
 	private final String tokenString;
 
@@ -20,6 +20,6 @@ public enum Properties {
 	}
 
 	public static final List<Properties> PROPERTIES = new LinkedList<>(
-			List.of(POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW, SHADE, SIDE, ANGLE, HEIGHT,
-					GRIDSIZE, SEC_COLOR, REFELECTIVITY, EMISSION, SHININESS));
+			List.of(POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW, SIDE, ANGLE, HEIGHT, GRIDSIZE,
+					SEC_COLOR, REFELECTIVITY, EMISSION, SHININESS));
 }

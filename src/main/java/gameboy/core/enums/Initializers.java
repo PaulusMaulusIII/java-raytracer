@@ -5,8 +5,7 @@ import java.util.List;
 
 public enum Initializers {
 	// Shapes
-	OPTIONS("Options"), CUBE("Cube"), LINE("Line"), PLANE("Plane"), SPHERE("Sphere"), CONE("Cone"), CAMERA("Camera"),
-	LIGHT("Light");
+	CUBE("Cube"), LINE("Line"), PLANE("Plane"), SPHERE("Sphere"), CONE("Cone"), CAMERA("Camera"), LIGHT("Light");
 
 	private final String Propertiestring;
 
@@ -19,5 +18,5 @@ public enum Initializers {
 	}
 
 	public static final List<Initializers> INITIALIZERS = new LinkedList<>(
-			List.of(CUBE, LINE, PLANE, SPHERE, CONE, CAMERA, LIGHT, OPTIONS));
+			List.of(CUBE, LINE, PLANE, SPHERE, CONE, CAMERA, LIGHT));
 }

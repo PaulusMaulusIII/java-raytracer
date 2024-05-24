@@ -14,7 +14,7 @@ public abstract class Material {
 
     protected double reflectivity = 0;
     protected double emission = 0;
-    protected double shininess = 0;
+    protected double shininess = 20;
 
     public Material(Color color) {
         this.color = color;

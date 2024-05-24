@@ -26,10 +26,11 @@ public class Viewport extends JPanel {
 	protected Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0),
 			"blank cursor");
 	protected Container container;
+	protected JDialog settingsDialog;
 
-	public Viewport(String code, Container container) {
+	public Viewport(Container container, SettingPanel settings) {
 		this.container = container;
-		scene = new Interpreter().interpret(code);
+		this.scene = settings.getScene();
 		setSize(container.getWidth(), container.getHeight());
 		setFocusable(true);
 
@@ -38,25 +39,35 @@ public class Viewport extends JPanel {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_D) {
 					deltaCamera.setX(0.2F);
-				} else if (e.getKeyCode() == KeyEvent.VK_A) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_A) {
 					deltaCamera.setX(-0.2F);
-				} else if (e.getKeyCode() == KeyEvent.VK_W) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_W) {
 					deltaCamera.setZ(0.2F);
-				} else if (e.getKeyCode() == KeyEvent.VK_S) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_S) {
 					deltaCamera.setZ(-0.2F);
-				} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 					deltaCamera.setY(0.2F);
-				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
 					deltaCamera.setY(-0.2F);
-				} else if (e.getKeyCode() == KeyEvent.VK_1) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_1) {
 					resolution = 1;
-				} else if (e.getKeyCode() == KeyEvent.VK_2) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_2) {
 					resolution = 0.5F;
-				} else if (e.getKeyCode() == KeyEvent.VK_3) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_3) {
 					resolution = 0.25F;
-				} else if (e.getKeyCode() == KeyEvent.VK_4) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_4) {
 					resolution = 0.125F;
-				} else if (e.getKeyCode() == KeyEvent.VK_F12 || e.getKeyCode() == KeyEvent.VK_PRINTSCREEN
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_F12 || e.getKeyCode() == KeyEvent.VK_PRINTSCREEN
 						|| e.getKeyCode() == KeyEvent.VK_F2) {
 					try {
 						renderer.renderToImage(scene, 3840, 2160);
@@ -70,20 +81,27 @@ public class Viewport extends JPanel {
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_D) {
 					deltaCamera.setX(0);
-				} else if (e.getKeyCode() == KeyEvent.VK_A) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_A) {
 					deltaCamera.setX(0);
-				} else if (e.getKeyCode() == KeyEvent.VK_W) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_W) {
 					deltaCamera.setZ(0);
-				} else if (e.getKeyCode() == KeyEvent.VK_S) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_S) {
 					deltaCamera.setZ(0);
-				} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 					deltaCamera.setY(0);
-				} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
 					deltaCamera.setY(0);
-				} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					if (captureCursor) {
 						setCaptureCursor(false);
-					} else {
+					}
+					else {
 						int i = JOptionPane.showConfirmDialog(null, "Beenden?");
 						if (i == 0)
 							System.exit(0);
@@ -135,7 +153,8 @@ public class Viewport extends JPanel {
 			int centerX = container.getX() + container.getWidth() / 2;
 			int centerY = container.getY() + container.getHeight() / 2;
 			robot.mouseMove(centerX, centerY);
-		} else {
+		}
+		else {
 			setCursor(Cursor.getDefaultCursor());
 		}
 	}

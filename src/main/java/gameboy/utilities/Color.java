@@ -106,7 +106,7 @@ public class Color {
 	public static final Color RED = new Color(1d, 0, 0);
 	public static final Color GREEN = new Color(0, 1d, 0);
 	public static final Color BLUE = new Color(0, 0, 1d);
-	public static final Color YELLOW = new Color(0, 1d, 1d);
+	public static final Color YELLOW = new Color(1d, 1d, 0);
 	public static final Color MAGENTA = new Color(1d, 0, 1d);
 	public static final Color CYAN = new Color(0, 1d, 1d);
 	public static final Color PINK = new Color(1d, .8, .8);

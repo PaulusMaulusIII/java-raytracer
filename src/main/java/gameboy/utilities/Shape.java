@@ -93,4 +93,9 @@ public abstract class Shape {
     public abstract Vector3 getIntersectionPoint(Ray ray);
 
     public abstract Vector3 getNormal(Vector3 hitPoint);
+
+    @Override
+    public String toString() {
+        return getClass().getName().replace("gameboy.geometries.", "") + "@" + Integer.toHexString(hashCode());
+    }
 }

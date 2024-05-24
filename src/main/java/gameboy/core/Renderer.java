@@ -91,6 +91,6 @@ public class Renderer {
         if (ray.getOrigin().distance(hit.getHitPoint()) > GlobalSettings.MAX_RENDER_DISTANCE)
             return null;
 
-        return new PixelData(hit, scene.getLights(), scene.getChildren(), scene.getOptions());
+        return new PixelData(hit, scene.getLights(), scene.getChildren());
     }
 }
