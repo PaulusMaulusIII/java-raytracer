@@ -6,7 +6,6 @@ import java.util.List;
 import gameboy.utilities.Material;
 import gameboy.utilities.Shape;
 import gameboy.utilities.math.Ray;
-import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 
 public class Cone extends Shape {
@@ -67,9 +66,8 @@ public class Cone extends Shape {
 	}
 
 	@Override
-	public Vector3 getNormal(RayHit hit) {
-		Vector3 cp = hit.getHitPoint();
-		Vector3 n = cp.scale(axis.dot(cp) / cp.dot(cp)).subtract(axis).normalize();
+	public Vector3 getNormal(Vector3 hitPoint) {
+		Vector3 n = hitPoint.scale(axis.dot(hitPoint) / hitPoint.dot(hitPoint)).subtract(axis).normalize();
 		return n;
 	}
 }

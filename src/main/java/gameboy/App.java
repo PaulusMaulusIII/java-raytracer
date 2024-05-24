@@ -29,7 +29,7 @@ public class App extends JFrame {
                 "Plane {\r\n" + //
                 "\tposition : {0, -2.5, 0}\r\n" + //
                 "\tmaterial : checker\r\n" + //
-                "\taxis : y\r\n" + //
+                "\taxis : {0, 1, 0}\r\n" + //
                 "\tcolor : {255,255,255}\r\n" + //
                 "\tcolor2 : {25,25,25}\r\n" + //
                 "\tgridsize : 4\r\n" + //
@@ -45,25 +45,25 @@ public class App extends JFrame {
                 "Sphere {\r\n" + //
                 "\tposition : {-6, 0, -7.5}\r\n" + //
                 "\tcolor : {255, 0, 0}\r\n" + //
-                "\tmaterial : checker\r\n" + //
-                "\tgridsize : 2.5\r\n" + //
+                "\tmaterial : basic\r\n" + //
                 "\tradius : 2.5\r\n" + //
+                "\trefl : 0.5\r\n" + //
                 "}\r\n" + //
                 "\r\n" + //
                 "Sphere {\r\n" + //
                 "\tposition : {0, 0, -7.5}\r\n" + //
                 "\tcolor : {0, 255, 0}\r\n" + //
-                "\tmaterial : checker\r\n" + //
-                "\tgridsize : 2.5\r\n" + //
+                "\tmaterial : basic\r\n" + //
                 "\tradius : 2.5\r\n" + //
+                "\trefl : 0.5\r\n" + //
                 "}\r\n" + //
                 "\r\n" + //
                 "Sphere {\r\n" + //
                 "\tposition : {6, 0, -7.5}\r\n" + //
                 "\tcolor : {0, 0, 255}\r\n" + //
-                "\tmaterial : checker\r\n" + //
-                "\tgridsize : 2.5\r\n" + //
+                "\tmaterial : basic\r\n" + //
                 "\tradius : 2.5\r\n" + //
+                "\trefl : 0.5\r\n" + //
                 "}\r\n" + //
                 "\r\n" + //
                 "Cube {\r\n" + //

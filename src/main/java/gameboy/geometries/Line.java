@@ -6,7 +6,6 @@ import java.util.List;
 import gameboy.utilities.Material;
 import gameboy.utilities.Shape;
 import gameboy.utilities.math.Ray;
-import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 
 public class Line extends Shape {
@@ -46,7 +45,7 @@ public class Line extends Shape {
     }
 
     @Override
-    public Vector3 getNormal(RayHit rayHit) {
-        return rayHit.getHitPoint().invert();
+    public Vector3 getNormal(Vector3 hitPoint) {
+        return hitPoint.invert();
     }
 }

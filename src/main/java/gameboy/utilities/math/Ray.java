@@ -78,7 +78,7 @@ public class Ray {
         }
     }
 
-    public RayHit castRay(List<Shape> objects) {
+    public RayHit cast(List<Shape> objects) {
         RayHit hit = null;
         for (Shape shape : objects) {
             Vector3 hitPoint = shape.getIntersectionPoint(this);

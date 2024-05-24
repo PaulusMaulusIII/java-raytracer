@@ -1,6 +1,5 @@
 package gameboy.utilities;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import gameboy.lights.Light;
@@ -13,7 +12,9 @@ public abstract class Material {
     protected final Color color;
     protected Shape shape;
 
-    protected double reflectiveness = 0;
+    protected double reflectivity = 0;
+    protected double emission = 0;
+    protected double shininess = 0;
 
     public Material(Color color) {
         this.color = color;
@@ -27,130 +28,109 @@ public abstract class Material {
         this.shape = shape;
     }
 
-    public void setReflectiveness(double reflectiveness) {
-        this.reflectiveness = reflectiveness;
+    public void setReflectivity(double reflectivity) {
+        this.reflectivity = reflectivity;
+    }
+
+    public void setEmission(double emission) {
+        this.emission = emission;
+    }
+
+    public double getEmission() {
+        return emission;
+    }
+
+    public double getReflectivity() {
+        return reflectivity;
+    }
+
+    public Shape getShape() {
+        return shape;
+    }
+
+    public Vector3 getNormal(Vector3 hitPoint) {
+        return shape.getNormal(hitPoint);
+    }
+
+    public void setShininess(double shininess) {
+        this.shininess = shininess;
+    }
+
+    public double getShininess() {
+        return shininess;
     }
 
     public Color shade(RayHit rayHit, List<Light> lights, List<Shape> objects) {
-        Vector3 incidentDirection = rayHit.getRay().getDirection();
-        Vector3 normal = rayHit.getShape().getNormal(rayHit); // Get object surface normal vector
-        Vector3 hitPoint = rayHit.getHitPoint(); // Get hitpoint
-        Color baseColor = getColor(hitPoint); // Get the specified base color at point on shape
+        Color baseColor = rayHit.getShape().getMaterial().getColor(rayHit.getHitPoint());
 
-        LinkedList<Color> colors = new LinkedList<>();
+        Color ambientComponent = baseColor.multiply(GlobalSettings.AMBIENT_BRIGHTNESS);
+
+        Color diffuseComponent = new Color(0, 0, 0);
+        Color specularComponent = new Color(0, 0, 0);
+
         for (Light light : lights) {
-            Ray shadowRay = new Ray(hitPoint, light.getAnchor().subtract(hitPoint));
-            Vector3 reflectionDirection = incidentDirection.subtract(normal.scale(2 * incidentDirection.dot(normal)));
-            if (!inShadow(shadowRay, light, objects)) {
-                Color shadedColor = calculateShadedColor(light, normal, baseColor, hitPoint);
-                if (reflectiveness > 0) {
-                    objects.add(shape);
-                    baseColor = calculateReflection(new Ray(hitPoint, reflectionDirection), light, objects,
-                            GlobalSettings.MAX_REFLECTION_DEPTH);
-                    colors.add(shadedColor.interpolate(baseColor, reflectiveness));
-                }
-                else
-                    colors.add(shadedColor);
-
-            }
-            else {
-                Color shadowColor = Color.BLACK.interpolate(baseColor, GlobalSettings.AMBIENT_BRIGHTNESS);
-                if (reflectiveness > 0) {
-                    objects.add(shape);
-                    colors.add(shadowColor.interpolate(calculateReflection(
-                            new Ray(hitPoint.add(new Vector3(1e-6, 1e-6, 1e-6)), reflectionDirection), light, objects,
-                            GlobalSettings.MAX_REFLECTION_DEPTH), 1 - reflectiveness));
-                }
-                else
-                    colors.add(shadowColor);
+            if (!isInShadow(rayHit, light, objects)) {
+                diffuseComponent = diffuseComponent.add(baseColor.multiply(calculateDiffuseLighting(rayHit, light)));
+                specularComponent = specularComponent
+                        .add(light.getColor().multiply(calculateSpecularLighting(rayHit, light)));
             }
         }
 
-        Color finalColor = Color.BLACK;
-        for (Color color : colors) {
-            finalColor = finalColor.add(color);
-        }
+        Color reflectionComponent = calculateReflection(rayHit, lights, objects);
 
+        Color finalColor = ambientComponent.add(diffuseComponent).add(specularComponent).add(reflectionComponent);
         return finalColor;
     }
 
-    private Color calculateReflection(Ray ray, Light light, List<Shape> objects, int depth) {
-        if (depth <= 0) {
-            return Color.BLACK;
-        }
+    private boolean isInShadow(RayHit rayHit, Light light, List<Shape> objects) {
+        Vector3 hitPoint = rayHit.getHitPoint();
+        Vector3 lightDirection = light.getAnchor().subtract(hitPoint).normalize();
+        Ray shadowRay = new Ray(hitPoint.add(lightDirection.scale(1e-4)), lightDirection);
 
-        RayHit hit = ray.castRay(objects);
+        RayHit hit = shadowRay.cast(objects);
 
-        if (hit != null) { // TODO WAAAAAAY TO HEAVY
-            Vector3 hitPoint = hit.getHitPoint();
-            Material hitMaterial = hit.getShape().getMaterial();
-            Vector3 incidentDirection = ray.getDirection().normalize();
-            Vector3 normal = hit.getShape().getNormal(hit);
-            Color colorAtHit = hitMaterial.getColor(hitPoint);
-            Vector3 shadowRayDirection = light.getAnchor().subtract(hitPoint);
-            Ray shadowRay = new Ray(hitPoint.add(shadowRayDirection.scale(0.001)), shadowRayDirection);
-
-            if (!inShadow(shadowRay, light, objects)) {
-                if (hitMaterial.reflectiveness > 0) {
-                    Vector3 reflectedDirection = incidentDirection
-                            .subtract(normal.scale(2 * incidentDirection.dot(normal))).normalize();
-                    Ray reflectedRay = new Ray(hitPoint.add(reflectedDirection.scale(0.001)), reflectedDirection);
-                    Color reflectedColor = calculateReflection(reflectedRay, light, objects, depth - 1);
-                    return colorAtHit.interpolate(reflectedColor, hitMaterial.reflectiveness);
-                }
-                else {
-                    Color shadedColor = calculateShadedColor(light, normal, colorAtHit, hitPoint);
-                    return shadedColor;
-                }
-            }
-            else {
-                Color shadowColorAtHit = Color.BLACK.interpolate(colorAtHit, GlobalSettings.AMBIENT_BRIGHTNESS);
-                if (hitMaterial.reflectiveness > 0) {
-                    objects.add(shape);
-                    Vector3 reflectedDirection = incidentDirection
-                            .subtract(normal.scale(2 * incidentDirection.dot(normal))).normalize();
-                    Ray reflectedRay = new Ray(hitPoint.add(reflectedDirection.scale(0.001)), reflectedDirection);
-                    return shadowColorAtHit.interpolate(calculateReflection(reflectedRay, light, objects, depth - 1),
-                            1 - reflectiveness);
-                }
-                else {
-                    return shadowColorAtHit;
-                }
-
-            }
-        }
-        else {
-            return getColor(ray.getOrigin()).interpolate(GlobalSettings.SKY_BOX_COLOR, reflectiveness);
-        }
-    }
-
-    private Color calculateShadedColor(Light light, Vector3 normal, Color baseColor, Vector3 hitPoint) {
-        Vector3 lightPosition = light.getAnchor();
-        double brightnessFactor = normal.dot(lightPosition.subtract(hitPoint).normalize())
-                / hitPoint.distance(lightPosition) * hitPoint.distance(lightPosition);
-        Color shadowColor = Color.BLACK.interpolate(baseColor, GlobalSettings.AMBIENT_BRIGHTNESS);
-        Color shadedColor = shadowColor;
-
-        shadedColor = baseColor.multiply(light.getColor());
-        shadedColor = shadedColor.brighten(brightnessFactor);
-        if (shadedColor.toAWT().getRGB() <= shadowColor.toAWT().getRGB())
-            return (shadowColor);
-        else
-            return (shadedColor);
-    }
-
-    private boolean inShadow(Ray ray, Light light, List<Shape> objects) {
-        for (Shape shape3d : objects) {
-            Vector3 intersectionPoint = shape3d.getIntersectionPoint(ray);
-            if (intersectionPoint != null) {
-                double distanceToIntersection = intersectionPoint.subtract(ray.getOrigin()).magnitude();
-                double distanceToLight = light.getAnchor().subtract(ray.getOrigin()).magnitude();
-                if (distanceToIntersection < distanceToLight) {
-                    return true;
-                }
-            }
-        }
+        if (hit != null)
+            return true;
         return false;
+    }
 
+    private double calculateDiffuseLighting(RayHit rayHit, Light light) {
+        Vector3 normal = rayHit.getShape().getNormal(rayHit.getHitPoint()).normalize();
+        Vector3 lightDirection = light.getAnchor().subtract(rayHit.getHitPoint()).normalize();
+        return Math.max(0, normal.dot(lightDirection));
+    }
+
+    private double calculateSpecularLighting(RayHit rayHit, Light light) {
+        Vector3 viewDirection = rayHit.getRay().getDirection().normalize();
+        Vector3 lightDirection = light.getAnchor().subtract(rayHit.getHitPoint()).normalize();
+        Vector3 normal = rayHit.getShape().getNormal(rayHit.getHitPoint()).normalize();
+        Vector3 reflectDirection = lightDirection.subtract(normal.scale(2 * lightDirection.dot(normal))).normalize();
+
+        double specularStrength = GlobalSettings.SPECULAR_STRENGTH;
+        double shininess = getShininess();
+        double specularFactor = Math.pow(Math.max(0, viewDirection.dot(reflectDirection)), shininess);
+
+        return specularStrength * specularFactor;
+    }
+
+    private Color calculateReflection(RayHit rayHit, List<Light> lights, List<Shape> objects) {
+        if (reflectivity <= 0) {
+            return GlobalSettings.SKY_BOX_COLOR;
+        }
+
+        Vector3 hitPoint = rayHit.getHitPoint();
+        Vector3 normal = getNormal(hitPoint);
+        Vector3 incident = rayHit.getRay().getDirection();
+        Vector3 reflectedDirection = incident.subtract(normal.scale(2 * incident.dot(normal))).normalize();
+        Ray reflectedRay = new Ray(hitPoint.add(reflectedDirection.scale(1e-4)), reflectedDirection);
+
+        RayHit reflectedHit = reflectedRay.cast(objects);
+        if (reflectedHit != null) {
+            Material reflectedMaterial = reflectedHit.getShape().getMaterial();
+            Color reflectedColor = reflectedMaterial.shade(reflectedHit, lights, objects);
+            return getColor(hitPoint).interpolate(reflectedColor, reflectivity);
+        }
+
+        return GlobalSettings.SKY_BOX_COLOR;
     }
 }

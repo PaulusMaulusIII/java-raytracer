@@ -46,6 +46,14 @@ public class Color {
 		return new Color(clamp(red), clamp(green), clamp(blue));
 	}
 
+	public Color multiply(double factor) {
+		int red = (int) (getRed() * (factor));
+		int green = (int) (getGreen() * (factor));
+		int blue = (int) (getBlue() * (factor));
+
+		return new Color(clamp(red), clamp(green), clamp(blue));
+	}
+
 	public Color interpolate(Color other, double ratio) {
 		int red = (int) (getRed() * (1 - ratio) + other.getRed() * ratio);
 		int green = (int) (getGreen() * (1 - ratio) + other.getGreen() * ratio);
@@ -69,6 +77,20 @@ public class Color {
 
 	public java.awt.Color toAWT() {
 		return new java.awt.Color(red, green, blue);
+	}
+
+	public Color add(double brightness) {
+		return new Color(Math.min(1, red + brightness), Math.min(1, green + brightness),
+				Math.min(1, blue + brightness));
+	}
+
+	private static double lerp(double a, double b, double t) {
+		return a + t * (b - a);
+	}
+
+	public static Color lerp(Color a, Color b, double t) {
+		return new Color(lerp(a.getRed() / 255, b.getRed() / 255, t), lerp(a.getGreen() / 255, b.getGreen() / 255, t),
+				lerp(a.getBlue() / 255, b.getBlue() / 255, t));
 	}
 
 	@Override

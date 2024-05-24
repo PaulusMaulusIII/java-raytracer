@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import gameboy.core.enums.Axis;
 import gameboy.core.enums.Initializers;
 import gameboy.core.enums.Materials;
 import gameboy.core.enums.Properties;
@@ -19,6 +18,7 @@ import gameboy.materials.CheckerMaterial;
 import gameboy.materials.CubeMaterial;
 import gameboy.materials.MirrorMaterial;
 import gameboy.materials.SphereMaterial;
+import gameboy.materials.WaveMaterial;
 import gameboy.utilities.Camera;
 import gameboy.utilities.Material;
 import gameboy.utilities.Scene;
@@ -68,7 +68,11 @@ public class Interpreter {
 				}
 			}
 		}
-		return new Scene(cameras, shapes, lights, options);
+		Scene scene = new Scene(cameras, shapes, lights, options);
+		for (Shape shape : shapes) {
+			shape.setScene(scene);
+		}
+		return scene;
 	}
 
 	private HashMap<Properties, String> extractTokenValues(String[] lines, int index) {
@@ -90,13 +94,16 @@ public class Interpreter {
 
 	private Shape createPlane(HashMap<Properties, String> properties) {
 		Vector3 anchor = parseVector(properties.get(Properties.POSITION));
-		Axis axis = Axis.valueOf(properties.get(Properties.AXIS).toUpperCase());
+		Vector3 axis = parseVector(properties.get(Properties.AXIS).toUpperCase());
 		Color color = parseColor(properties.getOrDefault((Properties.COLOR), "{255,255,255}"));
 		Color color2 = parseColor(properties.getOrDefault(Properties.SEC_COLOR, "{" + color.toAWT().darker().getRed()
 				+ "," + color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
 		double gridsize = Double.parseDouble(properties.getOrDefault(Properties.GRIDSIZE, "2"));
-		double reflectiveness = Double.parseDouble(properties.getOrDefault(Properties.REFLECTIVENESS, "0"));
-		Material material = parseMaterial(properties.get(Properties.MATERIAL), color, color2, gridsize, reflectiveness);
+		double reflectivity = Double.parseDouble(properties.getOrDefault(Properties.REFELECTIVITY, "0"));
+		double emission = Double.parseDouble(properties.getOrDefault(Properties.EMISSION, "0"));
+		double shininess = Double.parseDouble(properties.getOrDefault(Properties.SHININESS, "1"));
+		Material material = parseMaterial(properties.get(Properties.MATERIAL), color, color2, gridsize, reflectivity,
+				emission, shininess);
 		return new Plane(anchor, material, axis);
 	}
 
@@ -107,8 +114,11 @@ public class Interpreter {
 		Color color2 = parseColor(properties.getOrDefault(Properties.SEC_COLOR, "{" + color.toAWT().darker().getRed()
 				+ "," + color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
 		double gridsize = Double.parseDouble(properties.getOrDefault(Properties.GRIDSIZE, "2"));
-		double reflectiveness = Double.parseDouble(properties.getOrDefault(Properties.REFLECTIVENESS, "0"));
-		Material material = parseMaterial(properties.get(Properties.MATERIAL), color, color2, gridsize, reflectiveness);
+		double reflectivity = Double.parseDouble(properties.getOrDefault(Properties.REFELECTIVITY, "0"));
+		double emission = Double.parseDouble(properties.getOrDefault(Properties.EMISSION, "0"));
+		double shininess = Double.parseDouble(properties.getOrDefault(Properties.SHININESS, "1"));
+		Material material = parseMaterial(properties.get(Properties.MATERIAL), color, color2, gridsize, reflectivity,
+				emission, shininess);
 		return new Cube(center, material, sideLength);
 	}
 
@@ -119,8 +129,11 @@ public class Interpreter {
 		Color color2 = parseColor(properties.getOrDefault(Properties.SEC_COLOR, "{" + color.toAWT().darker().getRed()
 				+ "," + color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
 		double gridsize = Double.parseDouble(properties.getOrDefault(Properties.GRIDSIZE, "2"));
-		double reflectiveness = Double.parseDouble(properties.getOrDefault(Properties.REFLECTIVENESS, "0"));
-		Material material = parseMaterial(properties.get(Properties.MATERIAL), color, color2, gridsize, reflectiveness);
+		double reflectivity = Double.parseDouble(properties.getOrDefault(Properties.REFELECTIVITY, "0"));
+		double emission = Double.parseDouble(properties.getOrDefault(Properties.EMISSION, "0"));
+		double shininess = Double.parseDouble(properties.getOrDefault(Properties.SHININESS, "1"));
+		Material material = parseMaterial(properties.get(Properties.MATERIAL), color, color2, gridsize, reflectivity,
+				emission, shininess);
 		return new Sphere(center, material, radius);
 	}
 
@@ -133,8 +146,11 @@ public class Interpreter {
 		Color color2 = parseColor(properties.getOrDefault(Properties.SEC_COLOR, "{" + color.toAWT().darker().getRed()
 				+ "," + color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
 		double gridsize = Double.parseDouble(properties.getOrDefault(Properties.GRIDSIZE, "2"));
-		double reflectiveness = Double.parseDouble(properties.getOrDefault(Properties.REFLECTIVENESS, "0"));
-		Material material = parseMaterial(properties.get(Properties.MATERIAL), color, color2, gridsize, reflectiveness);
+		double reflectivity = Double.parseDouble(properties.getOrDefault(Properties.REFELECTIVITY, "0"));
+		double emission = Double.parseDouble(properties.getOrDefault(Properties.EMISSION, "0"));
+		double shininess = Double.parseDouble(properties.getOrDefault(Properties.SHININESS, "1"));
+		Material material = parseMaterial(properties.get(Properties.MATERIAL), color, color2, gridsize, reflectivity,
+				emission, shininess);
 		return new Cone(center, material, axis, angle, height);
 	}
 
@@ -172,8 +188,8 @@ public class Interpreter {
 				: Double.parseDouble(angleString);
 	}
 
-	private Material parseMaterial(String matString, Color color, Color color2, double gridsize,
-			double reflectiveness) {
+	private Material parseMaterial(String matString, Color color, Color color2, double gridsize, double reflectivity,
+			double emission, double shininess) {
 		Materials finalMat = Materials.BASIC;
 		for (Materials material : Materials.MATERIALS) {
 			if (matString.equals(material.getPropertiestring())) {
@@ -184,22 +200,38 @@ public class Interpreter {
 		switch (finalMat) {
 		case BASIC:
 			material = new BasicMaterial(color);
-			material.setReflectiveness(reflectiveness);
+			material.setReflectivity(reflectivity);
+			material.setEmission(emission);
+			material.setShininess(shininess);
 			break;
 		case CHECKER:
 			material = new CheckerMaterial(color, color2, gridsize);
-			material.setReflectiveness(reflectiveness);
+			material.setReflectivity(reflectivity);
+			material.setEmission(emission);
+			material.setShininess(shininess);
 			break;
 		case SPHEREMAT:
 			material = new SphereMaterial();
-			material.setReflectiveness(reflectiveness);
+			material.setReflectivity(reflectivity);
+			material.setEmission(emission);
+			material.setShininess(shininess);
 			break;
 		case CUBEMAT:
 			material = new CubeMaterial();
-			material.setReflectiveness(reflectiveness);
+			material.setReflectivity(reflectivity);
+			material.setEmission(emission);
+			material.setShininess(shininess);
+			break;
+		case WAVE:
+			material = new WaveMaterial();
+			material.setReflectivity(reflectivity);
+			material.setEmission(emission);
+			material.setShininess(shininess);
 			break;
 		case MIRROR:
 			material = new MirrorMaterial();
+			material.setEmission(emission);
+			material.setShininess(shininess);
 			break;
 		default:
 			break;

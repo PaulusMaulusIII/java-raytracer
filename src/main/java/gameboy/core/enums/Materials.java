@@ -6,7 +6,7 @@ import java.util.List;
 public enum Materials {
 
 	// Materials
-	CHECKER("checker"), MIRROR("mirror"), CUBEMAT("cube"), SPHEREMAT("sphere"), BASIC("basic");
+	CHECKER("checker"), MIRROR("mirror"), CUBEMAT("cube"), SPHEREMAT("sphere"), BASIC("basic"), WAVE("wave");
 
 	private final String Propertiestring;
 
@@ -19,5 +19,5 @@ public enum Materials {
 	}
 
 	public static final List<Materials> MATERIALS = new LinkedList<>(
-			List.of(CHECKER, MIRROR, CUBEMAT, SPHEREMAT, BASIC));
+			List.of(CHECKER, MIRROR, CUBEMAT, SPHEREMAT, BASIC, WAVE));
 }

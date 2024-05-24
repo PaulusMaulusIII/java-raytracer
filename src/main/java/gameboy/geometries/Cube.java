@@ -6,7 +6,6 @@ import java.util.List;
 import gameboy.utilities.Material;
 import gameboy.utilities.Shape;
 import gameboy.utilities.math.Ray;
-import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 
 public class Cube extends Shape {
@@ -105,8 +104,8 @@ public class Cube extends Shape {
     }
 
     @Override
-    public Vector3 getNormal(RayHit rayHit) {
-        switch (determineCubeSide(rayHit.getHitPoint())) {
+    public Vector3 getNormal(Vector3 hitPoint) {
+        switch (determineCubeSide(hitPoint)) {
         case 0:
             return new Vector3(1, 0, 0);
         case 1:

@@ -6,7 +6,6 @@ import java.util.List;
 import gameboy.utilities.Material;
 import gameboy.utilities.Shape;
 import gameboy.utilities.math.Ray;
-import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 
 public class Sphere extends Shape {
@@ -41,7 +40,7 @@ public class Sphere extends Shape {
     }
 
     @Override
-    public Vector3 getNormal(RayHit rayHit) {
-        return rayHit.getHitPoint().subtract(getAnchor()).normalize();
+    public Vector3 getNormal(Vector3 hitPoint) {
+        return hitPoint.subtract(getAnchor()).normalize();
     }
 }

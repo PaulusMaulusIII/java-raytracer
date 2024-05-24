@@ -3,13 +3,13 @@ package gameboy.utilities;
 import java.util.List;
 
 import gameboy.utilities.math.Ray;
-import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 
 public abstract class Shape {
 
     Vector3 anchor;
     Material material;
+    Scene scene;
 
     public Shape(Material material) {
         setMaterial(material);
@@ -20,6 +20,14 @@ public abstract class Shape {
         setAnchor(anchor);
         setMaterial(material);
         this.material.setShape(this);
+    }
+
+    public void setScene(Scene scene) {
+        this.scene = scene;
+    }
+
+    public Scene getScene() {
+        return scene;
     }
 
     /**
@@ -84,5 +92,5 @@ public abstract class Shape {
      */
     public abstract Vector3 getIntersectionPoint(Ray ray);
 
-    public abstract Vector3 getNormal(RayHit hit);
+    public abstract Vector3 getNormal(Vector3 hitPoint);
 }

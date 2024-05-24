@@ -85,7 +85,7 @@ public class Renderer {
         Vector3 rayDir = new Vector3(u, v, 0).subtract(eyePos).rotate(cam.getPitch(), cam.getYaw()).normalize();
         Ray ray = new Ray(eyePos.add(cam.getPosition()), rayDir);
 
-        RayHit hit = ray.castRay(scene.getChildren());
+        RayHit hit = ray.cast(scene.getChildren());
         if (hit == null)
             return null;
         if (ray.getOrigin().distance(hit.getHitPoint()) > GlobalSettings.MAX_RENDER_DISTANCE)

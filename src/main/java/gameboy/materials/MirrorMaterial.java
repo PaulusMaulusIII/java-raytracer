@@ -7,6 +7,6 @@ import gameboy.utilities.Material;
 public class MirrorMaterial extends Material {
 	public MirrorMaterial() {
 		super(Color.WHITE);
-		reflectiveness = 1;
+		reflectivity = 1;
 	}
 }
