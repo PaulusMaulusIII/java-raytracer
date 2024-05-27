@@ -26,7 +26,16 @@ public class Light {
         return anchor;
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     public Color getColor() {
         return color;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName().replace("gameboy.lights.", "") + "@" + Integer.toHexString(hashCode());
     }
 }

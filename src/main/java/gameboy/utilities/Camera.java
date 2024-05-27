@@ -4,7 +4,7 @@ import gameboy.utilities.math.Vector3;
 
 public class Camera {
     private Vector3 position;
-    private double pitch;
+    private double pitch = 0;
     private double yaw = 0;
     private double fov = 0;
 
@@ -59,5 +59,10 @@ public class Camera {
 
     public void translate(Vector3 vec) {
         this.position = this.position.add(vec);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName().replace("gameboy.utilities.", "") + "@" + Integer.toHexString(hashCode());
     }
 }

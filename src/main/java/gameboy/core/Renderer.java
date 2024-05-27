@@ -85,12 +85,12 @@ public class Renderer {
         Vector3 rayDir = new Vector3(u, v, 0).subtract(eyePos).rotate(cam.getPitch(), cam.getYaw()).normalize();
         Ray ray = new Ray(eyePos.add(cam.getPosition()), rayDir);
 
-        RayHit hit = ray.cast(scene.getChildren());
+        RayHit hit = ray.cast(scene.getShapes());
         if (hit == null)
             return null;
         if (ray.getOrigin().distance(hit.getHitPoint()) > GlobalSettings.MAX_RENDER_DISTANCE)
             return null;
 
-        return new PixelData(hit, scene.getLights(), scene.getChildren());
+        return new PixelData(hit, scene.getLights(), scene.getShapes());
     }
 }

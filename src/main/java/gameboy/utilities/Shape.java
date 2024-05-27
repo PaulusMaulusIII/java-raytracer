@@ -9,7 +9,6 @@ public abstract class Shape {
 
     Vector3 anchor;
     Material material;
-    Scene scene;
 
     public Shape(Material material) {
         setMaterial(material);
@@ -20,14 +19,6 @@ public abstract class Shape {
         setAnchor(anchor);
         setMaterial(material);
         this.material.setShape(this);
-    }
-
-    public void setScene(Scene scene) {
-        this.scene = scene;
-    }
-
-    public Scene getScene() {
-        return scene;
     }
 
     /**
@@ -92,6 +83,12 @@ public abstract class Shape {
      */
     public abstract Vector3 getIntersectionPoint(Ray ray);
 
+    /**
+     * Calculates {@code Vector3} surface normal vector at {@code Vector3} hitPoint
+     * 
+     * @param hitPoint {@code Vector3}
+     * @return {@code Vector3} surface normal vector at {@code Vector3} hitPoint
+     */
     public abstract Vector3 getNormal(Vector3 hitPoint);
 
     @Override

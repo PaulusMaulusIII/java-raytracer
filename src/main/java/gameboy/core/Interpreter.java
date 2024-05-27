@@ -65,9 +65,6 @@ public class Interpreter {
 			}
 		}
 		Scene scene = new Scene(cameras, shapes, lights);
-		for (Shape shape : shapes) {
-			shape.setScene(scene);
-		}
 		return scene;
 	}
 

@@ -31,7 +31,7 @@ public class Viewport extends JPanel {
 	public Viewport(Container container, SettingPanel settings) {
 		this.container = container;
 		this.scene = settings.getScene();
-		setSize(container.getWidth(), container.getHeight());
+		setSize(container.getWidth() - settings.getWidth(), container.getHeight());
 		setFocusable(true);
 
 		addKeyListener(new KeyAdapter() {
