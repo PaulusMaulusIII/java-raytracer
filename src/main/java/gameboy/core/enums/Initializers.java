@@ -1,6 +1,5 @@
 package gameboy.core.enums;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public enum Initializers {
@@ -17,6 +16,5 @@ public enum Initializers {
 		return Propertiestring;
 	}
 
-	public static final List<Initializers> INITIALIZERS = new LinkedList<>(
-			List.of(CUBE, LINE, PLANE, SPHERE, CONE, CAMERA, LIGHT));
+	public static final List<Initializers> INITIALIZERS = List.of(CUBE, LINE, PLANE, SPHERE, CONE, CAMERA, LIGHT);
 }

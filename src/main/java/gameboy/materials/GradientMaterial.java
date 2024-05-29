@@ -5,9 +5,8 @@ import gameboy.utilities.Material;
 
 public class GradientMaterial extends Material {
 
-	public GradientMaterial(Color color) {
-		super(color);
-		// TODO Auto-generated constructor stub
+	public GradientMaterial(Color color1, Color color2) {
+		super(color1);
 	}
 
 }

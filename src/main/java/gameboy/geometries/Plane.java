@@ -29,27 +29,15 @@ public class Plane extends Shape {
         Vector3 planePoint = getAnchor();
         Vector3 planeNormal = getAxis();
 
-        // Calculate the denominator
         double denominator = rayDirection.dot(planeNormal);
-
-        // If the denominator is 0, the ray is parallel to the plane and there is no
-        // intersection
-        if (Math.abs(denominator) < 1e-6) {
+        if (Math.abs(denominator) < 1e-6)
             return null;
-        }
 
-        // Calculate the numerator
         double numerator = planePoint.subtract(rayOrigin).dot(planeNormal);
-
-        // Calculate the intersection distance t
         double t = numerator / denominator;
 
-        // If t is negative, the intersection is behind the ray's origin
-        if (t < 0) {
+        if (t < 0)
             return null;
-        }
-
-        // Calculate the intersection point
         return rayOrigin.add(rayDirection.scale(t));
     }
 
@@ -60,5 +48,9 @@ public class Plane extends Shape {
     @Override
     public Vector3 getNormal(Vector3 hitPoint) {
         return axis;
+    }
+
+    public void setAxis(Vector3 axis) {
+        this.axis = axis;
     }
 }

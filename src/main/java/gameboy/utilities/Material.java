@@ -9,7 +9,7 @@ import gameboy.utilities.math.Vector3;
 
 public abstract class Material {
 
-    protected final Color color;
+    protected Color color;
     protected Shape shape;
 
     protected double reflectivity = 0;
@@ -22,6 +22,14 @@ public abstract class Material {
 
     public Color getColor(Vector3 point) {
         return this.color;
+    }
+
+    public Color getColor() {
+        return this.color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public void setShape(Shape shape) {

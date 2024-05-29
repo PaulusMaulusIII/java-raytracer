@@ -8,12 +8,20 @@ import gameboy.utilities.math.Vector3;
 public class CheckerMaterial extends Material {
 
 	double gridsize;
-	Color color2;
+	Color secColor;
 
 	public CheckerMaterial(Color color, Color color2, double gridsize) {
 		super(color);
-		this.color2 = color2;
+		this.secColor = color2;
 		this.gridsize = gridsize;
+	}
+
+	public void setSecColor(Color secColor) {
+		this.secColor = secColor;
+	}
+
+	public Color getSecColor() {
+		return secColor;
 	}
 
 	@Override
@@ -24,6 +32,14 @@ public class CheckerMaterial extends Material {
 
 		boolean isEven = (x + y + z) % 2 == 0;
 
-		return isEven ? color : color2;
+		return isEven ? color : secColor;
+	}
+
+	public double getGridsize() {
+		return gridsize;
+	}
+
+	public void setGridsize(double gridsize) {
+		this.gridsize = gridsize;
 	}
 }

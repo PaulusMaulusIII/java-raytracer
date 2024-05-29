@@ -1,6 +1,5 @@
 package gameboy.core.enums;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public enum Properties {
@@ -19,7 +18,6 @@ public enum Properties {
 		return tokenString;
 	}
 
-	public static final List<Properties> PROPERTIES = new LinkedList<>(
-			List.of(POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS, PITCH, YAW, SIDE, ANGLE, HEIGHT, GRIDSIZE,
-					SEC_COLOR, REFELECTIVITY, EMISSION, SHININESS));
+	public static final List<Properties> PROPERTIES = List.of(POSITION, SIDELENGTH, COLOR, MATERIAL, AXIS, FOV, RADIUS,
+			PITCH, YAW, SIDE, ANGLE, HEIGHT, GRIDSIZE, SEC_COLOR, REFELECTIVITY, EMISSION, SHININESS);
 }

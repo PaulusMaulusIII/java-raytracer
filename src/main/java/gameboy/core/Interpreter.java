@@ -87,7 +87,7 @@ public class Interpreter {
 
 	private Shape createPlane(HashMap<Properties, String> properties) {
 		Vector3 anchor = parseVector(properties.get(Properties.POSITION));
-		Vector3 axis = parseVector(properties.get(Properties.AXIS).toUpperCase());
+		Vector3 axis = parseVector(properties.get(Properties.AXIS));
 		Color color = parseColor(properties.getOrDefault((Properties.COLOR), "{255,255,255}"));
 		Color color2 = parseColor(properties.getOrDefault(Properties.SEC_COLOR, "{" + color.toAWT().darker().getRed()
 				+ "," + color.toAWT().darker().getGreen() + "," + color.toAWT().darker().getBlue() + "}"));
@@ -185,7 +185,7 @@ public class Interpreter {
 			double emission, double shininess) {
 		Materials finalMat = Materials.BASIC;
 		for (Materials material : Materials.MATERIALS) {
-			if (matString.equals(material.getPropertiestring())) {
+			if (matString.equals(material.getPropertystring())) {
 				finalMat = material;
 			}
 		}

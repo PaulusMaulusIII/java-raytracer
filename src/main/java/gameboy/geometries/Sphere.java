@@ -43,4 +43,12 @@ public class Sphere extends Shape {
     public Vector3 getNormal(Vector3 hitPoint) {
         return hitPoint.subtract(getAnchor()).normalize();
     }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
 }

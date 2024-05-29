@@ -123,4 +123,12 @@ public class Cube extends Shape {
             return null;
         }
     }
+
+    public double getSideLength() {
+        return sideLength;
+    }
+
+    public void setSideLength(double value) {
+        this.sideLength = value;
+    }
 }
