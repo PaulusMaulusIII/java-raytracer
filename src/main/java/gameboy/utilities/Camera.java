@@ -2,14 +2,13 @@ package gameboy.utilities;
 
 import gameboy.utilities.math.Vector3;
 
-public class Camera {
-    private Vector3 position;
+public class Camera extends Object3D {
     private double pitch = 0;
     private double yaw = 0;
     private double fov = 0;
 
     public Camera(Vector3 position, double fov) {
-        this.position = position;
+        super(position);
         this.fov = (double) fov;
     }
 
@@ -41,14 +40,6 @@ public class Camera {
         this.pitch = pitch;
     }
 
-    public Vector3 getPosition() {
-        return position;
-    }
-
-    public void setPosition(Vector3 position) {
-        this.position = position;
-    }
-
     public void setFOV(double fov) {
         this.fov = fov;
     }
@@ -58,7 +49,7 @@ public class Camera {
     }
 
     public void translate(Vector3 vec) {
-        this.position = this.position.add(vec);
+        this.anchor = this.anchor.add(vec);
     }
 
     @Override

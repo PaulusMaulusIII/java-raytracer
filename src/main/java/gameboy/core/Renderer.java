@@ -83,7 +83,7 @@ public class Renderer {
         Camera cam = scene.getCurrentCamera();
         Vector3 eyePos = new Vector3(0, 0, (-1 / Math.tan(cam.getFOV() / 2)));
         Vector3 rayDir = new Vector3(u, v, 0).subtract(eyePos).rotate(cam.getPitch(), cam.getYaw()).normalize();
-        Ray ray = new Ray(eyePos.add(cam.getPosition()), rayDir);
+        Ray ray = new Ray(eyePos.add(cam.getAnchor()), rayDir);
 
         RayHit hit = ray.cast(scene.getShapes());
         if (hit == null)

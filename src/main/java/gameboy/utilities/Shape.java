@@ -5,9 +5,8 @@ import java.util.List;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.Vector3;
 
-public abstract class Shape {
+public abstract class Shape extends Object3D {
 
-    Vector3 anchor;
     Material material;
 
     public Shape(Material material) {
@@ -19,24 +18,6 @@ public abstract class Shape {
         setAnchor(anchor);
         setMaterial(material);
         this.material.setShape(this);
-    }
-
-    /**
-     * Sets new {@code Vector3} Anchor property
-     * 
-     * @param anchor {@code Vector3} new Anchor
-     */
-    public void setAnchor(Vector3 anchor) {
-        this.anchor = anchor;
-    }
-
-    /**
-     * Gets current {@code Vector3} anchor property
-     * 
-     * @return {@code Vector3} current anchor
-     */
-    public Vector3 getAnchor() {
-        return anchor;
     }
 
     /**

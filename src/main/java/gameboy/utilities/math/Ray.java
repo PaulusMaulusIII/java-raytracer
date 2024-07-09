@@ -1,5 +1,6 @@
 package gameboy.utilities.math;
 
+import java.util.Iterator;
 import java.util.List;
 
 import gameboy.utilities.Shape;
@@ -80,7 +81,8 @@ public class Ray {
 
     public RayHit cast(List<Shape> objects) {
         RayHit hit = null;
-        for (Shape shape : objects) {
+        for (Iterator<Shape> iterator = objects.iterator(); iterator.hasNext();) {
+            Shape shape = iterator.next();
             Vector3 hitPoint = shape.getIntersectionPoint(this);
             if (hitPoint != null) {
                 RayHit hit2 = new RayHit(this, shape, hitPoint);

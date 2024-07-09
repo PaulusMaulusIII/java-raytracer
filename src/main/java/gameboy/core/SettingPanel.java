@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.Box;
@@ -40,24 +39,24 @@ import gameboy.materials.WaveMaterial;
 import gameboy.utilities.Camera;
 import gameboy.utilities.Color;
 import gameboy.utilities.Material;
+import gameboy.utilities.Object3D;
 import gameboy.utilities.Scene;
 import gameboy.utilities.Shape;
 import gameboy.utilities.math.Vector3;
 
 public class SettingPanel extends JPanel {
 
-	Scene scene = new Scene(new Camera(new Vector3(0, 2, -10), Math.toRadians(40)),
-			new LinkedList<Shape>(List.of(new Sphere(new Vector3(0, 0, 0), new SphereMaterial(), 2),
-					new Plane(new Vector3(0, -5, 0), new CheckerMaterial(Color.BLACK, Color.WHITE, 4),
-							new Vector3(0, 1, 0)))),
-			new LinkedList<Light>(List.of(new Light(new Vector3(-5, 10, -5), Color.BLUE),
-					new Light(new Vector3(5, 10, -5), Color.GREEN))));
+	Scene scene = new Scene(new Camera(new Vector3(0, 0, 0), Math.toRadians(40)),
+			List.of(new Sphere(new Vector3(0, 0, 0), new BasicMaterial(Color.WHITE), 2),
+					new Plane(new Vector3(0, -2, 0), new BasicMaterial(Color.WHITE), new Vector3(0, 1, 0))),
+			List.of(new Light(new Vector3(-10, 5, -10), Color.RED), new Light(new Vector3(0, 5, -10), Color.GREEN),
+					new Light(new Vector3(10, 5, -10), Color.BLUE)));
 	JFrame main;
 	SettingPanel settingPanel = this;
 	CurrentItemDisplay currentItemDisplay;
 
 	public SettingPanel(JFrame jFrame) {
-		setSize(400, 800);
+		setSize(500, 800);
 
 		main = jFrame;
 		currentItemDisplay = new CurrentItemDisplay();
@@ -70,7 +69,7 @@ public class SettingPanel extends JPanel {
 	}
 
 	public interface ObjectModification {
-		public void modify(Object object);
+		public void modify(Object3D Object3D);
 	}
 
 	public class VBox extends Box {
@@ -84,13 +83,13 @@ public class SettingPanel extends JPanel {
 		private Menu shapes;
 		private Menu lights;
 
-		private JComboBox<? extends Shape> shapeSelector = new JComboBox<>(new Shape[] {
+		private JComboBox<? extends Object3D> objectSelector = new JComboBox<>(new Object3D[] {
 				new Cone(new Vector3(0, 0, 0), new BasicMaterial(Color.WHITE), new Vector3(0, 1, 0), Math.toRadians(10),
 						5),
 				new Cube(new Vector3(0, 0, 0), new BasicMaterial(Color.WHITE), 4),
 				new Line(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new BasicMaterial(Color.WHITE)),
 				new Plane(new Vector3(0, 0, 0), new BasicMaterial(Color.WHITE), new Vector3(0, 1, 0)),
-				new Sphere(new Vector3(0, 0, 0), new BasicMaterial(Color.WHITE), 2)
+				new Sphere(new Vector3(0, 0, 0), new BasicMaterial(Color.WHITE), 2), new Light(new Vector3(0, 0, 0))
 		});
 
 		public MenuBar() {
@@ -104,57 +103,101 @@ public class SettingPanel extends JPanel {
 			add(shapes);
 			add(lights);
 
-			Button addShapeButton = new Button("Add Shape");
-			addShapeButton.addActionListener(new ActionListener() {
-
+			Button addObjectButton = new Button("Add Object3D");
+			addObjectButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					new NewShapeDialog(main);
+					new CreateObjectDialog(main);
 				}
 			});
-			add(addShapeButton);
+			add(addObjectButton);
+
+			Button removeCurrentObjectButton = new Button("Remove Object3D");
+			removeCurrentObjectButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Object3D currentItem = currentItemDisplay.getCurrentItem();
+					if (currentItem != null) {
+						Menu menu = null;
+						if (currentItem instanceof Camera) {
+							menu = cameras;
+							scene.getCameras().remove(currentItem);
+						}
+						else if (currentItem instanceof Shape) {
+							menu = shapes;
+							scene.getShapes().remove(currentItem);
+						}
+						else if (currentItem instanceof Light) {
+							menu = lights;
+							scene.getLights().remove(currentItem);
+						}
+						for (int i = 0; i < menu.getItemCount(); i++) {
+							if (((JMenuItem) menu.getItem(i)).getText().equals(currentItem.toString())) {
+								menu.remove(i);
+								break;
+							}
+						}
+					}
+				}
+			});
+			add(removeCurrentObjectButton);
 		}
 
-		public class NewShapeDialog extends JDialog {
+		public class CreateObjectDialog extends JDialog {
 
-			public NewShapeDialog(JFrame owner) {
+			public CreateObjectDialog(JFrame owner) {
 				super(owner);
 				setTitle("Select Shape To Add");
 				setSize(400, 100);
-				shapeSelector.addActionListener(new ActionListener() {
+				objectSelector.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						Shape shapeToAdd = ((Shape) shapeSelector.getSelectedItem());
-						JMenuItem menuItem = new JMenuItem(shapeToAdd.toString());
-						menuItem.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								currentItemDisplay.setCurrentItem(shapeToAdd);
-							}
-						});
-						shapes.add(menuItem);
-						scene.getShapes().add(shapeToAdd);
+						Object3D objectToAdd = (Object3D) objectSelector.getSelectedItem();
+						if (objectToAdd instanceof Shape) {
+							Shape shapeToAdd = (Shape) objectToAdd;
+							JMenuItem menuItem = new JMenuItem(shapeToAdd.toString());
+							menuItem.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									currentItemDisplay.setCurrentItem(shapeToAdd);
+								}
+							});
+							shapes.add(menuItem);
+							scene.getShapes().add(shapeToAdd);
+						}
+						else if (objectToAdd instanceof Light) {
+							Light lightToAdd = (Light) objectToAdd;
+							JMenuItem menuItem = new JMenuItem(lightToAdd.toString());
+							menuItem.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									currentItemDisplay.setCurrentItem(lightToAdd);
+								}
+							});
+							lights.add(menuItem);
+							scene.getLights().add(lightToAdd);
+						}
 						dispose();
 					}
 				});
-				shapeSelector.setAlignmentX(CENTER_ALIGNMENT);
-				shapeSelector.setAlignmentY(CENTER_ALIGNMENT);
+				objectSelector.setAlignmentX(CENTER_ALIGNMENT);
+				objectSelector.setAlignmentY(CENTER_ALIGNMENT);
 
-				add(shapeSelector);
+				add(objectSelector);
 
 				setVisible(true);
 			}
 		}
 
 		public class Menu extends JMenu {
-			public <T> Menu(String label, List<T> items) {
+			public Menu(String label, List<? extends Object3D> items) {
 				super(label);
-				for (T t : items) {
-					JMenuItem menuItem = new JMenuItem(t.toString());
+				for (Object3D object : items) {
+					JMenuItem menuItem = new JMenuItem(object.toString());
 					menuItem.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							currentItemDisplay.setCurrentItem(t);
+							currentItemDisplay.setCurrentItem(object);
 						}
 					});
 					add(menuItem);
@@ -165,31 +208,40 @@ public class SettingPanel extends JPanel {
 
 	public class CurrentItemDisplay extends VBox {
 
-		private Object currentItem = null;
+		private Object3D currentItem = null;
 		private Label label = new Label();
 
 		public CurrentItemDisplay() {
 			super();
 			add(label);
+			label.setText("No Object Selected!");
 		}
 
-		public void setCurrentItem(Object currentItem) {
+		public void setCurrentItem(Object3D currentItem) {
 			this.currentItem = currentItem;
-			label.setText(currentItem.toString());
-			try {
-				remove(1);
-			} catch (Exception e) {
+			if (currentItem != null) {
+				label.setText(currentItem.toString());
+				try {
+					remove(1);
+				} catch (Exception e) {
+				}
+				if (currentItem instanceof Camera)
+					add(new CameraSettings());
+				else if (currentItem instanceof Shape)
+					add(new ShapeSettings());
+				else if (currentItem instanceof Light)
+					add(new LightSettings());
 			}
-			if (currentItem instanceof Camera)
-				add(new CameraSettings());
-			else if (currentItem instanceof Shape)
-				add(new ShapeSettings());
-			else if (currentItem instanceof Light)
-				add(new LightSettings());
-
+			else {
+				label.setText("No Object Selected!");
+				try {
+					remove(1);
+				} catch (Exception e) {
+				}
+			}
 		}
 
-		public Object getCurrentItem() {
+		public Object3D getCurrentItem() {
 			return currentItem;
 		}
 
@@ -218,26 +270,27 @@ public class SettingPanel extends JPanel {
 			private Slider yawSlider = new Slider("Yaw", -10, 10);
 			private InputField fovField = new InputField("FOV", Math.toDegrees(cam.getFOV()), "°");
 
-			private ObjectModification setCameraPosition = (Object currentItem) -> ((Camera) currentItem)
-					.setPosition(new Vector3(xSlider.getValue(), ySlider.getValue(), zSlider.getValue()));
+			private ObjectModification setCameraPosition = (Object3D currentItem) -> ((Camera) currentItem)
+					.setAnchor(new Vector3(xSlider.getValue(), ySlider.getValue(), zSlider.getValue()));
 
 			public CameraSettings() {
 				super();
-				xSlider.setValue(cam.getPosition().x);
-				ySlider.setValue(cam.getPosition().y);
-				zSlider.setValue(cam.getPosition().z);
+				xSlider.setValue(cam.getAnchor().x);
+				ySlider.setValue(cam.getAnchor().y);
+				zSlider.setValue(cam.getAnchor().z);
 				xSlider.setAction(setCameraPosition);
 				ySlider.setAction(setCameraPosition);
 				zSlider.setAction(setCameraPosition);
 
 				pitchSlider.setAction(
-						(Object object) -> ((Camera) object).setPitch(Math.toRadians(-pitchSlider.getValue())));
+						(Object3D Object3D) -> ((Camera) Object3D).setPitch(Math.toRadians(-pitchSlider.getValue())));
 				add(pitchSlider);
 
-				yawSlider.setAction((Object object) -> ((Camera) object).setYaw(Math.toRadians(yawSlider.getValue())));
+				yawSlider.setAction(
+						(Object3D Object3D) -> ((Camera) Object3D).setYaw(Math.toRadians(yawSlider.getValue())));
 				add(yawSlider);
 
-				fovField.setAction((Object object) -> ((Camera) object)
+				fovField.setAction((Object3D Object3D) -> ((Camera) Object3D)
 						.setFOV(Math.toRadians(Double.parseDouble(fovField.getValue()))));
 				add(fovField);
 			}
@@ -248,7 +301,7 @@ public class SettingPanel extends JPanel {
 			private Light light = (Light) currentItem;
 			private ColorInput colorInput = new ColorInput(light.getColor());
 
-			private ObjectModification setLightPosition = (Object currentItem) -> ((Light) currentItem)
+			private ObjectModification setLightPosition = (Object3D currentItem) -> ((Light) currentItem)
 					.setAnchor(new Vector3(xSlider.getValue(), ySlider.getValue(), zSlider.getValue()));;
 
 			public LightSettings() {
@@ -260,14 +313,14 @@ public class SettingPanel extends JPanel {
 				ySlider.setAction(setLightPosition);
 				zSlider.setAction(setLightPosition);
 
-				colorInput.setAction((Object object) -> ((Light) currentItem).setColor(colorInput.getColor()));
+				colorInput.setAction((Object3D Object3D) -> ((Light) currentItem).setColor(colorInput.getColor()));
 				add(colorInput);
 			}
 		}
 
 		public class ShapeSettings extends Settings {
 
-			private ObjectModification setCameraPosition = (Object currentItem) -> ((Shape) currentItem)
+			private ObjectModification setCameraPosition = (Object3D currentItem) -> ((Shape) currentItem)
 					.setAnchor(new Vector3(xSlider.getValue(), ySlider.getValue(), zSlider.getValue()));
 
 			private Shape shape = (Shape) currentItem;
@@ -284,14 +337,14 @@ public class SettingPanel extends JPanel {
 				if (shape instanceof Cube) {
 					Cube cube = ((Cube) shape);
 					InputField sideLengthInputField = new InputField("Sidelength", cube.getSideLength());
-					sideLengthInputField.setAction((Object object) -> ((Cube) object)
+					sideLengthInputField.setAction((Object3D Object3D) -> ((Cube) Object3D)
 							.setSideLength(Double.parseDouble(sideLengthInputField.getValue())));
 					add(sideLengthInputField);
 				}
 				else if (shape instanceof Sphere) {
 					Sphere sphere = ((Sphere) shape);
 					InputField radiusInputField = new InputField("Radius", sphere.getRadius());
-					radiusInputField.setAction((Object object) -> ((Sphere) object)
+					radiusInputField.setAction((Object3D Object3D) -> ((Sphere) Object3D)
 							.setRadius(Double.parseDouble(radiusInputField.getValue())));
 					add(radiusInputField);
 				}
@@ -305,7 +358,7 @@ public class SettingPanel extends JPanel {
 					Slider zDirectionSlider = new Slider("zDir", -10, 10);
 					zDirectionSlider.setValue(plane.getAxis().z);
 
-					ObjectModification setPlaneAxis = (Object object) -> ((Plane) object)
+					ObjectModification setPlaneAxis = (Object3D Object3D) -> ((Plane) Object3D)
 							.setAxis(new Vector3(xDirectionSlider.getValue(), yDirectionSlider.getValue(),
 									zDirectionSlider.getValue()).normalize());
 
@@ -343,39 +396,41 @@ public class SettingPanel extends JPanel {
 						public void actionPerformed(ActionEvent e) {
 							new ObjectModification() {
 								@Override
-								public void modify(Object object) {
+								public void modify(Object3D Object3D) {
 									Material material = ((Material) materialSelector.getSelectedItem());
-									material.setShape((Shape) object);
-									((Shape) object).setMaterial(material);
+									material.setShape((Shape) Object3D);
+									((Shape) Object3D).setMaterial(material);
 
 								}
 							}.modify(currentItem);
 						}
 					});
 					add(materialSelector);
-					mainColorInput.setAction(
-							(Object object) -> ((Shape) object).getMaterial().setColor(mainColorInput.getColor()));
+					mainColorInput.setAction((Object3D Object3D) -> ((Shape) Object3D).getMaterial()
+							.setColor(mainColorInput.getColor()));
 					add(mainColorInput);
 					if (material instanceof CheckerMaterial) {
 						ColorInput secColorInput = new ColorInput(((CheckerMaterial) material).getSecColor());
-						secColorInput.setAction((Object object) -> ((CheckerMaterial) ((Shape) object).getMaterial())
-								.setSecColor(secColorInput.getColor()));
+						secColorInput
+								.setAction((Object3D Object3D) -> ((CheckerMaterial) ((Shape) Object3D).getMaterial())
+										.setSecColor(secColorInput.getColor()));
 						add(secColorInput);
 						InputField gridSizeField = new InputField("Gridsize",
 								((CheckerMaterial) material).getGridsize());
-						gridSizeField.setAction((Object object) -> ((CheckerMaterial) ((Shape) object).getMaterial())
-								.setGridsize(Double.parseDouble(gridSizeField.getValue())));
+						gridSizeField
+								.setAction((Object3D Object3D) -> ((CheckerMaterial) ((Shape) Object3D).getMaterial())
+										.setGridsize(Double.parseDouble(gridSizeField.getValue())));
 						add(gridSizeField);
 					}
 					if (!(material instanceof MirrorMaterial)) {
-						reflectivity.setAction((Object object) -> ((Shape) object).getMaterial()
+						reflectivity.setAction((Object3D Object3D) -> ((Shape) Object3D).getMaterial()
 								.setReflectivity(Double.parseDouble(reflectivity.getValue())));
 						add(reflectivity);
 					}
-					shininess.setAction((Object object) -> ((Shape) object).getMaterial()
+					shininess.setAction((Object3D Object3D) -> ((Shape) Object3D).getMaterial()
 							.setShininess(Double.parseDouble(shininess.getValue())));
 					add(shininess);
-					emission.setAction((Object object) -> ((Shape) object).getMaterial()
+					emission.setAction((Object3D Object3D) -> ((Shape) Object3D).getMaterial()
 							.setEmission(Double.parseDouble(emission.getValue())));
 					add(emission);
 				}

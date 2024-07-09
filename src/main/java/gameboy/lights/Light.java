@@ -1,29 +1,20 @@
 package gameboy.lights;
 
 import gameboy.utilities.Color;
-
+import gameboy.utilities.Object3D;
 import gameboy.utilities.math.Vector3;
 
-public class Light {
-    private Vector3 anchor;
+public class Light extends Object3D {
     private Color color;
 
     public Light(Vector3 anchor) {
-        this.anchor = anchor;
+        super(anchor);
         this.color = Color.WHITE;
     }
 
-    public void setAnchor(Vector3 anchor) {
-        this.anchor = anchor;
-    }
-
     public Light(Vector3 anchor, Color color) {
-        this.anchor = anchor;
+        super(anchor);
         this.color = color;
-    }
-
-    public Vector3 getAnchor() {
-        return anchor;
     }
 
     public void setColor(Color color) {

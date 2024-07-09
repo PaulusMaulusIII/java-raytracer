@@ -1,5 +1,6 @@
 package gameboy.utilities;
 
+import java.util.Iterator;
 import java.util.List;
 
 import gameboy.lights.Light;
@@ -76,11 +77,17 @@ public abstract class Material {
         Color diffuseComponent = new Color(0, 0, 0);
         Color specularComponent = new Color(0, 0, 0);
 
-        for (Light light : lights) {
+        for (Iterator<Light> iterator = lights.iterator(); iterator.hasNext();) {
+            Light light = iterator.next();
             if (!isInShadow(rayHit, light, objects)) {
-                diffuseComponent = diffuseComponent.add(baseColor.multiply(calculateDiffuseLighting(rayHit, light)));
+                double distance = rayHit.getHitPoint().distance(light.getAnchor());
+                double attenuation = 100 / (distance * distance);
+                Color lightColor = light.getColor().multiply(attenuation);
+
+                diffuseComponent = diffuseComponent
+                        .add(baseColor.multiply(calculateDiffuseLighting(rayHit, light)).multiply(lightColor));
                 specularComponent = specularComponent
-                        .add(light.getColor().multiply(calculateSpecularLighting(rayHit, light)));
+                        .add(lightColor.multiply(calculateSpecularLighting(rayHit, light)));
             }
         }
 
@@ -93,7 +100,7 @@ public abstract class Material {
     private boolean isInShadow(RayHit rayHit, Light light, List<Shape> objects) {
         Vector3 hitPoint = rayHit.getHitPoint();
         Vector3 lightDirection = light.getAnchor().subtract(hitPoint).normalize();
-        Ray shadowRay = new Ray(hitPoint.add(lightDirection.scale(1e-4)), lightDirection);
+        Ray shadowRay = new Ray(hitPoint.add(lightDirection.scale(1e-6)), lightDirection);
 
         RayHit hit = shadowRay.cast(objects);
 
