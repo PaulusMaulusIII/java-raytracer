@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.Box;
@@ -27,6 +28,7 @@ import gameboy.geometries.Cone;
 import gameboy.geometries.Cube;
 import gameboy.geometries.Line;
 import gameboy.geometries.Plane;
+import gameboy.geometries.Polygon;
 import gameboy.geometries.Sphere;
 import gameboy.lights.Light;
 import gameboy.materials.BasicMaterial;
@@ -49,11 +51,13 @@ import gameboy.utilities.Shape;
 import gameboy.utilities.math.Vector3;
 
 public class SettingPanel extends JPanel {
+	List<Vector3> polygonVertices = Arrays.asList(new Vector3(-2, 0, 0), new Vector3(2, 0, 0), new Vector3(0, 4, 0));
 
-	Scene scene = new Scene(new Camera(new Vector3(0, 0, 0), Math.toRadians(40)),
-			List.of(new Sphere(new Vector3(0, 0, 0), new MirrorMaterial(new PhongShader()), 2),
-					new Plane(new Vector3(0, -2, 0),
-							new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4), new Vector3(0, 1, 0))),
+	Scene scene = new Scene(new Camera(new Vector3(0, 0, 0), Math.toRadians(40)), List.of(
+			new Sphere(new Vector3(10, 0, 0), new MirrorMaterial(new PhongShader()), 2),
+			new Plane(new Vector3(0, -2, 0), new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4),
+					new Vector3(0, 1, 0)),
+			new Polygon(new Vector3(0, 0, 5), new BasicMaterial(new PhongShader(), Color.WHITE), polygonVertices)),
 			List.of(new Light(new Vector3(-10, 5, -10), new Color(255, 161, 72), 10)));
 	JFrame main;
 	SettingPanel settingPanel = this;

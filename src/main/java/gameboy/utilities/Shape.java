@@ -9,11 +9,6 @@ public abstract class Shape extends Object3D {
 
     Material material;
 
-    public Shape(Material material) {
-        setMaterial(material);
-        this.material.setShape(this);
-    }
-
     public Shape(Vector3 anchor, Material material) {
         setAnchor(anchor);
         setMaterial(material);

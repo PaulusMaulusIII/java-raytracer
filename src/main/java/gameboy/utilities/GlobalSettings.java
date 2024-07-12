@@ -7,4 +7,5 @@ public class GlobalSettings {
 	public static final int MAX_RENDER_DISTANCE = 10000;
 	public static final double SKY_EMISSION = 0;
 	public static final double SPECULAR_STRENGTH = 1;
+    public static final double ATTENUATION = 1000;
 }

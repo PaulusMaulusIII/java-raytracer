@@ -29,7 +29,7 @@ public class PhongShader implements Shader {
 		for (Light light : lights) {
 			if (!isInShadow(rayHit, lights, objects)) {
 				double distance = rayHit.getHitPoint().distance(light.getAnchor());
-				double attenuation = 100 / (distance * distance);
+				double attenuation = GlobalSettings.ATTENUATION / (distance * distance);
 				Color lightColor = light.getColor().multiply(attenuation);
 
 				double diffuseLighting = calculateDiffuseLighting(rayHit, light);
