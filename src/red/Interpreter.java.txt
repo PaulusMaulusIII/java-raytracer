@@ -1,5 +1,3 @@
-package gameboy.core;
-
 import gameboy.utilities.Color;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -194,37 +192,25 @@ public class Interpreter {
 		case BASIC:
 			material = new BasicMaterial(color);
 			material.setReflectivity(reflectivity);
-			material.setEmission(emission);
-			material.setShininess(shininess);
 			break;
 		case CHECKER:
 			material = new CheckerMaterial(color, color2, gridsize);
 			material.setReflectivity(reflectivity);
-			material.setEmission(emission);
-			material.setShininess(shininess);
 			break;
 		case SPHEREMAT:
 			material = new SphereMaterial();
 			material.setReflectivity(reflectivity);
-			material.setEmission(emission);
-			material.setShininess(shininess);
 			break;
 		case CUBEMAT:
 			material = new CubeMaterial();
 			material.setReflectivity(reflectivity);
-			material.setEmission(emission);
-			material.setShininess(shininess);
 			break;
 		case WAVE:
 			material = new WaveMaterial();
 			material.setReflectivity(reflectivity);
-			material.setEmission(emission);
-			material.setShininess(shininess);
 			break;
 		case MIRROR:
 			material = new MirrorMaterial();
-			material.setEmission(emission);
-			material.setShininess(shininess);
 			break;
 		default:
 			break;

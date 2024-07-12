@@ -6,15 +6,20 @@ import gameboy.utilities.math.Vector3;
 
 public class Light extends Object3D {
     private Color color;
-
-    public Light(Vector3 anchor) {
-        super(anchor);
-        this.color = Color.WHITE;
-    }
+    private double intensity = 1;
 
     public Light(Vector3 anchor, Color color) {
         super(anchor);
         this.color = color;
+    }
+
+    public Light(Vector3 anchor) {
+        this(anchor, Color.WHITE);
+    }
+
+    public Light(Vector3 anchor, Color color, double intensity) {
+        this(anchor, color);
+        this.intensity = intensity;
     }
 
     public void setColor(Color color) {
@@ -23,6 +28,14 @@ public class Light extends Object3D {
 
     public Color getColor() {
         return color;
+    }
+
+    public void setIntensity(double intensity) {
+        this.intensity = intensity;
+    }
+
+    public double getIntensity() {
+        return intensity;
     }
 
     @Override

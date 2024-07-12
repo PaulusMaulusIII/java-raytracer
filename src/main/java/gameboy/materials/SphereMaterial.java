@@ -1,5 +1,6 @@
 package gameboy.materials;
 
+import gameboy.shaders.Shader;
 import gameboy.utilities.Color;
 
 import gameboy.utilities.Material;
@@ -7,8 +8,8 @@ import gameboy.utilities.math.Vector3;
 
 public class SphereMaterial extends Material {
 
-	public SphereMaterial() {
-		super(Color.WHITE);
+	public SphereMaterial(Shader shader) {
+		super(shader, Color.WHITE);
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package gameboy.materials;
 
+import gameboy.shaders.Shader;
 import gameboy.utilities.Color;
 
 import gameboy.utilities.Material;
@@ -7,8 +8,8 @@ import gameboy.utilities.math.Vector3;
 
 public class CubeMaterial extends Material {
 
-	public CubeMaterial() {
-		super(Color.WHITE);
+	public CubeMaterial(Shader shader) {
+		super(shader, Color.WHITE);
 	}
 
 	@Override

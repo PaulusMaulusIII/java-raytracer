@@ -30,7 +30,7 @@ public class Renderer {
         this.width = width;
     }
 
-    public BufferedImage render(double resolution) {
+    public static BufferedImage render(Scene scene, int width, int height, double resolution, boolean verbose) {
         BufferedImage temp = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics gfx = temp.getGraphics();
         int blockSize = (int) (1 / resolution);
@@ -38,23 +38,26 @@ public class Renderer {
         for (int y = 0; y < height; y += blockSize) {
             for (int x = 0; x < width; x += blockSize) {
                 double[] screenUV = getNormalizedScreenCoordinates(x, y, width, height);
-                PixelData pixelData = getPixelData(screenUV[0], screenUV[1]);
+                PixelData pixelData = getPixelData(scene, screenUV[0], screenUV[1]);
                 gfx.setColor(GlobalSettings.SKY_BOX_COLOR.toAWT());
                 if (pixelData != null) {
                     gfx.setColor(pixelData.getColor().toAWT());
                 }
                 gfx.fillRect(x, y, blockSize, blockSize);
+                if (verbose && x % width == 0 && y % 512 == 0) {
+                    System.out.println((int) (((double) y / height) * 100) + "%");
+                }
             }
         }
 
         return temp;
     }
 
-    public void renderToImage(Scene scene, int i, int j) throws IOException {
+    public static void renderToImage(Scene scene, int width, int height) throws IOException {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         System.out.println("Rendering to image...");
 
-        image = new Renderer(scene, i, j).render(1);
+        image = render(scene, width, height, 1, true);
 
         File imgFile = new File("output.png");
         ImageIO.write(image, "PNG", new FileOutputStream(imgFile));
@@ -63,7 +66,7 @@ public class Renderer {
         Desktop.getDesktop().open(imgFile);
     }
 
-    public double[] getNormalizedScreenCoordinates(int x, int y, double width, double height) {
+    public static double[] getNormalizedScreenCoordinates(int x, int y, double width, double height) {
         double u = 0, v = 0;
         if (width > height) {
             u = (double) (x - width / 2 + height / 2) / height * 2 - 1;
@@ -79,18 +82,23 @@ public class Renderer {
         };
     }
 
-    public PixelData getPixelData(double u, double v) {
-        Camera cam = scene.getCurrentCamera();
+    public static PixelData getPixelData(Scene scene, double u, double v) {
+        Camera cam = scene.getCamera();
         Vector3 eyePos = new Vector3(0, 0, (-1 / Math.tan(cam.getFOV() / 2)));
         Vector3 rayDir = new Vector3(u, v, 0).subtract(eyePos).rotate(cam.getPitch(), cam.getYaw()).normalize();
         Ray ray = new Ray(eyePos.add(cam.getAnchor()), rayDir);
 
-        RayHit hit = ray.cast(scene.getShapes());
+        RayHit hit = ray.cast(scene.getObjects());
         if (hit == null)
             return null;
         if (ray.getOrigin().distance(hit.getHitPoint()) > GlobalSettings.MAX_RENDER_DISTANCE)
             return null;
 
-        return new PixelData(hit, scene.getLights(), scene.getShapes());
+        return new PixelData(hit, scene.getLights(), scene.getObjects());
+    }
+
+    public static PixelData getLookingAt(Scene scene, int width, int height) {
+        double[] screenUV = getNormalizedScreenCoordinates(width / 2, height / 2, width, height);
+        return getPixelData(scene, screenUV[0], screenUV[1]);
     }
 }

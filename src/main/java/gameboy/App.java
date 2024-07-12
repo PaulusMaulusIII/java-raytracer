@@ -22,14 +22,13 @@ public class App {
             }
         });
 
-        SettingPanel settings = new SettingPanel(main);
-        Viewport viewport = new Viewport(main, settings);
-
         JDialog settingsDialog = new JDialog(main, "Settings");
+        SettingPanel settings = new SettingPanel(main);
+        Viewport viewport = new Viewport(main, settings, settingsDialog);
 
         settingsDialog.add(settings);
         settingsDialog.setSize(settings.getSize());
-        settingsDialog.setVisible(true);
+        settingsDialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
 
         main.setVisible(true);
         main.add(viewport);

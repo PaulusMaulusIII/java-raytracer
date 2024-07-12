@@ -20,8 +20,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 import gameboy.geometries.Cone;
 import gameboy.geometries.Cube;
@@ -36,6 +36,10 @@ import gameboy.materials.GradientMaterial;
 import gameboy.materials.MirrorMaterial;
 import gameboy.materials.SphereMaterial;
 import gameboy.materials.WaveMaterial;
+import gameboy.shaders.BasicShader;
+import gameboy.shaders.PhongShader;
+import gameboy.shaders.RainbowShader;
+import gameboy.shaders.Shader;
 import gameboy.utilities.Camera;
 import gameboy.utilities.Color;
 import gameboy.utilities.Material;
@@ -47,17 +51,16 @@ import gameboy.utilities.math.Vector3;
 public class SettingPanel extends JPanel {
 
 	Scene scene = new Scene(new Camera(new Vector3(0, 0, 0), Math.toRadians(40)),
-			List.of(new Sphere(new Vector3(0, 0, 0), new BasicMaterial(Color.WHITE), 2),
-					new Plane(new Vector3(0, -2, 0), new BasicMaterial(Color.WHITE), new Vector3(0, 1, 0))),
-			List.of(new Light(new Vector3(-10, 5, -10), Color.RED), new Light(new Vector3(0, 5, -10), Color.GREEN),
-					new Light(new Vector3(10, 5, -10), Color.BLUE)));
+			List.of(new Sphere(new Vector3(0, 0, 0), new MirrorMaterial(new PhongShader()), 2),
+					new Plane(new Vector3(0, -2, 0),
+							new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4), new Vector3(0, 1, 0))),
+			List.of(new Light(new Vector3(-10, 5, -10), new Color(255, 161, 72), 10)));
 	JFrame main;
 	SettingPanel settingPanel = this;
 	CurrentItemDisplay currentItemDisplay;
 
 	public SettingPanel(JFrame jFrame) {
 		setSize(500, 800);
-
 		main = jFrame;
 		currentItemDisplay = new CurrentItemDisplay();
 		add(new MenuBar());
@@ -69,7 +72,7 @@ public class SettingPanel extends JPanel {
 	}
 
 	public interface ObjectModification {
-		public void modify(Object3D Object3D);
+		public void modify(Object3D object);
 	}
 
 	public class VBox extends Box {
@@ -79,27 +82,26 @@ public class SettingPanel extends JPanel {
 	}
 
 	public class MenuBar extends JMenuBar {
-		private Menu cameras;
+		private Button camera;
 		private Menu shapes;
 		private Menu lights;
 
-		private JComboBox<? extends Object3D> objectSelector = new JComboBox<>(new Object3D[] {
-				new Cone(new Vector3(0, 0, 0), new BasicMaterial(Color.WHITE), new Vector3(0, 1, 0), Math.toRadians(10),
-						5),
-				new Cube(new Vector3(0, 0, 0), new BasicMaterial(Color.WHITE), 4),
-				new Line(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new BasicMaterial(Color.WHITE)),
-				new Plane(new Vector3(0, 0, 0), new BasicMaterial(Color.WHITE), new Vector3(0, 1, 0)),
-				new Sphere(new Vector3(0, 0, 0), new BasicMaterial(Color.WHITE), 2), new Light(new Vector3(0, 0, 0))
-		});
-
 		public MenuBar() {
 			super();
-			cameras = new Menu("Cameras", scene.getCameras());
+			camera = new Button("Camera");
 			lights = new Menu("Lights", scene.getLights());
 			shapes = new Menu("Shapes", scene.getShapes());
 
+			camera.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					currentItemDisplay.setCurrentItem(scene.getCamera());
+					currentItemDisplay.repaint();
+				}
+			});
+
 			add(new Label("Java Ray-Tacer"));
-			add(cameras);
+			add(camera);
 			add(shapes);
 			add(lights);
 
@@ -119,11 +121,7 @@ public class SettingPanel extends JPanel {
 					Object3D currentItem = currentItemDisplay.getCurrentItem();
 					if (currentItem != null) {
 						Menu menu = null;
-						if (currentItem instanceof Camera) {
-							menu = cameras;
-							scene.getCameras().remove(currentItem);
-						}
-						else if (currentItem instanceof Shape) {
+						if (currentItem instanceof Shape) {
 							menu = shapes;
 							scene.getShapes().remove(currentItem);
 						}
@@ -147,6 +145,17 @@ public class SettingPanel extends JPanel {
 
 			public CreateObjectDialog(JFrame owner) {
 				super(owner);
+				JComboBox<? extends Object3D> objectSelector = new JComboBox<>(new Object3D[] {
+						new Cone(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE),
+								new Vector3(0, 1, 0), Math.toRadians(10), 5),
+						new Cube(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE), 4),
+						new Line(new Vector3(0, 0, 0), new Vector3(0, 0, 1),
+								new BasicMaterial(new BasicShader(), Color.WHITE)),
+						new Plane(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE),
+								new Vector3(0, 1, 0)),
+						new Sphere(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE), 2),
+						new Light(new Vector3(0, 0, 0))
+				});
 				setTitle("Select Shape To Add");
 				setSize(400, 100);
 				objectSelector.addActionListener(new ActionListener() {
@@ -177,6 +186,7 @@ public class SettingPanel extends JPanel {
 							lights.add(menuItem);
 							scene.getLights().add(lightToAdd);
 						}
+
 						dispose();
 					}
 				});
@@ -283,14 +293,14 @@ public class SettingPanel extends JPanel {
 				zSlider.setAction(setCameraPosition);
 
 				pitchSlider.setAction(
-						(Object3D Object3D) -> ((Camera) Object3D).setPitch(Math.toRadians(-pitchSlider.getValue())));
+						(Object3D object) -> ((Camera) object).setPitch(Math.toRadians(-pitchSlider.getValue())));
 				add(pitchSlider);
 
-				yawSlider.setAction(
-						(Object3D Object3D) -> ((Camera) Object3D).setYaw(Math.toRadians(yawSlider.getValue())));
+				yawSlider
+						.setAction((Object3D object) -> ((Camera) object).setYaw(Math.toRadians(yawSlider.getValue())));
 				add(yawSlider);
 
-				fovField.setAction((Object3D Object3D) -> ((Camera) Object3D)
+				fovField.setAction((Object3D object) -> ((Camera) object)
 						.setFOV(Math.toRadians(Double.parseDouble(fovField.getValue()))));
 				add(fovField);
 			}
@@ -300,6 +310,7 @@ public class SettingPanel extends JPanel {
 
 			private Light light = (Light) currentItem;
 			private ColorInput colorInput = new ColorInput(light.getColor());
+			private InputField intensity = new InputField("Intensity", 1.0);
 
 			private ObjectModification setLightPosition = (Object3D currentItem) -> ((Light) currentItem)
 					.setAnchor(new Vector3(xSlider.getValue(), ySlider.getValue(), zSlider.getValue()));;
@@ -313,8 +324,11 @@ public class SettingPanel extends JPanel {
 				ySlider.setAction(setLightPosition);
 				zSlider.setAction(setLightPosition);
 
-				colorInput.setAction((Object3D Object3D) -> ((Light) currentItem).setColor(colorInput.getColor()));
+				colorInput.setAction((Object3D object) -> ((Light) currentItem).setColor(colorInput.getColor()));
+				intensity.setAction((Object3D object) -> ((Light) currentItem)
+						.setIntensity(Double.parseDouble(intensity.getValue())));
 				add(colorInput);
+				add(intensity);
 			}
 		}
 
@@ -337,14 +351,14 @@ public class SettingPanel extends JPanel {
 				if (shape instanceof Cube) {
 					Cube cube = ((Cube) shape);
 					InputField sideLengthInputField = new InputField("Sidelength", cube.getSideLength());
-					sideLengthInputField.setAction((Object3D Object3D) -> ((Cube) Object3D)
+					sideLengthInputField.setAction((Object3D object) -> ((Cube) object)
 							.setSideLength(Double.parseDouble(sideLengthInputField.getValue())));
 					add(sideLengthInputField);
 				}
 				else if (shape instanceof Sphere) {
 					Sphere sphere = ((Sphere) shape);
 					InputField radiusInputField = new InputField("Radius", sphere.getRadius());
-					radiusInputField.setAction((Object3D Object3D) -> ((Sphere) Object3D)
+					radiusInputField.setAction((Object3D object) -> ((Sphere) object)
 							.setRadius(Double.parseDouble(radiusInputField.getValue())));
 					add(radiusInputField);
 				}
@@ -358,7 +372,7 @@ public class SettingPanel extends JPanel {
 					Slider zDirectionSlider = new Slider("zDir", -10, 10);
 					zDirectionSlider.setValue(plane.getAxis().z);
 
-					ObjectModification setPlaneAxis = (Object3D Object3D) -> ((Plane) Object3D)
+					ObjectModification setPlaneAxis = (Object3D object) -> ((Plane) object)
 							.setAxis(new Vector3(xDirectionSlider.getValue(), yDirectionSlider.getValue(),
 									zDirectionSlider.getValue()).normalize());
 
@@ -371,6 +385,7 @@ public class SettingPanel extends JPanel {
 					add(zDirectionSlider);
 				}
 				add(new MaterialSettingsPanel());
+				add(new ShaderSettingPanel());
 			}
 
 			public class MaterialSettingsPanel extends VBox {
@@ -378,14 +393,15 @@ public class SettingPanel extends JPanel {
 				private Material material = shape.getMaterial();
 				private Label label = new Label(material.getClass().toString());
 				private JComboBox<? extends Material> materialSelector = new JComboBox<>(new Material[] {
-						new BasicMaterial(Color.WHITE), new CheckerMaterial(Color.WHITE, Color.BLACK, 2),
-						new CubeMaterial(), new GradientMaterial(Color.WHITE, Color.BLACK), new MirrorMaterial(),
-						new SphereMaterial(), new WaveMaterial()
+						new BasicMaterial(new BasicShader(), Color.WHITE),
+						new CheckerMaterial(new BasicShader(), Color.WHITE, Color.BLACK, 2),
+						new CubeMaterial(new BasicShader()),
+						new GradientMaterial(new BasicShader(), Color.WHITE, Color.BLACK),
+						new MirrorMaterial(new BasicShader()), new SphereMaterial(new BasicShader()),
+						new WaveMaterial(new BasicShader())
 				});
 				private ColorInput mainColorInput = new ColorInput(material.getColor());
 				private InputField reflectivity = new InputField("Refl", material.getReflectivity());
-				private InputField shininess = new InputField("Shiny", material.getShininess());
-				private InputField emission = new InputField("Emiss", material.getEmission());
 
 				public MaterialSettingsPanel() {
 					super();
@@ -396,43 +412,76 @@ public class SettingPanel extends JPanel {
 						public void actionPerformed(ActionEvent e) {
 							new ObjectModification() {
 								@Override
-								public void modify(Object3D Object3D) {
+								public void modify(Object3D object) {
 									Material material = ((Material) materialSelector.getSelectedItem());
-									material.setShape((Shape) Object3D);
-									((Shape) Object3D).setMaterial(material);
+									material.setShape((Shape) object);
+									((Shape) object).setMaterial(material);
 
 								}
 							}.modify(currentItem);
 						}
 					});
 					add(materialSelector);
-					mainColorInput.setAction((Object3D Object3D) -> ((Shape) Object3D).getMaterial()
-							.setColor(mainColorInput.getColor()));
+					mainColorInput.setAction(
+							(Object3D object) -> ((Shape) object).getMaterial().setColor(mainColorInput.getColor()));
 					add(mainColorInput);
 					if (material instanceof CheckerMaterial) {
 						ColorInput secColorInput = new ColorInput(((CheckerMaterial) material).getSecColor());
-						secColorInput
-								.setAction((Object3D Object3D) -> ((CheckerMaterial) ((Shape) Object3D).getMaterial())
-										.setSecColor(secColorInput.getColor()));
+						secColorInput.setAction((Object3D object) -> ((CheckerMaterial) ((Shape) object).getMaterial())
+								.setSecColor(secColorInput.getColor()));
 						add(secColorInput);
 						InputField gridSizeField = new InputField("Gridsize",
 								((CheckerMaterial) material).getGridsize());
-						gridSizeField
-								.setAction((Object3D Object3D) -> ((CheckerMaterial) ((Shape) Object3D).getMaterial())
-										.setGridsize(Double.parseDouble(gridSizeField.getValue())));
+						gridSizeField.setAction((Object3D object) -> ((CheckerMaterial) ((Shape) object).getMaterial())
+								.setGridsize(Double.parseDouble(gridSizeField.getValue())));
 						add(gridSizeField);
 					}
 					if (!(material instanceof MirrorMaterial)) {
-						reflectivity.setAction((Object3D Object3D) -> ((Shape) Object3D).getMaterial()
+						reflectivity.setAction((Object3D object) -> ((Shape) object).getMaterial()
 								.setReflectivity(Double.parseDouble(reflectivity.getValue())));
 						add(reflectivity);
 					}
-					shininess.setAction((Object3D Object3D) -> ((Shape) Object3D).getMaterial()
-							.setShininess(Double.parseDouble(shininess.getValue())));
-					add(shininess);
-					emission.setAction((Object3D Object3D) -> ((Shape) Object3D).getMaterial()
-							.setEmission(Double.parseDouble(emission.getValue())));
-					add(emission);
+				}
+			}
+
+			public class ShaderSettingPanel extends VBox {
+				private Shader shader = shape.getMaterial().getShader();
+				private Label label = new Label(shader.getClass().toString());
+				private JComboBox<? extends Shader> shaderSelector = new JComboBox<>(new Shader[] {
+						new BasicShader(), new PhongShader(), new RainbowShader()
+				});
+
+				private InputField emission = new InputField("Emission", 1);
+				private InputField shininess = new InputField("Shininess", 128);
+
+				public ShaderSettingPanel() {
+					super();
+					label.setAlignment(1);
+					add(label);
+					shaderSelector.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							new ObjectModification() {
+								@Override
+								public void modify(Object3D object) {
+									((Shape) object).getMaterial().setShader((Shader) shaderSelector.getSelectedItem());
+								}
+							}.modify(currentItem);
+						}
+					});
+					add(shaderSelector);
+					if (shader instanceof PhongShader) {
+						emission.setAction(
+								(Object3D object) -> ((PhongShader) ((Shape) object).getMaterial().getShader())
+										.setEmission(Double.parseDouble(emission.getValue())));
+
+						shininess.setAction(
+								(Object3D object) -> ((PhongShader) ((Shape) object).getMaterial().getShader())
+										.setShininess(Double.parseDouble(shininess.getValue())));
+
+						add(emission);
+						add(shininess);
+					}
 				}
 			}
 		}

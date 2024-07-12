@@ -1,5 +1,6 @@
 package gameboy.materials;
 
+import gameboy.shaders.Shader;
 import gameboy.utilities.Color;
 
 import gameboy.utilities.Material;
@@ -10,8 +11,8 @@ public class CheckerMaterial extends Material {
 	double gridsize;
 	Color secColor;
 
-	public CheckerMaterial(Color color, Color color2, double gridsize) {
-		super(color);
+	public CheckerMaterial(Shader shader, Color color, Color color2, double gridsize) {
+		super(shader, color);
 		this.secColor = color2;
 		this.gridsize = gridsize;
 	}

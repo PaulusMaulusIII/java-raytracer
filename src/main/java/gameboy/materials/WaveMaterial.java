@@ -1,5 +1,6 @@
 package gameboy.materials;
 
+import gameboy.shaders.Shader;
 import gameboy.utilities.Color;
 import gameboy.utilities.Material;
 import gameboy.utilities.math.Vector3;
@@ -9,8 +10,8 @@ public class WaveMaterial extends Material {
 	private long time;
 	private Vector3 normal = new Vector3(1, 2, 0);
 
-	public WaveMaterial() {
-		super(Color.WHITE);
+	public WaveMaterial(Shader shader) {
+		super(shader, Color.WHITE);
 		time = System.currentTimeMillis();
 	}
 

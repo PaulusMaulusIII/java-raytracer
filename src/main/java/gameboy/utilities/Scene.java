@@ -6,50 +6,44 @@ import java.util.List;
 import gameboy.lights.Light;
 
 public class Scene {
-    private int currentCamera = 0;
-    private List<Camera> cameras = new LinkedList<>();
+    private Camera camera;
     private List<Shape> shapes = new LinkedList<>();
     private List<Light> lights = new LinkedList<>();
 
+    public Scene(Camera camera) {
+        this.camera = camera;
+    }
+
     public Scene(Camera camera, List<Shape> children) {
-        cameras.add(camera);
-        this.shapes = children;
+        this(camera);
+        this.shapes = new LinkedList<>(children);
     }
 
     public Scene(Camera camera, List<Shape> children, List<Light> lights) {
-        cameras.add(camera);
-        this.shapes = children;
-        this.lights = lights;
-    }
-
-    public Scene(List<Camera> cameras, List<Shape> children, List<Light> lights) {
-        this.cameras = cameras;
-        this.shapes = children;
-        this.lights = lights;
-    }
-
-    public Scene(Camera camera) {
-        cameras.add(camera);
+        this(camera, children);
+        this.lights = new LinkedList<>(lights);
     }
 
     public List<Shape> getShapes() {
         return shapes;
     }
 
-    public Camera getCurrentCamera() {
-        return cameras.get(currentCamera);
-    }
-
-    public void nextCamera() {
-        currentCamera++;
+    public Camera getCamera() {
+        return camera;
     }
 
     public List<Light> getLights() {
         return lights;
     }
 
-    public List<Camera> getCameras() {
-        return cameras;
+    public List<Object3D> getObjects() {
+        List<Object3D> objects = new LinkedList<>();
+        for (Light light : lights) {
+            objects.add(light);
+        }
+        for (Shape shape : shapes) {
+            objects.add(shape);
+        }
+        return objects;
     }
-
 }

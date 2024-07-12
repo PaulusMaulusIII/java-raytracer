@@ -1,12 +1,13 @@
 package gameboy.materials;
 
+import gameboy.shaders.Shader;
 import gameboy.utilities.Color;
 
 import gameboy.utilities.Material;
 
 public class MirrorMaterial extends Material {
-	public MirrorMaterial() {
-		super(Color.WHITE);
-		reflectivity = 1;
+	public MirrorMaterial(Shader shader) {
+		super(shader, Color.WHITE);
+		reflectivity = .99;
 	}
 }

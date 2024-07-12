@@ -2,7 +2,7 @@ package gameboy.utilities;
 
 import gameboy.utilities.math.Vector3;
 
-public class Object3D {
+public abstract class Object3D {
 
 	Vector3 anchor;
 
