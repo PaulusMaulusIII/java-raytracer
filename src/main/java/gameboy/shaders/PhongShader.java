@@ -8,15 +8,12 @@ import gameboy.utilities.GlobalSettings;
 import gameboy.utilities.Material;
 import gameboy.utilities.Object3D;
 import gameboy.utilities.Shape;
+import gameboy.utilities.data.PixelData;
 import gameboy.utilities.math.Ray;
 import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 
 public class PhongShader implements Shader {
-
-	protected double emission = 1;
-	protected double shininess = 128;
-
 	@Override
 	public Color shade(RayHit rayHit, List<Light> lights, List<Object3D> objects, Material material) {
 		Color baseColor = rayHit.getShape().getMaterial().getColor(rayHit.getHitPoint());
@@ -33,10 +30,10 @@ public class PhongShader implements Shader {
 				Color lightColor = light.getColor().multiply(attenuation);
 
 				double diffuseLighting = calculateDiffuseLighting(rayHit, light);
-				double specularLighting = calculateSpecularLighting(rayHit, light);
+				double specularLighting = calculateSpecularLighting(rayHit, light, material);
 
 				diffuseComponent = diffuseComponent
-						.add(baseColor.multiply(emission).multiply(diffuseLighting).multiply(lightColor));
+						.add(baseColor.multiply(material.getEmission()).multiply(diffuseLighting).multiply(lightColor));
 				specularComponent = specularComponent.add(lightColor.multiply(specularLighting));
 			}
 		}
@@ -44,15 +41,15 @@ public class PhongShader implements Shader {
 		double reflectivity = material.getReflectivity();
 		diffuseComponent = diffuseComponent.multiply(1 - reflectivity);
 
-		Color reflectionComponent = calculateReflection(rayHit, lights, objects, material);
+		PixelData reflection = calculateReflection(rayHit, lights, objects, material);
 
-		Color finalColor = ambientComponent.add(diffuseComponent).add(specularComponent)
-				.add(reflectionComponent.multiply(reflectivity));
+		Color finalColor = ambientComponent.add(reflection.getColor().multiply(reflectivity)).add(diffuseComponent)
+				.add(specularComponent);
 
 		return finalColor;
 	}
 
-	private boolean isInShadow(RayHit rayHit, List<Light> lights, List<Object3D> objects) {
+	protected boolean isInShadow(RayHit rayHit, List<Light> lights, List<Object3D> objects) {
 		Vector3 hitPoint = rayHit.getHitPoint();
 		for (Light light : lights) {
 			Vector3 lightDirection = light.getAnchor().subtract(hitPoint).normalize();
@@ -67,27 +64,27 @@ public class PhongShader implements Shader {
 		return false;
 	}
 
-	private double calculateDiffuseLighting(RayHit rayHit, Light light) {
+	protected double calculateDiffuseLighting(RayHit rayHit, Light light) {
 		Vector3 normal = rayHit.getShape().getNormal(rayHit.getHitPoint()).normalize();
 		Vector3 lightDirection = light.getAnchor().subtract(rayHit.getHitPoint()).normalize();
 		return Math.max(0, normal.dot(lightDirection) * light.getIntensity());
 	}
 
-	private double calculateSpecularLighting(RayHit rayHit, Light light) {
-		Vector3 viewDirection = rayHit.getRay().getDirection().normalize();
-		Vector3 lightDirection = light.getAnchor().subtract(rayHit.getHitPoint()).normalize();
-		Vector3 normal = rayHit.getShape().getNormal(rayHit.getHitPoint()).normalize();
-		Vector3 reflectDirection = lightDirection.subtract(normal.scale(2 * lightDirection.dot(normal))).normalize();
+	protected double calculateSpecularLighting(RayHit rayHit, Light light, Material material) {
+		Vector3 hitPos = rayHit.getHitPoint();
+		Vector3 cameraDirection = rayHit.getRay().getOrigin().subtract(hitPos).normalize();
+		Vector3 lightDirection = hitPos.subtract(light.getAnchor()).normalize();
+		Vector3 lightReflectionVector = lightDirection
+				.subtract(material.getNormal(hitPos).scale(2 * lightDirection.dot(material.getNormal(hitPos))));
 
-		double specularStrength = GlobalSettings.SPECULAR_STRENGTH * light.getIntensity();
-		double specularFactor = Math.pow(Math.max(0, viewDirection.dot(reflectDirection)), shininess);
-
-		return specularStrength * specularFactor;
+		double specularFactor = Math.max(0, Math.min(1, lightReflectionVector.dot(cameraDirection)));
+		return (double) Math.pow(specularFactor, 2) * rayHit.getShape().getMaterial().getReflectivity();
 	}
 
-	private Color calculateReflection(RayHit rayHit, List<Light> lights, List<Object3D> objects, Material material) {
+	protected PixelData calculateReflection(RayHit rayHit, List<Light> lights, List<Object3D> objects,
+			Material material) {
 		if (material.getReflectivity() <= 0) {
-			return GlobalSettings.SKY_BOX_COLOR;
+			return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);
 		}
 
 		Vector3 hitPoint = rayHit.getHitPoint();
@@ -98,28 +95,13 @@ public class PhongShader implements Shader {
 
 		RayHit reflectedHit = reflectedRay.cast(objects);
 		if (reflectedHit != null && reflectedHit.getObject() instanceof Shape) {
-			Material reflectedMaterial = reflectedHit.getShape().getMaterial();
-			Color reflectedColor = reflectedMaterial.getShader().shade(reflectedHit, lights, objects,
-					reflectedMaterial);
-			return material.getColor(hitPoint).interpolate(reflectedColor, material.getReflectivity());
+			return new PixelData(
+					reflectedHit.getShape().getMaterial().getShader().shade(reflectedHit, lights, objects,
+							reflectedHit.getShape().getMaterial()),
+					reflectedRay.getOrigin().distance(reflectedHit.getHitPoint()),
+					reflectedHit.getShape().getMaterial().getEmission());
 		}
 
-		return GlobalSettings.SKY_BOX_COLOR;
-	}
-
-	public void setEmission(double emission) {
-		this.emission = emission;
-	}
-
-	public double getEmission() {
-		return emission;
-	}
-
-	public void setShininess(double shininess) {
-		this.shininess = shininess;
-	}
-
-	public double getShininess() {
-		return shininess;
+		return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);
 	}
 }

@@ -4,11 +4,13 @@ import java.util.List;
 
 import gameboy.lights.Light;
 import gameboy.utilities.Color;
+import gameboy.utilities.GlobalSettings;
 import gameboy.utilities.Material;
 import gameboy.utilities.Object3D;
+import gameboy.utilities.data.PixelData;
 import gameboy.utilities.math.RayHit;
 
-public class BloomShader implements Shader {
+public class BloomShader extends PhongShader {
 
 	private double brightnessThreshold = 0.8;
 	private double bloomFactor = 1.5;
@@ -17,13 +19,38 @@ public class BloomShader implements Shader {
 	public Color shade(RayHit rayHit, List<Light> lights, List<Object3D> objects, Material material) {
 		Color baseColor = rayHit.getShape().getMaterial().getColor(rayHit.getHitPoint());
 
-		double brightness = (baseColor.getRed() + baseColor.getGreen() + baseColor.getBlue()) / 3.0;
+		Color ambientComponent = baseColor.multiply(GlobalSettings.AMBIENT_BRIGHTNESS);
 
-		if (brightness > brightnessThreshold) {
-			baseColor = baseColor.multiply(bloomFactor);
+		Color diffuseComponent = new Color(0, 0, 0);
+		Color specularComponent = new Color(0, 0, 0);
+
+		for (Light light : lights) {
+			if (!isInShadow(rayHit, lights, objects)) {
+				double distance = rayHit.getHitPoint().distance(light.getAnchor());
+				double attenuation = GlobalSettings.ATTENUATION / (distance * distance);
+				Color lightColor = light.getColor().multiply(attenuation);
+
+				double diffuseLighting = calculateDiffuseLighting(rayHit, light);
+				double specularLighting = calculateSpecularLighting(rayHit, light, material);
+
+				diffuseComponent = diffuseComponent
+						.add(baseColor.multiply(material.getEmission()).multiply(diffuseLighting).multiply(lightColor));
+				specularComponent = specularComponent.add(lightColor.multiply(specularLighting));
+			}
 		}
 
-		return baseColor;
+		double reflectivity = material.getReflectivity();
+		diffuseComponent = diffuseComponent.multiply(1 - reflectivity);
+
+		PixelData reflection = calculateReflection(rayHit, lights, objects, material);
+
+		Color finalColor = Color.lerp(ambientComponent, reflection.getColor(), reflectivity) // Reflected color
+				.multiply(diffuseComponent) // Diffuse lighting
+				.add(specularComponent) // Specular lighting
+				.add(baseColor.multiply(material.getEmission())) // Object emission
+				.add(reflection.getColor().multiply(reflection.getEmission() * reflectivity)); // Indirect illumination
+
+		return finalColor;
 	}
 
 	public void setBrightnessThreshold(double brightnessThreshold) {

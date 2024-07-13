@@ -9,6 +9,8 @@ public abstract class Material {
     protected Color color;
     protected Shape shape;
 
+    protected double emission = 1;
+    protected double shininess = 128;
     protected double reflectivity = 0;
 
     public Material(Shader shader, Color color) {
@@ -54,5 +56,13 @@ public abstract class Material {
 
     public void setShader(Shader shader) {
         this.shader = shader;
+    }
+
+    public void setEmission(double emission) {
+        this.emission = emission;
+    }
+
+    public double getEmission() {
+        return emission;
     }
 }

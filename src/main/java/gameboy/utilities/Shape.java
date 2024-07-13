@@ -67,6 +67,8 @@ public abstract class Shape extends Object3D {
      */
     public abstract Vector3 getNormal(Vector3 hitPoint);
 
+    public abstract double distanceToEdge(Vector3 point);
+
     @Override
     public String toString() {
         return getClass().getName().replace("gameboy.geometries.", "") + "@" + Integer.toHexString(hashCode());

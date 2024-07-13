@@ -51,4 +51,10 @@ public class Sphere extends Shape {
     public void setRadius(double radius) {
         this.radius = radius;
     }
+
+    @Override
+    public double distanceToEdge(Vector3 point) {
+        // Calculate the distance from the point to the edge of the sphere
+        return Math.abs(point.subtract(getAnchor()).length() - radius);
+    }
 }

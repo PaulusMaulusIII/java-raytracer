@@ -70,4 +70,14 @@ public class Cone extends Shape {
 		Vector3 n = hitPoint.scale(axis.dot(hitPoint) / hitPoint.dot(hitPoint)).subtract(axis).normalize();
 		return n;
 	}
+
+	@Override
+	public double distanceToEdge(Vector3 point) {
+		// Distance to the edge of the cone's base or the side surface
+		Vector3 baseCenter = getAnchor().add(axis.scale(height));
+		double distanceToAxis = point.subtract(getAnchor()).cross(axis).length();
+		double distanceToBaseEdge = Math.abs(distanceToAxis - height * Math.tan(angle));
+		double distanceToBase = Math.abs(point.subtract(baseCenter).dot(axis));
+		return Math.min(distanceToBaseEdge, distanceToBase);
+	}
 }

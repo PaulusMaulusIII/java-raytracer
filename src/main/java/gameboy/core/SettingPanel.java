@@ -28,17 +28,19 @@ import gameboy.geometries.Cone;
 import gameboy.geometries.Cube;
 import gameboy.geometries.Line;
 import gameboy.geometries.Plane;
-import gameboy.geometries.Polygon;
 import gameboy.geometries.Sphere;
 import gameboy.lights.Light;
 import gameboy.materials.BasicMaterial;
 import gameboy.materials.CheckerMaterial;
 import gameboy.materials.CubeMaterial;
+import gameboy.materials.EdgeMaterial;
 import gameboy.materials.GradientMaterial;
 import gameboy.materials.MirrorMaterial;
 import gameboy.materials.SphereMaterial;
 import gameboy.materials.WaveMaterial;
 import gameboy.shaders.BasicShader;
+import gameboy.shaders.BloomShader;
+import gameboy.shaders.DistanceShader;
 import gameboy.shaders.PhongShader;
 import gameboy.shaders.RainbowShader;
 import gameboy.shaders.Shader;
@@ -51,13 +53,13 @@ import gameboy.utilities.Shape;
 import gameboy.utilities.math.Vector3;
 
 public class SettingPanel extends JPanel {
-	List<Vector3> polygonVertices = Arrays.asList(new Vector3(-2, 0, 0), new Vector3(2, 0, 0), new Vector3(0, 4, 0));
+	List<Vector3> polygonVertices = Arrays.asList(new Vector3(-2, 0, 0), new Vector3(2, 0, 0), new Vector3(0, 0, 4),
+			new Vector3(0, 4, 2));
 
-	Scene scene = new Scene(new Camera(new Vector3(0, 0, 0), Math.toRadians(40)), List.of(
-			new Sphere(new Vector3(10, 0, 0), new MirrorMaterial(new PhongShader()), 2),
-			new Plane(new Vector3(0, -2, 0), new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4),
-					new Vector3(0, 1, 0)),
-			new Polygon(new Vector3(0, 0, 5), new BasicMaterial(new PhongShader(), Color.WHITE), polygonVertices)),
+	Scene scene = new Scene(new Camera(new Vector3(0, 0, 0), Math.toRadians(40)),
+			List.of(new Sphere(new Vector3(10, 0, 0), new MirrorMaterial(new PhongShader()), 2),
+					new Plane(new Vector3(0, -2, 0),
+							new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4), new Vector3(0, 1, 0))),
 			List.of(new Light(new Vector3(-10, 5, -10), new Color(255, 161, 72), 10)));
 	JFrame main;
 	SettingPanel settingPanel = this;
@@ -399,7 +401,7 @@ public class SettingPanel extends JPanel {
 				private JComboBox<? extends Material> materialSelector = new JComboBox<>(new Material[] {
 						new BasicMaterial(new BasicShader(), Color.WHITE),
 						new CheckerMaterial(new BasicShader(), Color.WHITE, Color.BLACK, 2),
-						new CubeMaterial(new BasicShader()),
+						new CubeMaterial(new BasicShader()), new EdgeMaterial(new BasicShader(), Color.WHITE, .1),
 						new GradientMaterial(new BasicShader(), Color.WHITE, Color.BLACK),
 						new MirrorMaterial(new BasicShader()), new SphereMaterial(new BasicShader()),
 						new WaveMaterial(new BasicShader())
@@ -452,11 +454,11 @@ public class SettingPanel extends JPanel {
 				private Shader shader = shape.getMaterial().getShader();
 				private Label label = new Label(shader.getClass().toString());
 				private JComboBox<? extends Shader> shaderSelector = new JComboBox<>(new Shader[] {
-						new BasicShader(), new PhongShader(), new RainbowShader()
+						new BasicShader(), new BloomShader(), new DistanceShader(), new PhongShader(),
+						new RainbowShader()
 				});
 
 				private InputField emission = new InputField("Emission", 1);
-				private InputField shininess = new InputField("Shininess", 128);
 
 				public ShaderSettingPanel() {
 					super();
@@ -475,16 +477,10 @@ public class SettingPanel extends JPanel {
 					});
 					add(shaderSelector);
 					if (shader instanceof PhongShader) {
-						emission.setAction(
-								(Object3D object) -> ((PhongShader) ((Shape) object).getMaterial().getShader())
-										.setEmission(Double.parseDouble(emission.getValue())));
-
-						shininess.setAction(
-								(Object3D object) -> ((PhongShader) ((Shape) object).getMaterial().getShader())
-										.setShininess(Double.parseDouble(shininess.getValue())));
+						emission.setAction((Object3D object) -> (((Shape) object).getMaterial())
+								.setEmission(Double.parseDouble(emission.getValue())));
 
 						add(emission);
-						add(shininess);
 					}
 				}
 			}

@@ -9,14 +9,14 @@ import javax.swing.*;
 
 import gameboy.utilities.Camera;
 import gameboy.utilities.Scene;
-import gameboy.utilities.data.PixelData;
+import gameboy.utilities.math.RayHit;
 import gameboy.utilities.math.Vector3;
 
 public class Viewport extends JPanel {
 
 	private BufferedImage frame;
 	private Vector3 deltaCamera = new Vector3(0, 0, 0);
-	private double resolution = 0.5F;
+	private double resolution = .125F;
 	private boolean captureCursor = true;
 	private double cameraYaw;
 	private double cameraPitch;
@@ -27,6 +27,9 @@ public class Viewport extends JPanel {
 			"blank cursor");
 	private Container container;
 	private int hud = 2;
+	private boolean dof = false;
+	private double distance = 0.1;
+	private boolean autoDOF = true;
 
 	public Viewport(Container container, SettingPanel settings, JDialog settingsDialog) {
 		this.container = container;
@@ -70,7 +73,7 @@ public class Viewport extends JPanel {
 				else if (e.getKeyCode() == KeyEvent.VK_F12 || e.getKeyCode() == KeyEvent.VK_PRINTSCREEN
 						|| e.getKeyCode() == KeyEvent.VK_F2) {
 					try {
-						Renderer.renderToImage(scene, 3840 * 2, 2160 * 2);
+						Renderer.renderToImage(scene, 3840, 2160, dof, distance);
 					} catch (IOException ex) {
 						ex.printStackTrace();
 					}
@@ -82,6 +85,23 @@ public class Viewport extends JPanel {
 					else {
 						hud = 0;
 					}
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_F) {
+					dof = !dof;
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_PLUS) {
+					distance += 0.1;
+					System.out.println(distance);
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_MINUS) {
+					distance -= 0.1;
+					if (distance < 0.1) {
+						distance = 0;
+					}
+					System.out.println(distance);
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_R) {
+					autoDOF = !autoDOF;
 				}
 			}
 
@@ -181,19 +201,25 @@ public class Viewport extends JPanel {
 				cam.setPitch(cameraPitch);
 				cam.translate(deltaCamera.rotate(cam.getPitch(), cam.getYaw()));
 			}
-			frame = Renderer.render(scene, container.getWidth(), container.getHeight(), resolution, false);
+			RayHit lookingAt = Renderer.getLookingAt(scene, container.getWidth(), container.getHeight());
+			if (autoDOF)
+				if (lookingAt != null)
+					distance = scene.getCamera().getAnchor().distance(lookingAt.getHitPoint());
+
+			frame = Renderer.render(scene, container.getWidth(), container.getHeight(), resolution, false, dof,
+					distance);
 
 			if (hud > 0) {
 				frame.getGraphics().drawString("+", container.getWidth() / 2, container.getHeight() / 2);
 
 				if (hud > 1) {
 					frame.getGraphics().drawString("CameraPos: " + scene.getCamera().getAnchor(), 10, 20);
-					PixelData lookingAt = Renderer.getLookingAt(scene, container.getWidth(), container.getHeight());
 					if (lookingAt != null) {
 						frame.getGraphics().drawString(
-								"Looking at: " + lookingAt.getHit().getHitPoint() + ", " + lookingAt.getShape() + ", "
-										+ lookingAt.getMaterial().getShader().shade(lookingAt.getHit(),
-												scene.getLights(), scene.getObjects(), lookingAt.getMaterial()),
+								"Looking at: " + lookingAt.getHitPoint() + ", " + lookingAt.getShape() + ", "
+										+ lookingAt.getShape().getMaterial().getShader().shade(lookingAt,
+												scene.getLights(), scene.getObjects(),
+												lookingAt.getShape().getMaterial()),
 								10, 40);
 					}
 
@@ -211,7 +237,11 @@ public class Viewport extends JPanel {
 				}
 
 				long deltaTime = System.currentTimeMillis() - startTime;
-				frame.getGraphics().drawString("FPS: " + 1000 / deltaTime, container.getWidth() - 75, 20);
+				frame.getGraphics()
+						.drawString(
+								"FPS: " + 1000 / (deltaTime + 1) + " @ " + (int) (container.getWidth() * resolution)
+										+ "x" + (int) (container.getHeight() * resolution),
+								container.getWidth() - 150, 20);
 			}
 
 			repaint();

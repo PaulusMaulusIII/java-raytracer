@@ -48,4 +48,10 @@ public class Line extends Shape {
     public Vector3 getNormal(Vector3 hitPoint) {
         return hitPoint.invert();
     }
+
+    @Override
+    public double distanceToEdge(Vector3 point) {
+        // Lines do not have edges
+        return Double.POSITIVE_INFINITY;
+    }
 }

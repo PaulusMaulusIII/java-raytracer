@@ -53,4 +53,10 @@ public class Plane extends Shape {
     public void setAxis(Vector3 axis) {
         this.axis = axis;
     }
+
+    @Override
+    public double distanceToEdge(Vector3 point) {
+        // Lines do not have edges
+        return Double.POSITIVE_INFINITY;
+    }
 }

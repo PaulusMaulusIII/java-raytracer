@@ -131,4 +131,15 @@ public class Cube extends Shape {
     public void setSideLength(double value) {
         this.sideLength = value;
     }
+
+    @Override
+    public double distanceToEdge(Vector3 point) {
+        // Calculate the distance from the point to the nearest edge of the cube
+        double halfSide = sideLength / 2;
+        Vector3 anchor = getAnchor();
+        double dx = Math.max(Math.abs(point.x - anchor.x) - halfSide, 0);
+        double dy = Math.max(Math.abs(point.y - anchor.y) - halfSide, 0);
+        double dz = Math.max(Math.abs(point.z - anchor.z) - halfSide, 0);
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
 }
