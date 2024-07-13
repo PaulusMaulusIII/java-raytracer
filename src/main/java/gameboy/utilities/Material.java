@@ -10,7 +10,6 @@ public abstract class Material {
     protected Shape shape;
 
     protected double emission = 1;
-    protected double shininess = 128;
     protected double reflectivity = 0;
 
     public Material(Shader shader, Color color) {

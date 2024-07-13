@@ -39,12 +39,11 @@ public class PhongShader implements Shader {
 		}
 
 		double reflectivity = material.getReflectivity();
-		diffuseComponent = diffuseComponent.multiply(1 - reflectivity);
 
 		PixelData reflection = calculateReflection(rayHit, lights, objects, material);
 
-		Color finalColor = ambientComponent.add(reflection.getColor().multiply(reflectivity)).add(diffuseComponent)
-				.add(specularComponent);
+		Color finalColor = ambientComponent.add(reflection.getColor().multiply(reflectivity))
+				.multiply(diffuseComponent.getValue()).add(diffuseComponent).add(specularComponent);
 
 		return finalColor;
 	}

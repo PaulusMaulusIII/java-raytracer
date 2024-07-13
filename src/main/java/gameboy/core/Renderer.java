@@ -50,8 +50,8 @@ public class Renderer {
                 for (int x = 0; x < resWidth; x++) {
                     int r = 0, g = 0, b = 0, count = 0;
                     blurRadius = (int) (Math.abs(((distance - pixelBuffer[y][x].getDistance()))) * resolution);
-                    if (blurRadius > 32)
-                        blurRadius = 32;
+                    if (blurRadius > 16)
+                        blurRadius = 16;
                     if (blurRadius >= 1) {
                         for (int dy = -blurRadius; dy <= blurRadius; dy++) {
                             for (int dx = -blurRadius; dx <= blurRadius; dx++) {

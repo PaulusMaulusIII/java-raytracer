@@ -40,68 +40,67 @@ public class Viewport extends JPanel {
 		addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_D) {
+				switch (e.getKeyCode()) {
+				case KeyEvent.VK_D:
 					deltaCamera.setX(0.2F);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_A) {
+					break;
+				case KeyEvent.VK_A:
 					deltaCamera.setX(-0.2F);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_W) {
+					break;
+				case KeyEvent.VK_W:
 					deltaCamera.setZ(0.2F);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_S) {
+					break;
+				case KeyEvent.VK_S:
 					deltaCamera.setZ(-0.2F);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+					break;
+				case KeyEvent.VK_SPACE:
 					deltaCamera.setY(0.2F);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+					break;
+				case KeyEvent.VK_SHIFT:
 					deltaCamera.setY(-0.2F);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_1) {
+					break;
+				case KeyEvent.VK_1:
 					resolution = 1;
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_2) {
+					break;
+				case KeyEvent.VK_2:
 					resolution = 0.5F;
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_3) {
+					break;
+				case KeyEvent.VK_3:
 					resolution = 0.25F;
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_4) {
+					break;
+				case KeyEvent.VK_4:
 					resolution = 0.125F;
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_F12 || e.getKeyCode() == KeyEvent.VK_PRINTSCREEN
-						|| e.getKeyCode() == KeyEvent.VK_F2) {
+					break;
+				case KeyEvent.VK_F12:
 					try {
 						Renderer.renderToImage(scene, 3840, 2160, dof, distance);
 					} catch (IOException ex) {
 						ex.printStackTrace();
 					}
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_H) {
-					if (hud < 3) {
+					break;
+				case KeyEvent.VK_H:
+					if (hud < 3)
 						hud++;
-					}
-					else {
+					else
 						hud = 0;
-					}
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_F) {
+					break;
+				case KeyEvent.VK_F:
 					dof = !dof;
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_PLUS) {
+					break;
+				case KeyEvent.VK_PLUS:
 					distance += 0.1;
-					System.out.println(distance);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_MINUS) {
+					break;
+				case KeyEvent.VK_MINUS:
 					distance -= 0.1;
-					if (distance < 0.1) {
+					if (distance < 0.1)
 						distance = 0;
-					}
-					System.out.println(distance);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_R) {
+					break;
+				case KeyEvent.VK_R:
 					autoDOF = !autoDOF;
+					break;
+
+				default:
+					break;
 				}
 			}
 
