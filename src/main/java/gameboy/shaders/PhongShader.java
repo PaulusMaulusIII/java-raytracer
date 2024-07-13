@@ -22,6 +22,7 @@ public class PhongShader implements Shader {
 
 		Color diffuseComponent = new Color(0, 0, 0);
 		Color specularComponent = new Color(0, 0, 0);
+		double diffuseFactor = 0;
 
 		for (Light light : lights) {
 			if (!isInShadow(rayHit, lights, objects)) {
@@ -31,6 +32,8 @@ public class PhongShader implements Shader {
 
 				double diffuseLighting = calculateDiffuseLighting(rayHit, light);
 				double specularLighting = calculateSpecularLighting(rayHit, light, material);
+				if (diffuseLighting > diffuseFactor)
+					diffuseFactor = diffuseLighting;
 
 				diffuseComponent = diffuseComponent
 						.add(baseColor.multiply(material.getEmission()).multiply(diffuseLighting).multiply(lightColor));
@@ -39,11 +42,13 @@ public class PhongShader implements Shader {
 		}
 
 		double reflectivity = material.getReflectivity();
+		if (diffuseFactor > 1)
+			diffuseFactor = 1;
 
 		PixelData reflection = calculateReflection(rayHit, lights, objects, material);
 
-		Color finalColor = ambientComponent.add(reflection.getColor().multiply(reflectivity))
-				.multiply(diffuseComponent.getValue()).add(diffuseComponent).add(specularComponent);
+		Color finalColor = ambientComponent.add(reflection.getColor().multiply(reflectivity)).multiply(diffuseFactor)
+				.add(diffuseComponent).add(specularComponent);
 
 		return finalColor;
 	}

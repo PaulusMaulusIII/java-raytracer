@@ -57,12 +57,11 @@ public class SettingPanel extends JPanel {
 			new Vector3(0, 4, 2));
 
 	Scene scene = new Scene(new Camera(new Vector3(0, 0, 0), Math.toRadians(40)),
-			List.of(new Sphere(new Vector3(10, 0, -10), new BasicMaterial(new PhongShader(), Color.RED), 2),
-					new Sphere(new Vector3(0, 0, 0), new BasicMaterial(new PhongShader(), Color.GREEN), 2),
-					new Sphere(new Vector3(-10, 0, 10), new BasicMaterial(new PhongShader(), Color.BLUE), 2),
+			List.of(new Sphere(new Vector3(0, 0, 0), new MirrorMaterial(new PhongShader()), 2),
 					new Plane(new Vector3(0, -2, 0),
 							new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4), new Vector3(0, 1, 0))),
-			List.of(new Light(new Vector3(7.5, 5, 11), new Color(255, 161, 72), 50)));
+			List.of(new Light(new Vector3(7.5, 5, 20), new Color(255, 255, 72), 50),
+					new Light(new Vector3(-7.5, 5, 20), new Color(255, 0, 72), 50)));
 	JFrame main;
 	SettingPanel settingPanel = this;
 	CurrentItemDisplay currentItemDisplay;
