@@ -5,6 +5,7 @@
     "editor.insertSpaces": false,
     "editor.tabSize": 4
   },
+  "editor.fontFamily": "Geist Mono",
   "java.configuration.updateBuildConfiguration": "interactive",
   "java.completion.filteredTypes": [
     "com.sun.*",
