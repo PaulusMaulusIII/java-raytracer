@@ -9,13 +9,27 @@ public class Vector3 {
         this.z = z;
     }
 
-    public Vector3 rotate(double pitch, double yaw) {
+    public Vector3 rotate(double pitch, double yaw, double roll) {
+        // Rotate around the Z axis (roll)
+        double cosRoll = Math.cos(roll);
+        double sinRoll = Math.sin(roll);
+        double rotatedX = x * cosRoll - y * sinRoll;
+        double rotatedY = x * sinRoll + y * cosRoll;
+        double rotatedZ = z;
 
-        double rotatedY = (double) (y * Math.cos(pitch) - z * Math.sin(pitch));
-        double rotatedZ = (double) (y * Math.sin(pitch) + z * Math.cos(pitch));
-        double rotatedX = (double) (x * Math.cos(yaw) + rotatedZ * Math.sin(yaw));
+        // Rotate around the X axis (pitch)
+        double cosPitch = Math.cos(pitch);
+        double sinPitch = Math.sin(pitch);
+        double tempY = rotatedY * cosPitch - rotatedZ * sinPitch;
+        rotatedZ = rotatedY * sinPitch + rotatedZ * cosPitch;
+        rotatedY = tempY;
 
-        rotatedZ = (double) (-x * Math.sin(yaw) + rotatedZ * Math.cos(yaw));
+        // Rotate around the Y axis (yaw)
+        double cosYaw = Math.cos(yaw);
+        double sinYaw = Math.sin(yaw);
+        double tempX = rotatedX * cosYaw + rotatedZ * sinYaw;
+        rotatedZ = -rotatedX * sinYaw + rotatedZ * cosYaw;
+        rotatedX = tempX;
 
         return new Vector3(rotatedX, rotatedY, rotatedZ);
     }

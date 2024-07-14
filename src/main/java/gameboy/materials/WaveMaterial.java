@@ -18,7 +18,7 @@ public class WaveMaterial extends Material {
 	@Override
 	public Vector3 getNormal(Vector3 hitPoint) {
 		if (System.currentTimeMillis() - time > 1) {
-			normal = normal.rotate(0, Math.toRadians(1)); // TODO specular !!!!!!!!!!
+			normal = normal.rotate(0, Math.toRadians(1), 0); // TODO specular !!!!!!!!!!
 			time = System.currentTimeMillis();
 		}
 		return normal;

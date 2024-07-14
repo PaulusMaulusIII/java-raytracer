@@ -11,7 +11,7 @@ import gameboy.utilities.math.RayHit;
 public class RainbowShader implements Shader {
 
 	@Override
-	public Color shade(RayHit rayHit, List<Light> lights, List<Object3D> objects, Material material) {
+	public Color shade(RayHit rayHit, List<Light> lights, List<Object3D> objects, Material material, int depth) {
 		double closestDistance = Double.MAX_VALUE;
 
 		for (Light light : lights) {

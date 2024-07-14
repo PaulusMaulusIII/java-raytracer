@@ -6,6 +6,7 @@ public class Camera extends Object3D {
     private double pitch = 0;
     private double yaw = 0;
     private double fov = 0;
+    private double tilt = 0;
 
     public Camera(Vector3 position, double fov) {
         super(position);
@@ -38,6 +39,19 @@ public class Camera extends Object3D {
 
     public void setPitch(double pitch) {
         this.pitch = pitch;
+    }
+
+    public double getTilt() {
+        return tilt;
+    }
+
+    public void setTilt(double tilt) {
+        if (tilt > 2 * Math.PI)
+            tilt = 0;
+        if (tilt < 0)
+            tilt = 2 * Math.PI;
+
+        this.tilt = tilt;
     }
 
     public void setFOV(double fov) {

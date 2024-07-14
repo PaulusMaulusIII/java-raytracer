@@ -9,5 +9,5 @@ import gameboy.utilities.Object3D;
 import gameboy.utilities.math.RayHit;
 
 public interface Shader {
-	public abstract Color shade(RayHit rayHit, List<Light> lights, List<Object3D> objects, Material material);
+	public abstract Color shade(RayHit rayHit, List<Light> lights, List<Object3D> objects, Material material, int depth);
 }

@@ -6,9 +6,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+
 import javax.imageio.ImageIO;
+
+import gameboy.post_processing.Effect;
 import gameboy.utilities.Camera;
-import gameboy.utilities.Color;
 import gameboy.utilities.GlobalSettings;
 import gameboy.utilities.Scene;
 import gameboy.utilities.data.PixelData;
@@ -29,7 +32,7 @@ public class Renderer {
     }
 
     public static BufferedImage render(Scene scene, int width, int height, double resolution, boolean verbose,
-            boolean dof, double distance) {
+            List<Effect> effects, double distance) {
         int resWidth = (int) (width * resolution);
         int resHeight = (int) (height * resolution);
         PixelData[][] pixelBuffer = new PixelData[resHeight][resWidth];
@@ -42,42 +45,8 @@ public class Renderer {
             }
         }
 
-        if (dof) {
-            PixelData[][] blurBuffer = new PixelData[resHeight][resWidth];
-            int blurRadius = 0;
-
-            for (int y = 0; y < resHeight; y++) {
-                for (int x = 0; x < resWidth; x++) {
-                    int r = 0, g = 0, b = 0, count = 0;
-                    blurRadius = (int) (Math.abs(((distance - pixelBuffer[y][x].getDistance()))) * resolution);
-                    if (blurRadius > GlobalSettings.DOF_MAX_STRENGHT)
-                        blurRadius = GlobalSettings.DOF_MAX_STRENGHT;
-                    if (blurRadius >= 1) {
-                        for (int dy = -blurRadius; dy <= blurRadius; dy++) {
-                            for (int dx = -blurRadius; dx <= blurRadius; dx++) {
-                                try {
-                                    PixelData p = pixelBuffer[y + dy][x + dx];
-                                    r += p.getColor().getRed();
-                                    g += p.getColor().getGreen();
-                                    b += p.getColor().getBlue();
-                                    count++;
-                                } catch (Exception e) {
-                                }
-                            }
-                        }
-                        r /= count;
-                        g /= count;
-                        b /= count;
-                        blurBuffer[y][x] = new PixelData(new Color(r, g, b), pixelBuffer[y][x].getDistance(),
-                                pixelBuffer[y][x].getEmission());
-                    }
-                }
-            }
-
-            for (int y = 0; y < resHeight; y++)
-                for (int x = 0; x < resWidth; x++)
-                    if (blurBuffer[y][x] != null)
-                        pixelBuffer[y][x] = blurBuffer[y][x];
+        for (Effect effect : effects) {
+            pixelBuffer = effect.apply(pixelBuffer, resolution);
         }
 
         BufferedImage temp = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -94,11 +63,11 @@ public class Renderer {
         return temp;
     }
 
-    public static void renderToImage(Scene scene, int width, int height, boolean dof, double distance)
+    public static void renderToImage(Scene scene, int width, int height, List<Effect> effects, double distance)
             throws IOException {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         System.out.println("Rendering to image...");
-        image = render(scene, width, height, 1, true, dof, distance);
+        image = render(scene, width, height, 1, true, effects, distance);
         File imgFile = new File("output.png");
         ImageIO.write(image, "PNG", new FileOutputStream(imgFile));
         System.out.println("Image saved.");
@@ -123,7 +92,8 @@ public class Renderer {
     public static PixelData getPixelData(Scene scene, double u, double v) {
         Camera cam = scene.getCamera();
         Vector3 eyePos = new Vector3(0, 0, (-1 / Math.tan(cam.getFOV() / 2)));
-        Vector3 rayDir = new Vector3(u, v, 0).subtract(eyePos).rotate(cam.getPitch(), cam.getYaw()).normalize();
+        Vector3 rayDir = new Vector3(u, v, 0).subtract(eyePos).rotate(cam.getPitch(), cam.getYaw(), cam.getTilt())
+                .normalize();
         Ray ray = new Ray(eyePos.add(cam.getAnchor()), rayDir);
         RayHit hit = ray.cast(scene.getObjects());
         if (hit == null)
@@ -132,7 +102,7 @@ public class Renderer {
             return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);
         return new PixelData(
                 hit.getShape().getMaterial().getShader().shade(hit, scene.getLights(), scene.getObjects(),
-                        hit.getShape().getMaterial()),
+                        hit.getShape().getMaterial(), 0),
                 ray.getOrigin().distance(hit.getHitPoint()), hit.getShape().getMaterial().getEmission());
     }
 
@@ -140,8 +110,8 @@ public class Renderer {
         double[] screenUV = getNormalizedScreenCoordinates(width / 2, height / 2, width, height);
         Camera cam = scene.getCamera();
         Vector3 eyePos = new Vector3(0, 0, (-1 / Math.tan(cam.getFOV() / 2)));
-        Vector3 rayDir = new Vector3(screenUV[0], screenUV[1], 0).subtract(eyePos).rotate(cam.getPitch(), cam.getYaw())
-                .normalize();
+        Vector3 rayDir = new Vector3(screenUV[0], screenUV[1], 0).subtract(eyePos)
+                .rotate(cam.getPitch(), cam.getYaw(), cam.getTilt()).normalize();
         Ray ray = new Ray(eyePos.add(cam.getAnchor()), rayDir);
         return ray.cast(scene.getObjects());
     }

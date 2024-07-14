@@ -16,7 +16,7 @@ public class BloomShader extends PhongShader {
 	private double bloomFactor = 1.5;
 
 	@Override
-	public Color shade(RayHit rayHit, List<Light> lights, List<Object3D> objects, Material material) {
+	public Color shade(RayHit rayHit, List<Light> lights, List<Object3D> objects, Material material, int depth) {
 		Color baseColor = rayHit.getShape().getMaterial().getColor(rayHit.getHitPoint());
 
 		Color ambientComponent = baseColor.multiply(GlobalSettings.AMBIENT_BRIGHTNESS);
@@ -42,7 +42,7 @@ public class BloomShader extends PhongShader {
 		double reflectivity = material.getReflectivity();
 		diffuseComponent = diffuseComponent.multiply(1 - reflectivity);
 
-		PixelData reflection = calculateReflection(rayHit, lights, objects, material);
+		PixelData reflection = calculateReflection(rayHit, lights, objects, material, depth);
 
 		Color finalColor = Color.lerp(ambientComponent, reflection.getColor(), reflectivity) // Reflected color
 				.multiply(diffuseComponent) // Diffuse lighting

@@ -12,7 +12,7 @@ public class PixelData {
         this.distance = distance;
         this.emission = emission;
     }
-
+    
     public void setColor(Color color) {
         this.color = color;
     }

@@ -1,12 +1,27 @@
 package gameboy.core;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
+import gameboy.post_processing.DepthOfField;
+import gameboy.post_processing.Effect;
+import gameboy.post_processing.Fog;
 import gameboy.utilities.Camera;
 import gameboy.utilities.Scene;
 import gameboy.utilities.math.RayHit;
@@ -16,10 +31,9 @@ public class Viewport extends JPanel {
 
 	private BufferedImage frame;
 	private Vector3 deltaCamera = new Vector3(0, 0, 0);
-	private double resolution = .125F;
+	private Vector3 deltaPYT = new Vector3(0, 0, 0);
+	private double resolution = .125;
 	private boolean captureCursor = true;
-	private double cameraYaw;
-	private double cameraPitch;
 	private Robot robot;
 	private Scene scene;
 	private BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -27,9 +41,10 @@ public class Viewport extends JPanel {
 			"blank cursor");
 	private Container container;
 	private int hud = 2;
-	private boolean dof = false;
+	private List<Effect> effects = new LinkedList<>(List.of(new Fog()));
 	private double distance = 0.1;
 	private boolean autoDOF = true;
+	private Effect dof = new DepthOfField(() -> distance);
 
 	public Viewport(Container container, SettingPanel settings, JDialog settingsDialog) {
 		this.container = container;
@@ -42,38 +57,44 @@ public class Viewport extends JPanel {
 			public void keyPressed(KeyEvent e) {
 				switch (e.getKeyCode()) {
 				case KeyEvent.VK_D:
-					deltaCamera.setX(0.2F);
+					deltaCamera.setX(0.2);
 					break;
 				case KeyEvent.VK_A:
-					deltaCamera.setX(-0.2F);
+					deltaCamera.setX(-0.2);
 					break;
 				case KeyEvent.VK_W:
-					deltaCamera.setZ(0.2F);
+					deltaCamera.setZ(0.2);
 					break;
 				case KeyEvent.VK_S:
-					deltaCamera.setZ(-0.2F);
+					deltaCamera.setZ(-0.2);
 					break;
 				case KeyEvent.VK_SPACE:
-					deltaCamera.setY(0.2F);
+					deltaCamera.setY(0.2);
 					break;
 				case KeyEvent.VK_SHIFT:
-					deltaCamera.setY(-0.2F);
+					deltaCamera.setY(-0.2);
 					break;
 				case KeyEvent.VK_1:
 					resolution = 1;
 					break;
 				case KeyEvent.VK_2:
-					resolution = 0.5F;
+					resolution = 0.5;
 					break;
 				case KeyEvent.VK_3:
-					resolution = 0.25F;
+					resolution = 0.25;
 					break;
 				case KeyEvent.VK_4:
-					resolution = 0.125F;
+					resolution = 0.125;
+					break;
+				case KeyEvent.VK_Q:
+					deltaPYT.setZ(Math.toRadians(1));
+					break;
+				case KeyEvent.VK_E:
+					deltaPYT.setZ(-Math.toRadians(1));
 					break;
 				case KeyEvent.VK_F12:
 					try {
-						Renderer.renderToImage(scene, 3840, 2160, dof, distance);
+						Renderer.renderToImage(scene, 3840, 2160, effects, distance);
 					} catch (IOException ex) {
 						ex.printStackTrace();
 					}
@@ -85,7 +106,10 @@ public class Viewport extends JPanel {
 						hud = 0;
 					break;
 				case KeyEvent.VK_F:
-					dof = !dof;
+					if (!effects.contains(dof))
+						effects.add(dof);
+					else
+						effects.remove(dof);
 					break;
 				case KeyEvent.VK_PLUS:
 					distance += 0.1;
@@ -106,25 +130,24 @@ public class Viewport extends JPanel {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_D) {
+				switch (e.getKeyCode()) {
+				case KeyEvent.VK_D:
+				case KeyEvent.VK_A:
 					deltaCamera.setX(0);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_A) {
-					deltaCamera.setX(0);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_W) {
-					deltaCamera.setZ(0);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_S) {
-					deltaCamera.setZ(0);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+					break;
+				case KeyEvent.VK_SPACE:
+				case KeyEvent.VK_SHIFT:
 					deltaCamera.setY(0);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-					deltaCamera.setY(0);
-				}
-				else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+					break;
+				case KeyEvent.VK_W:
+				case KeyEvent.VK_S:
+					deltaCamera.setZ(0);
+					break;
+				case KeyEvent.VK_Q:
+				case KeyEvent.VK_E:
+					deltaPYT.setZ(0);
+					break;
+				case KeyEvent.VK_ESCAPE:
 					if (captureCursor) {
 						setCaptureCursor(false);
 					}
@@ -138,6 +161,11 @@ public class Viewport extends JPanel {
 							settingsDialog.setVisible(true);
 						}
 					}
+					break;
+
+				default:
+					break;
+
 				}
 			}
 		});
@@ -150,8 +178,8 @@ public class Viewport extends JPanel {
 
 					int mouseXOffset = e.getXOnScreen() - centerX;
 					int mouseYOffset = e.getYOnScreen() - centerY;
-					cameraYaw = (cameraYaw + mouseXOffset * 0.001);
-					cameraPitch = (Math.min(90, Math.max(-90, cameraPitch + mouseYOffset * 0.001)));
+					deltaPYT.x = (Math.min(90, Math.max(-90, deltaPYT.x + mouseYOffset * 0.001)));
+					deltaPYT.y = (deltaPYT.y + mouseXOffset * 0.001);
 					robot.mouseMove(centerX, centerY);
 				}
 			}
@@ -172,8 +200,9 @@ public class Viewport extends JPanel {
 		}
 
 		Camera cam = scene.getCamera();
-		this.cameraYaw = cam.getYaw();
-		this.cameraPitch = cam.getPitch();
+		this.deltaPYT.x = cam.getPitch();
+		this.deltaPYT.y = cam.getYaw();
+		this.deltaPYT.z = cam.getTilt();
 		setCaptureCursor(true);
 	}
 
@@ -196,29 +225,34 @@ public class Viewport extends JPanel {
 			long startTime = System.currentTimeMillis();
 			Camera cam = scene.getCamera();
 			if (captureCursor) {
-				cam.setYaw(cameraYaw);
-				cam.setPitch(cameraPitch);
-				cam.translate(deltaCamera.rotate(cam.getPitch(), cam.getYaw()));
+				cam.setPitch(deltaPYT.x);
+				cam.setYaw(deltaPYT.y);
+				cam.setTilt(cam.getTilt() + deltaPYT.z);
+				cam.translate(deltaCamera.rotate(cam.getPitch(), cam.getYaw(), cam.getTilt()));
 			}
 			RayHit lookingAt = Renderer.getLookingAt(scene, container.getWidth(), container.getHeight());
 			if (autoDOF)
 				if (lookingAt != null)
 					distance = scene.getCamera().getAnchor().distance(lookingAt.getHitPoint());
 
-			frame = Renderer.render(scene, container.getWidth(), container.getHeight(), resolution, false, dof,
+			frame = Renderer.render(scene, container.getWidth(), container.getHeight(), resolution, false, effects,
 					distance);
 
 			if (hud > 0) {
 				frame.getGraphics().drawString("+", container.getWidth() / 2, container.getHeight() / 2);
 
 				if (hud > 1) {
-					frame.getGraphics().drawString("CameraPos: " + scene.getCamera().getAnchor(), 10, 20);
+					frame.getGraphics()
+							.drawString("CameraPos: " + scene.getCamera().getAnchor() + ", "
+									+ Math.toDegrees(scene.getCamera().getPitch()) + "°, "
+									+ Math.toDegrees(scene.getCamera().getYaw()) + "°, "
+									+ Math.toDegrees(scene.getCamera().getTilt()) + "°", 10, 20);
 					if (lookingAt != null) {
 						frame.getGraphics().drawString(
 								"Looking at: " + lookingAt.getHitPoint() + ", " + lookingAt.getShape() + ", "
 										+ lookingAt.getShape().getMaterial().getShader().shade(lookingAt,
 												scene.getLights(), scene.getObjects(),
-												lookingAt.getShape().getMaterial()),
+												lookingAt.getShape().getMaterial(), 0),
 								10, 40);
 					}
 
