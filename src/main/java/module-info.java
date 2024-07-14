@@ -1,5 +1,5 @@
-module gameboy {
+module raytracer {
     requires java.desktop;
     
-    exports gameboy;
+    exports raytracer;
 }
