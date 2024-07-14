@@ -60,4 +60,9 @@ public class DepthOfField implements Effect {
 
 		return blurBuffer;
 	}
+
+	@Override
+	public String getName() {
+		return "Depth of field";
+	}
 }

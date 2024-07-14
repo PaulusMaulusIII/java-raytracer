@@ -184,7 +184,6 @@ public class Viewport extends JPanel {
 				}
 			}
 		});
-
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {

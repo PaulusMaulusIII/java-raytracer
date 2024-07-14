@@ -21,44 +21,55 @@ import raytracer.utilities.math.Vector3;
 
 public class Renderer {
 
-    Scene scene;
-    int height;
-    int width;
-
-    public Renderer(Scene scene, int width, int height) {
-        this.scene = scene;
-        this.height = height;
-        this.width = width;
-    }
-
     public static BufferedImage render(Scene scene, int width, int height, double resolution, boolean verbose,
             List<Effect> effects, double distance) {
         int resWidth = (int) (width * resolution);
         int resHeight = (int) (height * resolution);
         PixelData[][] pixelBuffer = new PixelData[resHeight][resWidth];
 
+        if (verbose)
+            System.out.println("Casting rays");
+
         for (int y = 0; y < resHeight; y++) {
             for (int x = 0; x < resWidth; x++) {
-                double[] screenUV = getNormalizedScreenCoordinates((int) (x / resolution), (int) (y / resolution),
-                        width, height);
+                double[] screenUV = getNormalizedScreenCoordinates(x / resolution, y / resolution, width, height);
                 pixelBuffer[y][x] = getPixelData(scene, screenUV[0], screenUV[1]);
             }
+            if (verbose && y != 0 && y % (resHeight / 100) == 0)
+                System.out.print("#");
         }
+
+        if (verbose)
+            System.out.println("\nApplying FX");
 
         for (Effect effect : effects) {
+            if (verbose)
+                System.out.println("Applying " + effect.getName());
             pixelBuffer = effect.apply(pixelBuffer, resolution);
+            if (verbose)
+                System.out.println("Applied " + effect.getName());
         }
 
+        if (verbose)
+            System.out.println("Drawing image");
         BufferedImage temp = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics gfx = temp.getGraphics();
         int blockSize = (int) (1 / resolution);
 
-        for (int y = 0; y < height; y += blockSize) {
-            for (int x = 0; x < width; x += blockSize) {
-                gfx.setColor(pixelBuffer[(int) (y * resolution)][(int) (x * resolution)].getColor().toAWT());
-                gfx.fillRect(x, y, blockSize, blockSize);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int px = (int) (x * resolution);
+                int py = (int) (y * resolution);
+                if (px < resWidth && py < resHeight) {
+                    gfx.setColor(pixelBuffer[py][px].getColor().toAWT());
+                    gfx.fillRect(x, y, blockSize, blockSize);
+                }
             }
+            if (verbose && y != 0 && y % (height / 100) == 0)
+                System.out.print("#");
         }
+        if (verbose)
+            System.out.println();
 
         return temp;
     }
@@ -74,15 +85,15 @@ public class Renderer {
         Desktop.getDesktop().open(imgFile);
     }
 
-    public static double[] getNormalizedScreenCoordinates(int x, int y, double width, double height) {
-        double u = 0, v = 0;
+    public static double[] getNormalizedScreenCoordinates(double x, double y, double width, double height) {
+        double u, v;
         if (width > height) {
-            u = (double) (x - width / 2 + height / 2) / height * 2 - 1;
-            v = -((double) y / height * 2 - 1);
+            u = ((x - width / 2 + height / 2) / height) * 2 - 1;
+            v = -((y / height) * 2 - 1);
         }
         else {
-            u = (double) x / width * 2 - 1;
-            v = -((double) (y - height / 2 + width / 2) / width * 2 - 1);
+            u = (x / width) * 2 - 1;
+            v = -((y - height / 2 + width / 2) / width) * 2 - 1;
         }
         return new double[] {
                 u, v
