@@ -1,16 +1,20 @@
 {
-    "java.debug.settings.onBuildFailureProceed": true,
-    "java.format.settings.url": ".vscode/java-formatter.xml",
-    "[java]": {
-        "editor.insertSpaces": false,
-        "editor.tabSize": 4
-    },
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "java.completion.filteredTypes": [
-        "com.sun.*",
-        "sun.*",
-        "jdk.*",
-        "org.graalvm.*",
-        "io.micrometer.shaded.*"
-    ]
+  "java.debug.settings.onBuildFailureProceed": true,
+  "java.format.settings.url": ".vscode/java-formatter.xml",
+  "[java]": {
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4
+  },
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.completion.filteredTypes": [
+    "com.sun.*",
+    "sun.*",
+    "jdk.*",
+    "org.graalvm.*",
+    "io.micrometer.shaded.*"
+  ],
+  "vscode_custom_css.imports": [
+    "file:///C:/Users/Maja/.vscode/extensions/coltwillcox.synthwave-x-fluoromachine-contrast-2.0.1/logo.css",
+    "file:///C:/Users/Maja/.vscode/extensions/coltwillcox.synthwave-x-fluoromachine-contrast-2.0.1/synthwave.css"
+  ]
 }
