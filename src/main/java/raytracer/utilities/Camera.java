@@ -68,6 +68,6 @@ public class Camera extends Object3D {
 
     @Override
     public String toString() {
-        return getClass().getName().replace("gameboy.utilities.", "") + "@" + Integer.toHexString(hashCode());
+        return getClass().getName().replace("raytracer.utilities.", "") + "@" + Integer.toHexString(hashCode());
     }
 }

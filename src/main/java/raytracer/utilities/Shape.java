@@ -71,6 +71,6 @@ public abstract class Shape extends Object3D {
 
     @Override
     public String toString() {
-        return getClass().getName().replace("gameboy.geometries.", "") + "@" + Integer.toHexString(hashCode());
+        return getClass().getName().replace("raytracer.geometries.", "") + "@" + Integer.toHexString(hashCode());
     }
 }

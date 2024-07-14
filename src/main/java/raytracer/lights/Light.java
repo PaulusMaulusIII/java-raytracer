@@ -40,6 +40,6 @@ public class Light extends Object3D {
 
     @Override
     public String toString() {
-        return getClass().getName().replace("gameboy.lights.", "") + "@" + Integer.toHexString(hashCode());
+        return getClass().getName().replace("raytracer.lights.", "") + "@" + Integer.toHexString(hashCode());
     }
 }

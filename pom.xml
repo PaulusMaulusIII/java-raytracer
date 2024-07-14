@@ -2,8 +2,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>gameboy</groupId>
-    <artifactId>java-gameboy</artifactId>
+    <groupId>raytracer</groupId>
+    <artifactId>java-raytracer</artifactId>
     <version>preAlpha</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,7 +32,7 @@
                         <!-- Usage: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>gameboy.App</mainClass>
+                            <mainClass>raytracer.App</mainClass>
                         </configuration>
                     </execution>
                 </executions>
