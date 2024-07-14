@@ -2,6 +2,7 @@ package gameboy.geometries;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import gameboy.utilities.Material;
 import gameboy.utilities.Shape;
 import gameboy.utilities.math.Ray;

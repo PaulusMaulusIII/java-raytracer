@@ -18,4 +18,9 @@ public class Fog implements Effect {
 		return pixelBuffer;
 	}
 
+	@Override
+	public String getName() {
+		return "Fog";
+	}
+
 }

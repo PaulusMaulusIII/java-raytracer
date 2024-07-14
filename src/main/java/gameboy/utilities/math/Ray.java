@@ -3,10 +3,6 @@ package gameboy.utilities.math;
 import java.util.Iterator;
 import java.util.List;
 
-//import gameboy.geometries.Sphere;
-//import gameboy.lights.Light;
-//import gameboy.materials.BasicMaterial;
-//import gameboy.shaders.BloomShader;
 import gameboy.utilities.Object3D;
 import gameboy.utilities.Shape;
 

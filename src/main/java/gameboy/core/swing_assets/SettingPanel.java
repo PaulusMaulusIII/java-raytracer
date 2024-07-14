@@ -1,4 +1,4 @@
-package gameboy.core;
+package gameboy.core.swing_assets;
 
 import java.awt.Button;
 import java.awt.Label;

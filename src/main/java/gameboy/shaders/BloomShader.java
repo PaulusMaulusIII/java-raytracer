@@ -2,9 +2,9 @@ package gameboy.shaders;
 
 import java.util.List;
 
+import gameboy.core.GlobalSettings;
 import gameboy.lights.Light;
 import gameboy.utilities.Color;
-import gameboy.utilities.GlobalSettings;
 import gameboy.utilities.Material;
 import gameboy.utilities.Object3D;
 import gameboy.utilities.data.PixelData;

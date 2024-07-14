@@ -1,4 +1,6 @@
-package gameboy.utilities;
+package gameboy.core;
+
+import gameboy.utilities.Color;
 
 public class GlobalSettings {
 	public static final double AMBIENT_BRIGHTNESS = .01;

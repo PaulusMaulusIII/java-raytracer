@@ -79,4 +79,9 @@ public class Bloom implements Effect {
 		}
 		return weights;
 	}
+
+	@Override
+	public String getName() {
+		return "Bloom";
+	}
 }

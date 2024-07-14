@@ -1,4 +1,4 @@
-package gameboy.core;
+package gameboy.core.swing_assets;
 
 import java.awt.Container;
 import java.awt.Cursor;
@@ -19,6 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import gameboy.core.Renderer;
 import gameboy.post_processing.DepthOfField;
 import gameboy.post_processing.Effect;
 import gameboy.post_processing.Fog;
@@ -184,7 +185,6 @@ public class Viewport extends JPanel {
 				}
 			}
 		});
-
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {

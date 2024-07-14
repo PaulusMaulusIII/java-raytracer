@@ -1,7 +1,7 @@
 package gameboy.post_processing;
 
+import gameboy.core.GlobalSettings;
 import gameboy.utilities.Color;
-import gameboy.utilities.GlobalSettings;
 import gameboy.utilities.data.PixelData;
 
 public class DepthOfField implements Effect {
@@ -59,5 +59,10 @@ public class DepthOfField implements Effect {
 					blurBuffer[y][x] = pixelBuffer[y][x];
 
 		return blurBuffer;
+	}
+
+	@Override
+	public String getName() {
+		return "Depth of field";
 	}
 }

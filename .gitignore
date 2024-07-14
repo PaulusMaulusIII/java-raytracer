@@ -23,7 +23,6 @@
 hs_err_pid*
 replay_pid*
 
-/target
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -36,3 +35,6 @@ replay_pid*
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+src/red
+/target

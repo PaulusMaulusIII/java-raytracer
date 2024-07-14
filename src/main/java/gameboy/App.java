@@ -6,15 +6,14 @@ import java.awt.event.WindowEvent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
-import gameboy.core.SettingPanel;
-import gameboy.core.Viewport;
+import gameboy.core.swing_assets.SettingPanel;
+import gameboy.core.swing_assets.Viewport;
 
 public class App {
 
     public App() {
 
         JFrame main = new JFrame();
-        main.setSize(1280, 720);
         main.setTitle("Java Ray-Tracer");
         main.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
