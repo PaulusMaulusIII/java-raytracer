@@ -10,11 +10,44 @@ public abstract class Material {
     protected Shape shape;
 
     protected double emission = 1;
-    protected double reflectivity = 0;
+    protected double reflectivity = 0.4;
+    protected double transparency = 0;
 
     public Material(Shader shader, Color color) {
         this.shader = shader;
         this.color = color;
+    }
+
+    public Material(Shader shader, Color color, double emission, double reflectivity, double transparency) {
+        this.shader = shader;
+        this.color = color;
+        this.emission = emission;
+        this.reflectivity = reflectivity;
+        this.transparency = transparency;
+    }
+
+    public double getEmission() {
+        return emission;
+    }
+
+    public double getEmissionAt(Vector3 point) {
+        return emission;
+    }
+
+    public double getReflectivity() {
+        return reflectivity;
+    }
+
+    public double getReflectivityAt(Vector3 point) {
+        return reflectivity;
+    }
+
+    public double getTransparency() {
+        return transparency;
+    }
+
+    public double getTransparencyAt(Vector3 point) {
+        return transparency;
     }
 
     public Color getColor(Vector3 point) {
@@ -45,8 +78,8 @@ public abstract class Material {
         this.reflectivity = reflectivity;
     }
 
-    public double getReflectivity() {
-        return reflectivity;
+    public void setTransparency(double transparency) {
+        this.transparency = transparency;
     }
 
     public Shader getShader() {
@@ -59,9 +92,5 @@ public abstract class Material {
 
     public void setEmission(double emission) {
         this.emission = emission;
-    }
-
-    public double getEmission() {
-        return emission;
     }
 }

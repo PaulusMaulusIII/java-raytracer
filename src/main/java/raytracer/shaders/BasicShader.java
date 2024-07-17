@@ -17,16 +17,16 @@ public class BasicShader implements Shader {
 
 	@Override
 	public Color shade(RayHit rayHit, List<Light> lights, List<Object3D> objects, Material material, int depth) {
-		for (Light light : lights) {
-			if (isInShadow(rayHit, light, objects)) {
-				return Color.BLACK;
-			}
-			if (material.getReflectivity() > 0) {
-				return material.getColor(rayHit.getHitPoint()).interpolate(
-						calculateReflection(rayHit, lights, objects, material, depth).getColor(),
-						material.getReflectivity());
-			}
-		}
+		// for (Light light : lights) {
+		// if (isInShadow(rayHit, light, objects)) {
+		// return Color.BLACK;
+		// }
+		// if (material.getReflectivity() > 0) {
+		// return material.getColor(rayHit.getHitPoint()).interpolate(
+		// calculateReflection(rayHit, lights, objects, material, depth).getColor(),
+		// material.getReflectivity());
+		// }
+		// }
 		return material.getColor(rayHit.getHitPoint());
 	}
 
@@ -47,7 +47,7 @@ public class BasicShader implements Shader {
 		if (depth > GlobalSettings.MAX_REFLECTION_DEPTH)
 			return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);
 
-		if (material.getReflectivity() <= 0)
+		if (material.getReflectivityAt(rayHit.getHitPoint()) <= 0)
 			return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);
 
 		Vector3 hitPoint = rayHit.getHitPoint();
@@ -62,7 +62,7 @@ public class BasicShader implements Shader {
 					reflectedHit.getShape().getMaterial().getShader().shade(reflectedHit, lights, objects,
 							reflectedHit.getShape().getMaterial(), depth + 1),
 					reflectedRay.getOrigin().distance(reflectedHit.getHitPoint()),
-					reflectedHit.getShape().getMaterial().getEmission());
+					reflectedHit.getShape().getMaterial().getEmissionAt(reflectedHit.getHitPoint()));
 		}
 
 		return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);

@@ -23,11 +23,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeListener;
 
-import raytracer.geometries.Cone;
 import raytracer.geometries.Cube;
-import raytracer.geometries.Line;
+import raytracer.geometries.Cylinder;
 import raytracer.geometries.Plane;
 import raytracer.geometries.Sphere;
+import raytracer.geometries.additional.Arrow;
 import raytracer.lights.Light;
 import raytracer.materials.BasicMaterial;
 import raytracer.materials.CheckerMaterial;
@@ -58,9 +58,10 @@ public class SettingPanel extends JPanel {
 			new Vector3(0, 4, 2));
 
 	Scene scene = new Scene(new Camera(new Vector3(0, 0, 0), Math.toRadians(40)),
-			List.of(new Sphere(new Vector3(0, 0, 0), new MirrorMaterial(new PhongShader()), 2),
-					new Plane(new Vector3(0, -2, 0),
-							new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4), new Vector3(0, 1, 0))),
+			List.of(new Plane(new Vector3(0, -2, 0),
+					new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4), new Vector3(0, 1, 0)),
+					new Arrow(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.GREEN),
+							new Vector3(0, 1, 0), 10)),
 			List.of(new Light(new Vector3(7.5, 5, 20), new Color(255, 255, 72), 50),
 					new Light(new Vector3(-7.5, 5, 20), new Color(255, 0, 72), 50)));
 	JFrame main;
@@ -154,11 +155,9 @@ public class SettingPanel extends JPanel {
 			public CreateObjectDialog(JFrame owner) {
 				super(owner);
 				JComboBox<? extends Object3D> objectSelector = new JComboBox<>(new Object3D[] {
-						new Cone(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE),
-								new Vector3(0, 1, 0), Math.toRadians(10), 5),
+						new Cylinder(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE),
+								new Vector3(0, -1, 0), 2, 5),
 						new Cube(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE), 4),
-						new Line(new Vector3(0, 0, 0), new Vector3(0, 0, 1),
-								new BasicMaterial(new BasicShader(), Color.WHITE)),
 						new Plane(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE),
 								new Vector3(0, 1, 0)),
 						new Sphere(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE), 2),
@@ -211,14 +210,16 @@ public class SettingPanel extends JPanel {
 			public Menu(String label, List<? extends Object3D> items) {
 				super(label);
 				for (Object3D object : items) {
-					JMenuItem menuItem = new JMenuItem(object.toString());
-					menuItem.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							currentItemDisplay.setCurrentItem(object);
-						}
-					});
-					add(menuItem);
+					if (!(object instanceof Arrow)) {
+						JMenuItem menuItem = new JMenuItem(object.toString());
+						menuItem.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								currentItemDisplay.setCurrentItem(object);
+							}
+						});
+						add(menuItem);
+					}
 				}
 			}
 		}
@@ -392,6 +393,39 @@ public class SettingPanel extends JPanel {
 					add(yDirectionSlider);
 					add(zDirectionSlider);
 				}
+				else if (shape instanceof Cylinder) {
+					Cylinder cylinder = ((Cylinder) shape);
+
+					Slider xDirectionSlider = new Slider("xDir", -10, 10);
+					xDirectionSlider.setValue(cylinder.getAxis().x);
+					Slider yDirectionSlider = new Slider("yDir", -10, 10);
+					yDirectionSlider.setValue(cylinder.getAxis().y);
+					Slider zDirectionSlider = new Slider("zDir", -10, 10);
+					zDirectionSlider.setValue(cylinder.getAxis().z);
+
+					ObjectModification setAxis = (Object3D object) -> ((Cylinder) object)
+							.setAxis(new Vector3(xDirectionSlider.getValue(), yDirectionSlider.getValue(),
+									zDirectionSlider.getValue()).normalize());
+
+					xDirectionSlider.setAction(setAxis);
+					yDirectionSlider.setAction(setAxis);
+					zDirectionSlider.setAction(setAxis);
+
+					InputField height = new InputField("Height", cylinder.getHeight());
+					height.setAction(
+							(Object3D object) -> ((Cylinder) object).setHeight(Double.parseDouble(height.getValue())));
+
+					InputField radius = new InputField("Height", cylinder.getRadius());
+					radius.setAction(
+							(Object3D object) -> ((Cylinder) object).setRadius(Double.parseDouble(radius.getValue())));
+
+					add(xDirectionSlider);
+					add(yDirectionSlider);
+					add(zDirectionSlider);
+					add(height);
+					add(radius);
+
+				}
 				add(new MaterialSettingsPanel());
 				add(new ShaderSettingPanel());
 			}
@@ -410,6 +444,7 @@ public class SettingPanel extends JPanel {
 				});
 				private ColorInput mainColorInput = new ColorInput(material.getColor());
 				private InputField reflectivity = new InputField("Refl", material.getReflectivity());
+				private InputField transparency = new InputField("Trans", material.getTransparency());
 
 				public MaterialSettingsPanel() {
 					super();
@@ -449,6 +484,9 @@ public class SettingPanel extends JPanel {
 								.setReflectivity(Double.parseDouble(reflectivity.getValue())));
 						add(reflectivity);
 					}
+					transparency.setAction((Object3D object) -> ((Shape) object).getMaterial()
+							.setTransparency(Double.parseDouble(transparency.getValue())));
+					add(transparency);
 				}
 			}
 

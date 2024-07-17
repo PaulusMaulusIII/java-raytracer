@@ -3,17 +3,20 @@ package raytracer.materials;
 import raytracer.shaders.Shader;
 import raytracer.utilities.Color;
 import raytracer.utilities.Material;
+import raytracer.utilities.math.Noise;
 import raytracer.utilities.math.Vector3;
 
 public class CheckerMaterial extends Material {
 
 	double gridsize;
 	Color secColor;
+	Noise noise;
 
 	public CheckerMaterial(Shader shader, Color color, Color color2, double gridsize) {
 		super(shader, color);
 		this.secColor = color2;
 		this.gridsize = gridsize;
+		noise = new Noise();
 	}
 
 	public void setSecColor(Color secColor) {
@@ -41,5 +44,10 @@ public class CheckerMaterial extends Material {
 
 	public void setGridsize(double gridsize) {
 		this.gridsize = gridsize;
+	}
+
+	@Override
+	public double getReflectivityAt(Vector3 point) {
+		return noise.smoothNoise(point.x, point.y, point.z) / 10;
 	}
 }

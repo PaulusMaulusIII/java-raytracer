@@ -56,14 +56,10 @@ public class Renderer {
         Graphics gfx = temp.getGraphics();
         int blockSize = (int) (1 / resolution);
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int px = (int) (x * resolution);
-                int py = (int) (y * resolution);
-                if (px < resWidth && py < resHeight) {
-                    gfx.setColor(pixelBuffer[py][px].getColor().toAWT());
-                    gfx.fillRect(x, y, blockSize, blockSize);
-                }
+        for (int y = 0; y < height; y += blockSize) {
+            for (int x = 0; x < width; x += blockSize) {
+                gfx.setColor(pixelBuffer[(int) (y * resolution)][(int) (x * resolution)].getColor().toAWT());
+                gfx.fillRect(x, y, blockSize, blockSize);
             }
             if (verbose && y != 0 && y % (height / 100) == 0)
                 System.out.print("#");
@@ -114,7 +110,8 @@ public class Renderer {
         return new PixelData(
                 hit.getShape().getMaterial().getShader().shade(hit, scene.getLights(), scene.getObjects(),
                         hit.getShape().getMaterial(), 0),
-                ray.getOrigin().distance(hit.getHitPoint()), hit.getShape().getMaterial().getEmission());
+                ray.getOrigin().distance(hit.getHitPoint()),
+                hit.getShape().getMaterial().getEmissionAt(hit.getHitPoint()));
     }
 
     public static RayHit getLookingAt(Scene scene, int width, int height) {

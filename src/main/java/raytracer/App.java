@@ -7,13 +7,14 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 import raytracer.core.Viewport;
-import raytracer.core.SettingPanel;;
+import raytracer.core.SettingPanel;
 
 public class App {
 
     public App() {
 
         JFrame main = new JFrame();
+        main.setSize(1280, 720);
         main.setTitle("Java Ray-Tracer");
         main.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {

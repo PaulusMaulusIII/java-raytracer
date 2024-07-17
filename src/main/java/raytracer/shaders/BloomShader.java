@@ -25,7 +25,7 @@ public class BloomShader extends PhongShader {
 		Color specularComponent = new Color(0, 0, 0);
 
 		for (Light light : lights) {
-			if (!isInShadow(rayHit, lights, objects)) {
+			if (!isInShadow(rayHit, light, objects)) {
 				double distance = rayHit.getHitPoint().distance(light.getAnchor());
 				double attenuation = GlobalSettings.ATTENUATION / (distance * distance);
 				Color lightColor = light.getColor().multiply(attenuation);
@@ -33,13 +33,13 @@ public class BloomShader extends PhongShader {
 				double diffuseLighting = calculateDiffuseLighting(rayHit, light);
 				double specularLighting = calculateSpecularLighting(rayHit, light, material);
 
-				diffuseComponent = diffuseComponent
-						.add(baseColor.multiply(material.getEmission()).multiply(diffuseLighting).multiply(lightColor));
+				diffuseComponent = diffuseComponent.add(baseColor.multiply(material.getEmissionAt(rayHit.getHitPoint()))
+						.multiply(diffuseLighting).multiply(lightColor));
 				specularComponent = specularComponent.add(lightColor.multiply(specularLighting));
 			}
 		}
 
-		double reflectivity = material.getReflectivity();
+		double reflectivity = material.getReflectivityAt(rayHit.getHitPoint());
 		diffuseComponent = diffuseComponent.multiply(1 - reflectivity);
 
 		PixelData reflection = calculateReflection(rayHit, lights, objects, material, depth);
@@ -47,7 +47,7 @@ public class BloomShader extends PhongShader {
 		Color finalColor = Color.lerp(ambientComponent, reflection.getColor(), reflectivity) // Reflected color
 				.multiply(diffuseComponent) // Diffuse lighting
 				.add(specularComponent) // Specular lighting
-				.add(baseColor.multiply(material.getEmission())) // Object emission
+				.add(baseColor.multiply(material.getEmissionAt(rayHit.getHitPoint()))) // Object emission
 				.add(reflection.getColor().multiply(reflection.getEmission() * reflectivity)); // Indirect illumination
 
 		return finalColor;
