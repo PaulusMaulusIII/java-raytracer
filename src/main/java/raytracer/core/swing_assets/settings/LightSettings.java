@@ -11,7 +11,7 @@ import raytracer.utilities.math.Vector3;
 public class LightSettings extends Settings {
 
 	private Light light;
-	private ColorInput colorInput = new ColorInput(light.getColor());
+	private ColorInput colorInput;
 	private InputField intensity = new InputField("Intensity", 1.0);
 
 	private ObjectModification setLightPosition = (Object3D currentItem) -> ((Light) currentItem)
@@ -23,6 +23,7 @@ public class LightSettings extends Settings {
 		super();
 		this.settingPanel = parent;
 		this.light = (Light) settingPanel.getCurrentItemDisplay().getCurrentItem();
+		colorInput = new ColorInput(light.getColor());
 
 		xSlider.setValue(light.getAnchor().x);
 		ySlider.setValue(light.getAnchor().y);

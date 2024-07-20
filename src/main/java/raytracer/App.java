@@ -78,7 +78,7 @@ public class App {
 
         MenuItem addObject = new MenuItem("Add Object");
         addObject.addActionListener((ActionEvent e) -> {
-            new CreateObjectDialog(main, settings).setVisible(true);
+            new CreateObjectDialog(main, settingsDialog, settings).setVisible(true);
         });
 
         MenuItem removeObject = new MenuItem("Remove Object");

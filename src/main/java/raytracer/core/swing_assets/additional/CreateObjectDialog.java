@@ -23,7 +23,7 @@ import raytracer.utilities.math.Vector3;
 
 public class CreateObjectDialog extends JDialog {
 
-	public CreateObjectDialog(JFrame owner, SettingPanel settingPanel) {
+	public CreateObjectDialog(JFrame owner, JDialog settingsDialog, SettingPanel settingPanel) {
 		super(owner);
 		JComboBox<? extends Object3D> objectSelector = new JComboBox<>(new Object3D[] {
 				new Cylinder(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE),
@@ -47,9 +47,11 @@ public class CreateObjectDialog extends JDialog {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							settingPanel.getCurrentItemDisplay().setCurrentItem(shapeToAdd);
+							if (!settingsDialog.isVisible())
+								settingsDialog.setVisible(true);
 						}
 					});
-					owner.getMenuBar().getMenu(1).add(menuItem);
+					owner.getMenuBar().getMenu(2).add(menuItem);
 					settingPanel.getScene().getShapes().add(shapeToAdd);
 				}
 				else if (objectToAdd instanceof Light) {
@@ -59,9 +61,11 @@ public class CreateObjectDialog extends JDialog {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							settingPanel.getCurrentItemDisplay().setCurrentItem(lightToAdd);
+							if (!settingsDialog.isVisible())
+								settingsDialog.setVisible(true);
 						}
 					});
-					owner.getMenuBar().getMenu(2).add(menuItem);
+					owner.getMenuBar().getMenu(3).add(menuItem);
 					settingPanel.getScene().getLights().add(lightToAdd);
 				}
 

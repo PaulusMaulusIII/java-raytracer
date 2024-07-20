@@ -49,24 +49,48 @@ public class Color {
 		return red;
 	}
 
+	public void setRed(int red) {
+		this.red = red;
+	}
+
 	public int getGreen() {
 		return green;
+	}
+
+	public void setGreen(int green) {
+		this.green = green;
 	}
 
 	public int getBlue() {
 		return blue;
 	}
 
+	public void setBlue(int blue) {
+		this.blue = blue;
+	}
+
 	public double getHue() {
 		return hue;
+	}
+
+	public void setHue(double hue) {
+		this.hue = hue;
 	}
 
 	public double getSaturation() {
 		return saturation;
 	}
 
+	public void setSaturation(double saturation) {
+		this.saturation = saturation;
+	}
+
 	public double getValue() {
 		return value;
+	}
+
+	public void setValue(double value) {
+		this.value = value;
 	}
 
 	public void toHSV() {

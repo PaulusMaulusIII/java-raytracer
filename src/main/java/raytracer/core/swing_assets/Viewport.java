@@ -11,9 +11,9 @@ import javax.swing.*;
 
 import raytracer.core.Renderer;
 import raytracer.core.interfaces.Effect;
+import raytracer.core.swing_assets.additional.CreateObjectDialog;
 import raytracer.geometries.additional.Arrow;
 import raytracer.post_processing.DepthOfField;
-import raytracer.post_processing.Fog;
 import raytracer.utilities.Camera;
 import raytracer.utilities.Color;
 import raytracer.utilities.Object3D;
@@ -33,12 +33,13 @@ public class Viewport extends JPanel {
 	private double tilt = 0;
 	private double distance = 0.1;
 	private Effect dof = new DepthOfField(() -> distance);
-	private List<Effect> effects = new LinkedList<>(List.of(new Fog()));
+	private List<Effect> effects = new LinkedList<>();
 	private boolean captureCursor = false;
 	private int hud = 2;
 	private BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 	private double resolution = 0.125;
 	private double speed = 0;
+	private Vector3 axis = new Vector3(0, 0, 0);
 
 	private Cursor blankCursor;
 	private Container container;
@@ -50,7 +51,6 @@ public class Viewport extends JPanel {
 	private SettingPanel settings;
 	private JDialog settingsDialog;
 	private Object3D selectedObject;
-	private Vector3 axis = new Vector3(0, 0, 0);
 
 	// Constructors
 	public Viewport(Container container, SettingPanel settings, JDialog settingsDialog, int width, int height) {
@@ -138,20 +138,16 @@ public class Viewport extends JPanel {
 
 	// Apply camera movement based on input
 	private void applyMovement(Camera cam) {
+		deltaCamera.z = (Math.abs(deltaCamera.z) > Math.abs(speed)) ? deltaCamera.z : speed;
 		if (captureCursor) {
-			deltaCamera.z = (Math.abs(deltaCamera.z) > Math.abs(speed)) ? deltaCamera.z : speed;
-			// Adjust the pitch and yaw considering the tilt
-			double adjustedPitch = deltaPY.x * Math.cos(cam.getTilt()) - deltaPY.y * Math.sin(cam.getTilt());
-			double adjustedYaw = deltaPY.y * Math.cos(cam.getTilt()) + deltaPY.x * Math.sin(cam.getTilt());
-
-			cam.setPitch(adjustedPitch);
-			cam.setYaw(adjustedYaw);
+			cam.setPitch(deltaPY.x);
+			cam.setYaw(deltaPY.y);
 			cam.setTilt(cam.getTilt() + tilt);
 
 			// Apply the camera translation considering the tilt
-			Vector3 rotatedDeltaCamera = deltaCamera.rotate(adjustedPitch, adjustedYaw, cam.getTilt());
-			cam.translate(rotatedDeltaCamera);
 		}
+		Vector3 rotatedDeltaCamera = deltaCamera.rotate(cam.getPitch(), cam.getYaw(), cam.getTilt());
+		cam.translate(rotatedDeltaCamera);
 	}
 
 	private void setCaptureCursor(boolean captureCursor) {
@@ -220,6 +216,7 @@ public class Viewport extends JPanel {
 		case KeyEvent.VK_CONTROL -> {
 			ctrl = true;
 		}
+		case KeyEvent.VK_C -> new CreateObjectDialog(((JFrame) container), settingsDialog, settings);
 		}
 	}
 

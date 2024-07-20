@@ -46,10 +46,4 @@ public class CheckerMaterial extends Material {
 	public void setGridsize(double gridsize) {
 		this.gridsize = gridsize;
 	}
-
-	@Override
-	public double getReflectivityAt(Vector3 point) {
-		return noise.smoothNoise(point.x, point.y, point.z) / 10;
-	}
-
 }
