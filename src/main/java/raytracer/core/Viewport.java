@@ -21,24 +21,29 @@ import raytracer.utilities.Object3D;
 import raytracer.utilities.Scene;
 import raytracer.utilities.Shape;
 import raytracer.utilities.math.RayHit;
+import raytracer.utilities.math.Vector2;
 import raytracer.utilities.math.Vector3;
 
 public class Viewport extends JPanel {
 
 	// Fields
 	private boolean autoDOF = true;
-	private Cursor blankCursor;
-	private Container container;
 	private boolean ctrl = false;
 	private Vector3 deltaCamera = new Vector3(0, 0, 0);
-	private Vector3 deltaPYT = new Vector3(0, 0, 0);
+	private Vector2 deltaPY = new Vector2(0, 0);
+	private double tilt = 0;
 	private double distance = 0.1;
 	private Effect dof = new DepthOfField(() -> distance);
 	private List<Effect> effects = new LinkedList<>(List.of(new Fog()));
-	private BufferedImage frame;
 	private boolean captureCursor = true;
 	private int hud = 2;
 	private BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+	private double resolution = 0.125;
+	private double speed = 0;
+
+	private Cursor blankCursor;
+	private Container container;
+	private BufferedImage frame;
 	private int origX;
 	private int origY;
 	private Robot robot;
@@ -48,7 +53,6 @@ public class Viewport extends JPanel {
 	private Object3D selectedObject;
 	private Shader tempShader;
 	private Vector3 axis;
-	private double resolution = 0.125;
 
 	// Constructors
 	public Viewport(Container container, SettingPanel settings, JDialog settingsDialog) {
@@ -61,6 +65,12 @@ public class Viewport extends JPanel {
 
 	// Initialization methods
 	private void initialize() {
+		Camera cam = scene.getCamera();
+		deltaPY.x = cam.getPitch();
+		deltaPY.y = cam.getYaw();
+		tilt = cam.getTilt();
+		blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+
 		try {
 			robot = new Robot();
 		} catch (Exception e) {
@@ -71,27 +81,9 @@ public class Viewport extends JPanel {
 		addKeyListener(keyAdapter);
 		addMouseListener(mouseClickAdapter);
 		addMouseMotionListener(mouseMoveAdapter);
+		addMouseWheelListener(mouseWheelListener);
 		setFocusable(true);
 		setCaptureCursor(true);
-
-		Camera cam = scene.getCamera();
-		deltaPYT.x = cam.getPitch();
-		deltaPYT.y = cam.getYaw();
-		deltaPYT.z = cam.getTilt();
-		blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
-	}
-
-	private void setCaptureCursor(boolean captureCursor) {
-		this.captureCursor = captureCursor;
-		if (captureCursor) {
-			setCursor(blankCursor);
-			int centerX = container.getX() + container.getWidth() / 2;
-			int centerY = container.getY() + container.getHeight() / 2;
-			robot.mouseMove(centerX, centerY);
-		}
-		else {
-			setCursor(Cursor.getDefaultCursor());
-		}
 	}
 
 	// Main loop
@@ -103,24 +95,13 @@ public class Viewport extends JPanel {
 			RayHit lookingAt = Renderer.getLookingAt(scene, container.getWidth(), container.getHeight());
 			if (autoDOF && lookingAt != null)
 				distance = cam.getAnchor().distance(lookingAt.getHitPoint());
-			frame = renderFinalImage();
+			frame = renderFrame();
 			displayHUD(cam, lookingAt, startTime);
 			repaint();
 		}
-	}
+	} // Render the final image
 
-	// Apply camera movement based on input
-	private void applyMovement(Camera cam) {
-		if (captureCursor) {
-			cam.setPitch(deltaPYT.x);
-			cam.setYaw(deltaPYT.y);
-			cam.setTilt(cam.getTilt() + deltaPYT.z);
-			cam.translate(deltaCamera.rotate(cam.getPitch(), cam.getYaw(), cam.getTilt()));
-		}
-	}
-
-	// Render the final image
-	private BufferedImage renderFinalImage() {
+	private BufferedImage renderFrame() {
 		BufferedImage renderedFrame = Renderer.render(scene, container.getWidth(), container.getHeight(), resolution,
 				false, effects, distance);
 		return renderedFrame;
@@ -131,8 +112,10 @@ public class Viewport extends JPanel {
 		if (hud > 0) {
 			frame.getGraphics().drawString("+", container.getWidth() / 2, container.getHeight() / 2);
 			if (hud > 1) {
-				frame.getGraphics().drawString("CameraPos: " + cam.getAnchor() + ", " + Math.toDegrees(cam.getPitch())
-						+ "°, " + Math.toDegrees(cam.getYaw()) + "°, " + Math.toDegrees(cam.getTilt()) + "°", 10, 20);
+				frame.getGraphics()
+						.drawString("CameraPos: " + cam.getAnchor() + ", " + Math.toDegrees(cam.getPitch()) + "°, "
+								+ Math.toDegrees(cam.getYaw()) + "°, " + Math.toDegrees(cam.getTilt()) + "°, " + speed,
+								10, 20);
 				if (lookingAt != null) {
 					frame.getGraphics()
 							.drawString("Looking at: " + lookingAt.getHitPoint() + ", " + lookingAt.getShape() + ", "
@@ -158,13 +141,43 @@ public class Viewport extends JPanel {
 		}
 	}
 
+	// Apply camera movement based on input
+	private void applyMovement(Camera cam) {
+		if (captureCursor) {
+			deltaCamera.z = (Math.abs(deltaCamera.z) > Math.abs(speed)) ? deltaCamera.z : speed;
+			// Adjust the pitch and yaw considering the tilt
+			double adjustedPitch = deltaPY.x * Math.cos(cam.getTilt()) - deltaPY.y * Math.sin(cam.getTilt());
+			double adjustedYaw = deltaPY.y * Math.cos(cam.getTilt()) + deltaPY.x * Math.sin(cam.getTilt());
+
+			cam.setPitch(adjustedPitch);
+			cam.setYaw(adjustedYaw);
+			cam.setTilt(cam.getTilt() + tilt);
+
+			// Apply the camera translation considering the tilt
+			Vector3 rotatedDeltaCamera = deltaCamera.rotate(adjustedPitch, adjustedYaw, cam.getTilt());
+			cam.translate(rotatedDeltaCamera);
+		}
+	}
+
+	private void setCaptureCursor(boolean captureCursor) {
+		this.captureCursor = captureCursor;
+		if (captureCursor) {
+			setCursor(blankCursor);
+			int centerX = container.getX() + container.getWidth() / 2;
+			int centerY = container.getY() + container.getHeight() / 2;
+			robot.mouseMove(centerX, centerY);
+		}
+		else {
+			setCursor(Cursor.getDefaultCursor());
+		}
+	}
+
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.drawImage(frame, 0, 0, this);
-	}
+	}// Key adapter for handling keyboard input
 
-	// Key adapter for handling keyboard input
 	private KeyAdapter keyAdapter = new KeyAdapter() {
 		@Override
 		public void keyPressed(KeyEvent e) {
@@ -189,8 +202,9 @@ public class Viewport extends JPanel {
 		case KeyEvent.VK_2 -> resolution = 0.5;
 		case KeyEvent.VK_3 -> resolution = 0.25;
 		case KeyEvent.VK_4 -> resolution = 0.125;
-		case KeyEvent.VK_Q -> deltaPYT.setZ(Math.toRadians(1));
-		case KeyEvent.VK_E -> deltaPYT.setZ(-Math.toRadians(1));
+		case KeyEvent.VK_5 -> resolution = 0.0625;
+		case KeyEvent.VK_Q -> tilt = Math.toRadians(1);
+		case KeyEvent.VK_E -> tilt = -Math.toRadians(1);
 		case KeyEvent.VK_F12 -> {
 			try {
 				Renderer.renderToImage(scene, 3840, 2160, effects, distance);
@@ -217,7 +231,7 @@ public class Viewport extends JPanel {
 		case KeyEvent.VK_D, KeyEvent.VK_A -> deltaCamera.setX(0);
 		case KeyEvent.VK_SPACE, KeyEvent.VK_SHIFT -> deltaCamera.setY(0);
 		case KeyEvent.VK_W, KeyEvent.VK_S -> deltaCamera.setZ(0);
-		case KeyEvent.VK_Q, KeyEvent.VK_E -> deltaPYT.setZ(0);
+		case KeyEvent.VK_Q, KeyEvent.VK_E -> tilt = 0;
 		case KeyEvent.VK_ESCAPE -> handleEscapeKey();
 		case KeyEvent.VK_CONTROL -> ctrl = false;
 		}
@@ -318,8 +332,8 @@ public class Viewport extends JPanel {
 				int centerY = container.getY() + container.getHeight() / 2;
 				int mouseXOffset = e.getXOnScreen() - centerX;
 				int mouseYOffset = e.getYOnScreen() - centerY;
-				deltaPYT.x = Math.min(90, Math.max(-90, deltaPYT.x + mouseYOffset * 0.001));
-				deltaPYT.y += mouseXOffset * 0.001;
+				deltaPY.x = Math.min(90, Math.max(-90, deltaPY.x + mouseYOffset * 0.001));
+				deltaPY.y += mouseXOffset * 0.001;
 				robot.mouseMove(centerX, centerY);
 			}
 		}
@@ -338,5 +352,17 @@ public class Viewport extends JPanel {
 			origX = e.getX();
 			origY = e.getY();
 		}
+	};
+
+	private MouseWheelListener mouseWheelListener = new MouseWheelListener() {
+
+		@Override
+		public void mouseWheelMoved(MouseWheelEvent e) {
+			if (ctrl)
+				speed -= ((double) e.getUnitsToScroll() / 100);
+			else
+				speed -= ((double) e.getUnitsToScroll() / 1000);
+		}
+
 	};
 }
