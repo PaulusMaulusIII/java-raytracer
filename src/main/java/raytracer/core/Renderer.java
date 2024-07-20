@@ -103,6 +103,9 @@ public class Renderer {
                 .normalize();
         Ray ray = new Ray(eyePos.add(cam.getAnchor()), rayDir);
         RayHit hit = ray.cast(scene.getObjects());
+        RayHit arrowHit = ray.castArrows(scene.getObjects());
+        if (arrowHit != null)
+            hit = arrowHit;
         if (hit == null)
             return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);
         if (ray.getOrigin().distance(hit.getHitPoint()) > GlobalSettings.MAX_RENDER_DISTANCE)
@@ -125,6 +128,8 @@ public class Renderer {
         Vector3 rayDir = new Vector3(screenUV[0], screenUV[1], 0).subtract(eyePos)
                 .rotate(cam.getPitch(), cam.getYaw(), cam.getTilt()).normalize();
         Ray ray = new Ray(eyePos.add(cam.getAnchor()), rayDir);
-        return ray.cast(scene.getObjects());
+        RayHit hit = ray.cast(scene.getObjects());
+        RayHit arrowHit = ray.castArrows(scene.getObjects());
+        return (arrowHit == null) ? hit : arrowHit;
     }
 }

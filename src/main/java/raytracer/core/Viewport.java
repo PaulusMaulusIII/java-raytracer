@@ -13,8 +13,6 @@ import raytracer.geometries.additional.Arrow;
 import raytracer.post_processing.DepthOfField;
 import raytracer.post_processing.Effect;
 import raytracer.post_processing.Fog;
-import raytracer.shaders.Shader;
-import raytracer.shaders.TransparentShader;
 import raytracer.utilities.Camera;
 import raytracer.utilities.Color;
 import raytracer.utilities.Object3D;
@@ -35,7 +33,7 @@ public class Viewport extends JPanel {
 	private double distance = 0.1;
 	private Effect dof = new DepthOfField(() -> distance);
 	private List<Effect> effects = new LinkedList<>(List.of(new Fog()));
-	private boolean captureCursor = true;
+	private boolean captureCursor = false;
 	private int hud = 2;
 	private BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 	private double resolution = 0.125;
@@ -51,8 +49,7 @@ public class Viewport extends JPanel {
 	private SettingPanel settings;
 	private JDialog settingsDialog;
 	private Object3D selectedObject;
-	private Shader tempShader;
-	private Vector3 axis;
+	private Vector3 axis = new Vector3(0, 0, 0);
 
 	// Constructors
 	public Viewport(Container container, SettingPanel settings, JDialog settingsDialog) {
@@ -83,7 +80,7 @@ public class Viewport extends JPanel {
 		addMouseMotionListener(mouseMoveAdapter);
 		addMouseWheelListener(mouseWheelListener);
 		setFocusable(true);
-		setCaptureCursor(true);
+		setCaptureCursor(false);
 	}
 
 	// Main loop
@@ -192,12 +189,12 @@ public class Viewport extends JPanel {
 
 	private void handleKeyPress(KeyEvent e) {
 		switch (e.getKeyCode()) {
-		case KeyEvent.VK_D -> deltaCamera.setX(0.2);
-		case KeyEvent.VK_A -> deltaCamera.setX(-0.2);
-		case KeyEvent.VK_W -> deltaCamera.setZ(0.2);
-		case KeyEvent.VK_S -> deltaCamera.setZ(-0.2);
-		case KeyEvent.VK_SPACE -> deltaCamera.setY(0.2);
-		case KeyEvent.VK_SHIFT -> deltaCamera.setY(-0.2);
+		case KeyEvent.VK_D -> deltaCamera.setX((ctrl) ? 2 : 0.2);
+		case KeyEvent.VK_A -> deltaCamera.setX((ctrl) ? -2 : -0.2);
+		case KeyEvent.VK_W -> deltaCamera.setZ((ctrl) ? 2 : 0.2);
+		case KeyEvent.VK_S -> deltaCamera.setZ((ctrl) ? -2 : -0.2);
+		case KeyEvent.VK_SPACE -> deltaCamera.setY((ctrl) ? 2 : 0.2);
+		case KeyEvent.VK_SHIFT -> deltaCamera.setY((ctrl) ? -2 : -0.2);
 		case KeyEvent.VK_1 -> resolution = 1;
 		case KeyEvent.VK_2 -> resolution = 0.5;
 		case KeyEvent.VK_3 -> resolution = 0.25;
@@ -222,7 +219,9 @@ public class Viewport extends JPanel {
 		case KeyEvent.VK_PLUS -> distance += 0.1;
 		case KeyEvent.VK_MINUS -> distance = Math.max(0.1, distance - 0.1);
 		case KeyEvent.VK_R -> autoDOF = !autoDOF;
-		case KeyEvent.VK_CONTROL -> ctrl = true;
+		case KeyEvent.VK_CONTROL -> {
+			ctrl = true;
+		}
 		}
 	}
 
@@ -259,23 +258,29 @@ public class Viewport extends JPanel {
 		public void mousePressed(MouseEvent e) {
 			handleMousePress(e);
 		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			switch (e.getButton()) {
+			case MouseEvent.BUTTON2 -> setCaptureCursor(false);
+			}
+		}
 	};
 
 	private void handleMousePress(MouseEvent e) {
-		if (!captureCursor) {
-			setCaptureCursor(true);
-		}
 		switch (e.getButton()) {
 		case MouseEvent.BUTTON1 -> handleLeftClick(e);
+		case MouseEvent.BUTTON2 -> setCaptureCursor(true);
 		case MouseEvent.BUTTON3 -> handleRightClick(e);
 		}
+
 	}
 
 	private void handleLeftClick(MouseEvent e) {
 		RayHit atCursor = Renderer.getAt(scene, e.getX(), e.getY(), container.getWidth(), container.getHeight());
 		if (atCursor != null && atCursor.getObject() instanceof Shape && atCursor.getShape() instanceof Arrow) {
-			origX = e.getX();
-			origY = e.getY();
+			origX = e.getX(); // TODO only works if axis+ = x/y+
+			origY = e.getY(); // TODO only works if axis+ = x/y+
 			axis = ((Arrow) atCursor.getShape()).getAxis();
 		}
 	}
@@ -285,21 +290,12 @@ public class Viewport extends JPanel {
 		List<Shape> shapes = new LinkedList<>(scene.getShapes());
 		shapes.removeIf(shape -> shape instanceof Arrow);
 		if (lookingAt != null && lookingAt.getObject() instanceof Shape && !(lookingAt.getShape() instanceof Arrow)) {
-			if (selectedObject != null) {
-				((Shape) selectedObject).getMaterial().setShader(tempShader);
-				((Shape) selectedObject).getMaterial().setTransparency(0);
-			}
 			if (lookingAt.getShape() == selectedObject) {
-				((Shape) selectedObject).getMaterial().setShader(tempShader);
-				((Shape) selectedObject).getMaterial().setTransparency(0);
 				selectedObject = null;
 			}
 			else {
 				selectedObject = lookingAt.getShape();
-				tempShader = ((Shape) selectedObject).getMaterial().getShader();
-				((Shape) selectedObject).getMaterial().setShader(new TransparentShader());
 				selectedObject.addChangeListener((origPos, newPos) -> {
-					scene.getCamera().setAnchor(scene.getCamera().getAnchor().add(newPos.subtract(origPos)));
 					for (Shape shape : scene.getShapes()) {
 						if (shape instanceof Arrow)
 							shape.setAnchor(shape.getAnchor().add(newPos.subtract(origPos)));
@@ -340,17 +336,22 @@ public class Viewport extends JPanel {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			double scale = ctrl ? 1 : 0.1;
-			if (axis.x > 0 || axis.z > 0) {
-				selectedObject
-						.setAnchor(selectedObject.getAnchor().add(axis.scale(e.getX() - origX > 0 ? scale : -scale)));
+			if (captureCursor) {
+				mouseMoved(e);
 			}
-			else {
-				selectedObject
-						.setAnchor(selectedObject.getAnchor().add(axis.scale(origY - e.getY() > 0 ? scale : -scale)));
+			else if (selectedObject != null && axis != null) {
+				double scale = ctrl ? 1 : 0.1;
+				if (axis.x > 0 || axis.z > 0) {
+					selectedObject.setAnchor(
+							selectedObject.getAnchor().add(axis.scale(e.getX() - origX > 0 ? scale : -scale)));
+				}
+				else {
+					selectedObject.setAnchor(
+							selectedObject.getAnchor().add(axis.scale(origY - e.getY() > 0 ? scale : -scale)));
+				}
+				origX = e.getX(); // TODO only works if axis+ = x/y+
+				origY = e.getY(); // TODO only works if axis+ = x/y+
 			}
-			origX = e.getX();
-			origY = e.getY();
 		}
 	};
 

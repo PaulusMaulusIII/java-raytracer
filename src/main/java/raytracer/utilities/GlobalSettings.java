@@ -1,5 +1,8 @@
 package raytracer.utilities;
 
+import raytracer.shaders.PhongShader;
+import raytracer.shaders.Shader;
+
 public class GlobalSettings {
 	public static final double AMBIENT_BRIGHTNESS = .01;
 	public static final Color SKY_BOX_COLOR = new Color(10, 5, 10);
@@ -9,4 +12,5 @@ public class GlobalSettings {
 	public static final double SPECULAR_STRENGTH = 1;
 	public static final double ATTENUATION = 1000;
 	public static final int DOF_MAX_STRENGHT = 16;
+	public static final Shader SHADER = new PhongShader();
 }

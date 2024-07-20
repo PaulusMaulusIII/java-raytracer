@@ -52,39 +52,49 @@ public class PhongShader implements Shader {
 		specularComponent = specularComponent.multiply(reflectivity);
 
 		PixelData reflection = calculateReflection(rayHit, lights, objects, material, depth);
-		PixelData transparentComponent = calculateTransparency(rayHit, lights, objects, material, depth);
+		// PixelData transparentComponent = calculateTransparency(rayHit, lights,
+		// objects, material, depth);
 
 		Color finalColor = ambientComponent
-				.add(transparentComponent.getColor().multiply(material.getTransparencyAt(rayHit.getHitPoint())))
+				/*
+				 * .add(transparentComponent.getColor().multiply(material.getTransparencyAt(
+				 * rayHit.getHitPoint())))
+				 */
 				.add(reflection.getColor().multiply(reflectivity)).multiply(diffuseFactor).add(diffuseComponent)
 				.add(specularComponent);
 
 		return finalColor;
 	}
 
-	private PixelData calculateTransparency(RayHit rayHit, List<Light> lights, List<Object3D> objects,
-			Material material, int depth) {
-		if (material.getTransparencyAt(rayHit.getHitPoint()) <= 0 || depth > GlobalSettings.MAX_REFLECTION_DEPTH)
-			return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);
-
-		Vector3 transparencyStart = rayHit.getHitPoint();
-		Vector3 transparencyDirection = rayHit.getRay().getDirection();
-		Ray transparencyRay = new Ray(transparencyStart.scale(1e-6), transparencyDirection);
-
-		RayHit transparencyHit = transparencyRay.cast(objects);
-
-		if (transparencyHit != null && transparencyHit.getObject() instanceof Shape
-				&& !(transparencyHit.getShape() instanceof Arrow)) {
-			return new PixelData(
-					transparencyHit.getShape().getMaterial().getShader().shade(transparencyHit, lights, objects,
-							transparencyHit.getShape().getMaterial(), depth + 1),
-					transparencyRay.getOrigin().distance(transparencyHit.getHitPoint())
-							+ (rayHit.getHitPoint().distance(rayHit.getRay().getOrigin())),
-					transparencyHit.getShape().getMaterial().getEmissionAt(transparencyHit.getHitPoint()));
-
-		}
-		return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);
-	}
+	// private PixelData calculateTransparency(RayHit rayHit, List<Light> lights,
+	// List<Object3D> objects,
+	// Material material, int depth) {
+	// if (material.getTransparencyAt(rayHit.getHitPoint()) <= 0 || depth >
+	// GlobalSettings.MAX_REFLECTION_DEPTH)
+	// return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY,
+	// GlobalSettings.SKY_EMISSION);
+	//
+	// Vector3 transparencyStart = rayHit.getHitPoint();
+	// Vector3 transparencyDirection = rayHit.getRay().getDirection();
+	// Ray transparencyRay = new Ray(transparencyStart.scale(1e-6),
+	// transparencyDirection);
+	//
+	// RayHit transparencyHit = transparencyRay.cast(objects);
+	//
+	// if (transparencyHit != null && transparencyHit.getObject() instanceof Shape
+	// && !(transparencyHit.getShape() instanceof Arrow)) {
+	// return new PixelData(
+	// transparencyHit.getShape().getMaterial().getShader().shade(transparencyHit,
+	// lights, objects,
+	// transparencyHit.getShape().getMaterial(), depth + 1),
+	// transparencyRay.getOrigin().distance(transparencyHit.getHitPoint())
+	// + (rayHit.getHitPoint().distance(rayHit.getRay().getOrigin())),
+	// transparencyHit.getShape().getMaterial().getEmissionAt(transparencyHit.getHitPoint()));
+	//
+	// }
+	// return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY,
+	// GlobalSettings.SKY_EMISSION);
+	// }
 
 	protected boolean isInShadow(RayHit rayHit, Light light, List<Object3D> objects) {
 		Vector3 hitPoint = rayHit.getHitPoint();

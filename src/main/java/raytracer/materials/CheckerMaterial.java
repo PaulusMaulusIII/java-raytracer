@@ -29,9 +29,10 @@ public class CheckerMaterial extends Material {
 
 	@Override
 	public Color getColor(Vector3 point) {
-		double x = Math.floor(point.x * (1 / gridsize) + 1e-6);
-		double y = Math.floor(point.y * (1 / gridsize) + 1e-6);
-		double z = Math.floor(point.z * (1 / gridsize) + 1e-6);
+		Vector3 pointRelative = shape.getAnchor().subtract(point);
+		double x = Math.floor(pointRelative.x * (1 / gridsize) + 1e-6);
+		double y = Math.floor(pointRelative.y * (1 / gridsize) + 1e-6);
+		double z = Math.floor(pointRelative.z * (1 / gridsize) + 1e-6);
 
 		boolean isEven = (x + y + z) % 2 == 0;
 
