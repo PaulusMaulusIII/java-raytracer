@@ -293,7 +293,7 @@ public class Viewport extends JPanel {
 				selectedObject.addChangeListener((origPos, newPos) -> {
 					for (Shape shape : scene.getShapes()) {
 						if (shape instanceof Arrow)
-							shape.setAnchor(shape.getAnchor().add(newPos.subtract(origPos)));
+							shape.setAnchor(newPos);
 					}
 				});
 				shapes.addAll(List.of(new Arrow(selectedObject, new Vector3(1, 0, 0), Color.RED),
