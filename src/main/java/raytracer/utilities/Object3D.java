@@ -3,7 +3,7 @@ package raytracer.utilities;
 import java.util.List;
 import java.util.LinkedList;
 
-import raytracer.utilities.data.PositionChangeListener;
+import raytracer.core.interfaces.PositionChangeListener;
 import raytracer.utilities.math.Vector3;
 
 public abstract class Object3D {

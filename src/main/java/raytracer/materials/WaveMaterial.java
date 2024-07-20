@@ -1,6 +1,6 @@
 package raytracer.materials;
 
-import raytracer.shaders.Shader;
+import raytracer.core.interfaces.Shader;
 import raytracer.utilities.Color;
 import raytracer.utilities.Material;
 import raytracer.utilities.math.Vector3;

@@ -2,6 +2,7 @@ package raytracer.shaders;
 
 import java.util.List;
 
+import raytracer.core.interfaces.Shader;
 import raytracer.lights.Light;
 import raytracer.utilities.Color;
 import raytracer.utilities.Material;

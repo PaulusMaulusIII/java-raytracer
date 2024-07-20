@@ -1,4 +1,4 @@
-package raytracer.post_processing;
+package raytracer.core.interfaces;
 
 import raytracer.utilities.data.PixelData;
 

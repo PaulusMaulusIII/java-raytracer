@@ -1,4 +1,4 @@
-package raytracer.utilities.data;
+package raytracer.core.interfaces;
 
 import raytracer.utilities.math.Vector3;
 

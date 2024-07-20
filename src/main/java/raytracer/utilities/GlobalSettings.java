@@ -1,7 +1,7 @@
 package raytracer.utilities;
 
+import raytracer.core.interfaces.Shader;
 import raytracer.shaders.PhongShader;
-import raytracer.shaders.Shader;
 
 public class GlobalSettings {
 	public static final double AMBIENT_BRIGHTNESS = .01;

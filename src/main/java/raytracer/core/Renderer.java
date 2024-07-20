@@ -10,7 +10,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import raytracer.post_processing.Effect;
+import raytracer.core.interfaces.Effect;
 import raytracer.utilities.Camera;
 import raytracer.utilities.GlobalSettings;
 import raytracer.utilities.Scene;
@@ -58,7 +58,15 @@ public class Renderer {
 
         for (int y = 0; y < height; y += blockSize) {
             for (int x = 0; x < width; x += blockSize) {
-                gfx.setColor(pixelBuffer[(int) (y * resolution)][(int) (x * resolution)].getColor().toAWT());
+                int pixelY = (int) (y * resolution);
+                int pixelX = (int) (x * resolution);
+                // Ensure pixelY and pixelX are within bounds
+                if (pixelY >= resHeight)
+                    pixelY = resHeight - 1;
+                if (pixelX >= resWidth)
+                    pixelX = resWidth - 1;
+
+                gfx.setColor(pixelBuffer[pixelY][pixelX].getColor().toAWT());
                 gfx.fillRect(x, y, blockSize, blockSize);
             }
             if (verbose && y != 0 && y % (height / 100) == 0)

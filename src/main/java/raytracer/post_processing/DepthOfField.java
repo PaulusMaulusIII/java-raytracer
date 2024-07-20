@@ -1,5 +1,6 @@
 package raytracer.post_processing;
 
+import raytracer.core.interfaces.Effect;
 import raytracer.utilities.Color;
 import raytracer.utilities.GlobalSettings;
 import raytracer.utilities.data.PixelData;

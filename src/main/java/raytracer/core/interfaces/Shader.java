@@ -1,4 +1,4 @@
-package raytracer.shaders;
+package raytracer.core.interfaces;
 
 import java.util.List;
 

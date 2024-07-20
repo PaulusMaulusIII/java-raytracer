@@ -1,4 +1,4 @@
-package raytracer.core;
+package raytracer.core.swing_assets;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -9,9 +9,10 @@ import java.util.List;
 
 import javax.swing.*;
 
+import raytracer.core.Renderer;
+import raytracer.core.interfaces.Effect;
 import raytracer.geometries.additional.Arrow;
 import raytracer.post_processing.DepthOfField;
-import raytracer.post_processing.Effect;
 import raytracer.post_processing.Fog;
 import raytracer.utilities.Camera;
 import raytracer.utilities.Color;
@@ -52,11 +53,12 @@ public class Viewport extends JPanel {
 	private Vector3 axis = new Vector3(0, 0, 0);
 
 	// Constructors
-	public Viewport(Container container, SettingPanel settings, JDialog settingsDialog) {
+	public Viewport(Container container, SettingPanel settings, JDialog settingsDialog, int width, int height) {
 		this.container = container;
 		this.scene = settings.getScene();
 		this.settings = settings;
 		this.settingsDialog = settingsDialog;
+		setSize(width, height);
 		initialize();
 	}
 
@@ -74,12 +76,13 @@ public class Viewport extends JPanel {
 			e.printStackTrace();
 		}
 
-		setSize(container.getWidth() - settings.getWidth(), container.getHeight());
+		setSize(getWidth() - settings.getWidth(), getHeight());
 		addKeyListener(keyAdapter);
 		addMouseListener(mouseClickAdapter);
 		addMouseMotionListener(mouseMoveAdapter);
 		addMouseWheelListener(mouseWheelListener);
 		setFocusable(true);
+		setEnabled(true);
 		setCaptureCursor(false);
 	}
 
@@ -89,7 +92,7 @@ public class Viewport extends JPanel {
 			long startTime = System.currentTimeMillis();
 			Camera cam = scene.getCamera();
 			applyMovement(cam);
-			RayHit lookingAt = Renderer.getLookingAt(scene, container.getWidth(), container.getHeight());
+			RayHit lookingAt = Renderer.getLookingAt(scene, getWidth(), getHeight());
 			if (autoDOF && lookingAt != null)
 				distance = cam.getAnchor().distance(lookingAt.getHitPoint());
 			frame = renderFrame();
@@ -99,15 +102,15 @@ public class Viewport extends JPanel {
 	} // Render the final image
 
 	private BufferedImage renderFrame() {
-		BufferedImage renderedFrame = Renderer.render(scene, container.getWidth(), container.getHeight(), resolution,
-				false, effects, distance);
+		BufferedImage renderedFrame = Renderer.render(scene, getWidth(), getHeight(), resolution, false, effects,
+				distance);
 		return renderedFrame;
 	}
 
 	// Display HUD and other overlays
 	private void displayHUD(Camera cam, RayHit lookingAt, long startTime) {
 		if (hud > 0) {
-			frame.getGraphics().drawString("+", container.getWidth() / 2, container.getHeight() / 2);
+			frame.getGraphics().drawString("+", getWidth() / 2, getHeight() / 2);
 			if (hud > 1) {
 				frame.getGraphics()
 						.drawString("CameraPos: " + cam.getAnchor() + ", " + Math.toDegrees(cam.getPitch()) + "°, "
@@ -121,20 +124,15 @@ public class Viewport extends JPanel {
 									10, 40);
 				}
 				if (hud > 2) {
-					frame.getGraphics().drawLine(0, container.getHeight() / 3, container.getWidth(),
-							container.getHeight() / 3);
-					frame.getGraphics().drawLine(0, (container.getHeight() / 3) * 2, container.getWidth(),
-							(container.getHeight() / 3) * 2);
-					frame.getGraphics().drawLine(container.getWidth() / 3, 0, container.getWidth() / 3,
-							container.getHeight());
-					frame.getGraphics().drawLine((container.getWidth() / 3) * 2, 0, (container.getWidth() / 3) * 2,
-							container.getHeight());
+					frame.getGraphics().drawLine(0, getHeight() / 3, getWidth(), getHeight() / 3);
+					frame.getGraphics().drawLine(0, (getHeight() / 3) * 2, getWidth(), (getHeight() / 3) * 2);
+					frame.getGraphics().drawLine(getWidth() / 3, 0, getWidth() / 3, getHeight());
+					frame.getGraphics().drawLine((getWidth() / 3) * 2, 0, (getWidth() / 3) * 2, getHeight());
 				}
 			}
 			long deltaTime = System.currentTimeMillis() - startTime;
-			frame.getGraphics().drawString("FPS: " + 1000 / (deltaTime + 1) + " @ "
-					+ (int) (container.getWidth() * resolution) + "x" + (int) (container.getHeight() * resolution),
-					container.getWidth() - 150, 20);
+			frame.getGraphics().drawString("FPS: " + 1000 / (deltaTime + 1) + " @ " + (int) (getWidth() * resolution)
+					+ "x" + (int) (getHeight() * resolution), getWidth() - 150, 20);
 		}
 	}
 
@@ -160,8 +158,8 @@ public class Viewport extends JPanel {
 		this.captureCursor = captureCursor;
 		if (captureCursor) {
 			setCursor(blankCursor);
-			int centerX = container.getX() + container.getWidth() / 2;
-			int centerY = container.getY() + container.getHeight() / 2;
+			int centerX = container.getX() + getWidth() / 2;
+			int centerY = container.getY() + getHeight() / 2;
 			robot.mouseMove(centerX, centerY);
 		}
 		else {
@@ -277,7 +275,7 @@ public class Viewport extends JPanel {
 	}
 
 	private void handleLeftClick(MouseEvent e) {
-		RayHit atCursor = Renderer.getAt(scene, e.getX(), e.getY(), container.getWidth(), container.getHeight());
+		RayHit atCursor = Renderer.getAt(scene, e.getX(), e.getY(), getWidth(), getHeight());
 		if (atCursor != null && atCursor.getObject() instanceof Shape && atCursor.getShape() instanceof Arrow) {
 			origX = e.getX(); // TODO only works if axis+ = x/y+
 			origY = e.getY(); // TODO only works if axis+ = x/y+
@@ -286,7 +284,7 @@ public class Viewport extends JPanel {
 	}
 
 	private void handleRightClick(MouseEvent e) {
-		RayHit lookingAt = Renderer.getLookingAt(scene, container.getWidth(), container.getHeight());
+		RayHit lookingAt = Renderer.getLookingAt(scene, getWidth(), getHeight());
 		List<Shape> shapes = new LinkedList<>(scene.getShapes());
 		shapes.removeIf(shape -> shape instanceof Arrow);
 		if (lookingAt != null && lookingAt.getObject() instanceof Shape && !(lookingAt.getShape() instanceof Arrow)) {
@@ -324,8 +322,8 @@ public class Viewport extends JPanel {
 		@Override
 		public void mouseMoved(MouseEvent e) {
 			if (captureCursor) {
-				int centerX = container.getX() + container.getWidth() / 2;
-				int centerY = container.getY() + container.getHeight() / 2;
+				int centerX = container.getX() + getWidth() / 2;
+				int centerY = container.getY() + getHeight() / 2;
 				int mouseXOffset = e.getXOnScreen() - centerX;
 				int mouseYOffset = e.getYOnScreen() - centerY;
 				deltaPY.x = Math.min(90, Math.max(-90, deltaPY.x + mouseYOffset * 0.001));
