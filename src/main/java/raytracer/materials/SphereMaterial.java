@@ -3,12 +3,16 @@ package raytracer.materials;
 import raytracer.shaders.Shader;
 import raytracer.utilities.Color;
 import raytracer.utilities.Material;
+import raytracer.utilities.math.Noise;
 import raytracer.utilities.math.Vector3;
 
 public class SphereMaterial extends Material {
 
+	Noise noise;
+
 	public SphereMaterial(Shader shader) {
 		super(shader, Color.WHITE);
+		noise = new Noise();
 	}
 
 	/**
@@ -34,5 +38,11 @@ public class SphereMaterial extends Material {
 				Color.PINK
 		};
 		return colors[getSide(point)];
+	}
+
+	@Override
+	public Vector3 getNormal(Vector3 hitPoint) {
+		return super.getNormal(hitPoint).add(
+				new Vector3(noise.noise(hitPoint.x / 10), noise.noise(hitPoint.y / 10), noise.noise(hitPoint.z / 10)));
 	}
 }

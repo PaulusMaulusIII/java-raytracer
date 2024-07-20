@@ -14,10 +14,10 @@ public class Cylinder extends Shape {
 	private double height;
 
 	public Cylinder(Vector3 anchor, Material material, Vector3 axis, double radius, double height) {
-		super(anchor.subtract(axis.scale(2)), material);
+		super(anchor, material);
 		this.axis = axis.normalize();
 		this.radius = radius;
-		this.height = height + 2;
+		this.height = height;
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class Cylinder extends Shape {
 		double c = (position.subtract(anchor)).dot(position.subtract(anchor))
 				- Math.pow((position.subtract(anchor)).dot(axis), 2) - Math.pow(radius, 2);
 
-		double discriminant = Math.pow(b, 2) - 4 * a * c;
+		double discriminant = (Math.pow(b, 2) - 4 * a * c);
 		if (discriminant < 0) {
 			return null;
 		}

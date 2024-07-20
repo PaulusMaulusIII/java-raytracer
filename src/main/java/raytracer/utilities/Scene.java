@@ -24,6 +24,10 @@ public class Scene {
         this.lights = new LinkedList<>(lights);
     }
 
+    public void setShapes(List<Shape> shapes) {
+        this.shapes = shapes;
+    }
+
     public List<Shape> getShapes() {
         return shapes;
     }

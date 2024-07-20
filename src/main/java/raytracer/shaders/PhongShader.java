@@ -2,6 +2,7 @@ package raytracer.shaders;
 
 import java.util.List;
 
+import raytracer.geometries.additional.Arrow;
 import raytracer.lights.Light;
 import raytracer.utilities.Color;
 import raytracer.utilities.GlobalSettings;
@@ -72,7 +73,8 @@ public class PhongShader implements Shader {
 
 		RayHit transparencyHit = transparencyRay.cast(objects);
 
-		if (transparencyHit != null && transparencyHit.getObject() instanceof Shape) {
+		if (transparencyHit != null && transparencyHit.getObject() instanceof Shape
+				&& !(transparencyHit.getShape() instanceof Arrow)) {
 			return new PixelData(
 					transparencyHit.getShape().getMaterial().getShader().shade(transparencyHit, lights, objects,
 							transparencyHit.getShape().getMaterial(), depth + 1),
@@ -91,7 +93,7 @@ public class PhongShader implements Shader {
 
 		RayHit hit = shadowRay.cast(objects);
 
-		return hit != null && hit.getObject() instanceof Shape;
+		return hit != null && hit.getObject() instanceof Shape && !(hit.getShape() instanceof Arrow);
 	}
 
 	protected double calculateDiffuseLighting(RayHit rayHit, Light light) {
@@ -125,7 +127,8 @@ public class PhongShader implements Shader {
 		Ray reflectedRay = new Ray(hitPoint.add(reflectedDirection.scale(1e-4)), reflectedDirection);
 
 		RayHit reflectedHit = reflectedRay.cast(objects);
-		if (reflectedHit != null && reflectedHit.getObject() instanceof Shape) {
+		if (reflectedHit != null && reflectedHit.getObject() instanceof Shape
+				&& !(reflectedHit.getShape() instanceof Arrow)) {
 			return new PixelData(
 					reflectedHit.getShape().getMaterial().getShader().shade(reflectedHit, lights, objects,
 							reflectedHit.getShape().getMaterial(), depth + 1),

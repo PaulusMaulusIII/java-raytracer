@@ -115,7 +115,11 @@ public class Renderer {
     }
 
     public static RayHit getLookingAt(Scene scene, int width, int height) {
-        double[] screenUV = getNormalizedScreenCoordinates(width / 2, height / 2, width, height);
+        return getAt(scene, width / 2, height / 2, width, height);
+    }
+
+    public static RayHit getAt(Scene scene, int posX, int posY, double width, double height) {
+        double[] screenUV = getNormalizedScreenCoordinates(posX, posY, width, height);
         Camera cam = scene.getCamera();
         Vector3 eyePos = new Vector3(0, 0, (-1 / Math.tan(cam.getFOV() / 2)));
         Vector3 rayDir = new Vector3(screenUV[0], screenUV[1], 0).subtract(eyePos)

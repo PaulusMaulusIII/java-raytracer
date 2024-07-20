@@ -59,9 +59,7 @@ public class SettingPanel extends JPanel {
 
 	Scene scene = new Scene(new Camera(new Vector3(0, 0, 0), Math.toRadians(40)),
 			List.of(new Plane(new Vector3(0, -2, 0),
-					new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4), new Vector3(0, 1, 0)),
-					new Arrow(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.GREEN),
-							new Vector3(0, 1, 0), 10)),
+					new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4), new Vector3(0, 1, 0))),
 			List.of(new Light(new Vector3(7.5, 5, 20), new Color(255, 255, 72), 50),
 					new Light(new Vector3(-7.5, 5, 20), new Color(255, 0, 72), 50)));
 	JFrame main;
@@ -82,6 +80,11 @@ public class SettingPanel extends JPanel {
 
 	public interface ObjectModification {
 		public void modify(Object3D object);
+	}
+
+	public void setCurrentItem(Object3D object) {
+		if (currentItemDisplay != null)
+			currentItemDisplay.setCurrentItem(object);
 	}
 
 	public class VBox extends Box {
@@ -156,7 +159,7 @@ public class SettingPanel extends JPanel {
 				super(owner);
 				JComboBox<? extends Object3D> objectSelector = new JComboBox<>(new Object3D[] {
 						new Cylinder(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE),
-								new Vector3(0, -1, 0), 2, 5),
+								new Vector3(0, 1, 0), 2, 5),
 						new Cube(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE), 4),
 						new Plane(new Vector3(0, 0, 0), new BasicMaterial(new BasicShader(), Color.WHITE),
 								new Vector3(0, 1, 0)),
@@ -415,7 +418,7 @@ public class SettingPanel extends JPanel {
 					height.setAction(
 							(Object3D object) -> ((Cylinder) object).setHeight(Double.parseDouble(height.getValue())));
 
-					InputField radius = new InputField("Height", cylinder.getRadius());
+					InputField radius = new InputField("Radius", cylinder.getRadius());
 					radius.setAction(
 							(Object3D object) -> ((Cylinder) object).setRadius(Double.parseDouble(radius.getValue())));
 
