@@ -12,7 +12,6 @@ import javax.imageio.ImageIO;
 
 import com.paulusmaulus.raytracer.core.interfaces.Effect;
 import com.paulusmaulus.raytracer.utilities.Camera;
-import com.paulusmaulus.raytracer.utilities.GlobalSettings;
 import com.paulusmaulus.raytracer.utilities.Scene;
 import com.paulusmaulus.raytracer.utilities.data.PixelData;
 import com.paulusmaulus.raytracer.utilities.math.Ray;
@@ -22,7 +21,7 @@ import com.paulusmaulus.raytracer.utilities.math.Vector3;
 public class Renderer {
 
     public static BufferedImage render(Scene scene, int width, int height, double resolution, boolean verbose,
-            List<Effect> effects, double distance) {
+            List<Effect> effects, double distance, boolean showArrows) {
         int resWidth = (int) (width * resolution);
         int resHeight = (int) (height * resolution);
         PixelData[][] pixelBuffer = new PixelData[resHeight][resWidth];
@@ -33,7 +32,7 @@ public class Renderer {
         for (int y = 0; y < resHeight; y++) {
             for (int x = 0; x < resWidth; x++) {
                 double[] screenUV = getNormalizedScreenCoordinates(x / resolution, y / resolution, width, height);
-                pixelBuffer[y][x] = getPixelData(scene, screenUV[0], screenUV[1]);
+                pixelBuffer[y][x] = getPixelData(scene, screenUV[0], screenUV[1], showArrows);
             }
             if (verbose && y != 0 && y % (resHeight / 100) == 0)
                 System.out.print("#");
@@ -82,7 +81,7 @@ public class Renderer {
             throws IOException {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         System.out.println("Rendering to image...");
-        image = render(scene, width, height, 1, true, effects, distance);
+        image = render(scene, width, height, 1, true, effects, distance, false);
         File imgFile = new File("output.png");
         ImageIO.write(image, "PNG", new FileOutputStream(imgFile));
         System.out.println("Image saved.");
@@ -104,23 +103,26 @@ public class Renderer {
         };
     }
 
-    public static PixelData getPixelData(Scene scene, double u, double v) {
+    public static PixelData getPixelData(Scene scene, double u, double v, boolean showArrows) {
         Camera cam = scene.getCamera();
         Vector3 eyePos = new Vector3(0, 0, (-1 / Math.tan(cam.getFOV() / 2)));
         Vector3 rayDir = new Vector3(u, v, 0).subtract(eyePos).rotate(cam.getPitch(), cam.getYaw(), cam.getTilt())
                 .normalize();
         Ray ray = new Ray(eyePos.add(cam.getAnchor()), rayDir);
         RayHit hit = ray.cast(scene.getObjects());
-        RayHit arrowHit = ray.castArrows(scene.getObjects());
-        if (arrowHit != null)
-            hit = arrowHit;
+        if (showArrows) {
+            RayHit arrowHit = ray.castArrows(scene.getObjects());
+            if (arrowHit != null)
+                hit = arrowHit;
+        }
         if (hit == null)
-            return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);
+            return new PixelData(scene.getSkybox().getColor(rayDir), Double.POSITIVE_INFINITY,
+                    GlobalSettings.SKY_EMISSION);
         if (ray.getOrigin().distance(hit.getHitPoint()) > GlobalSettings.MAX_RENDER_DISTANCE)
-            return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);
+            return new PixelData(scene.getSkybox().getColor(rayDir), Double.POSITIVE_INFINITY,
+                    GlobalSettings.SKY_EMISSION);
         return new PixelData(
-                hit.getShape().getMaterial().getShader().shade(hit, scene.getLights(), scene.getObjects(),
-                        hit.getShape().getMaterial(), 0),
+                hit.getShape().getMaterial().getShader().shade(hit, scene, hit.getShape().getMaterial(), 0),
                 ray.getOrigin().distance(hit.getHitPoint()),
                 hit.getShape().getMaterial().getEmissionAt(hit.getHitPoint()));
     }

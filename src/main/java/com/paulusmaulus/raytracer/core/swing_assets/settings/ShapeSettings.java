@@ -1,10 +1,15 @@
 package com.paulusmaulus.raytracer.core.swing_assets.settings;
 
+import java.awt.Button;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 
 import com.paulusmaulus.raytracer.core.interfaces.ObjectModification;
 import com.paulusmaulus.raytracer.core.interfaces.Shader;
@@ -24,6 +29,7 @@ import com.paulusmaulus.raytracer.materials.EdgeMaterial;
 import com.paulusmaulus.raytracer.materials.GradientMaterial;
 import com.paulusmaulus.raytracer.materials.MirrorMaterial;
 import com.paulusmaulus.raytracer.materials.SphereMaterial;
+import com.paulusmaulus.raytracer.materials.TextureMaterial;
 import com.paulusmaulus.raytracer.materials.WaveMaterial;
 import com.paulusmaulus.raytracer.shaders.BasicShader;
 import com.paulusmaulus.raytracer.shaders.BloomShader;
@@ -34,7 +40,8 @@ import com.paulusmaulus.raytracer.utilities.Color;
 import com.paulusmaulus.raytracer.utilities.Material;
 import com.paulusmaulus.raytracer.utilities.Object3D;
 import com.paulusmaulus.raytracer.utilities.Shape;
-import com.paulusmaulus.raytracer.utilities.math.Vector3;
+import com.paulusmaulus.raytracer.utilities.Texture;
+import com.paulusmaulus.raytracer.utilities.math.Vector3;;
 
 public class ShapeSettings extends Settings {
 
@@ -142,7 +149,7 @@ public class ShapeSettings extends Settings {
 				new CubeMaterial(new BasicShader()), new EdgeMaterial(new BasicShader(), Color.WHITE, .1),
 				new GradientMaterial(new BasicShader(), Color.WHITE, Color.BLACK),
 				new MirrorMaterial(new BasicShader()), new SphereMaterial(new BasicShader()),
-				new WaveMaterial(new BasicShader())
+				new WaveMaterial(new BasicShader()), new TextureMaterial(new Texture(), new BasicShader())
 		});
 		private ColorInput mainColorInput = new ColorInput(material.getColor());
 		private InputField reflectivity = new InputField("Refl", material.getReflectivity());
@@ -191,6 +198,22 @@ public class ShapeSettings extends Settings {
 								.setReflectivity(Double.parseDouble(reflectivity.getValue())),
 						settingPanel.getCurrentItemDisplay().getCurrentItem());
 				add(reflectivity);
+			}
+			if (material instanceof TextureMaterial) {
+				Button selectImage = new Button("Select Image");
+				selectImage.addActionListener((ActionEvent e) -> {
+					JFileChooser jfc = new JFileChooser();
+					jfc.showOpenDialog(selectImage);
+					BufferedImage image = null;
+					try {
+						image = ImageIO.read(jfc.getSelectedFile());
+					} catch (IOException e1) {
+						System.out.println("A");
+						e1.printStackTrace();
+					}
+					((TextureMaterial) material).getTexture().setImage(image);
+				});
+				add(selectImage);
 			}
 			transparency.setAction(
 					(Object3D object) -> ((Shape) object).getMaterial()

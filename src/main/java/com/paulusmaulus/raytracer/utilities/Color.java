@@ -34,6 +34,14 @@ public class Color {
 		return new Color(hue, saturation, value, true);
 	}
 
+	public static Color fromInt(int argb) {
+		int b = (argb) & 0xFF;
+		int g = (argb >> 8) & 0xFF;
+		int r = (argb >> 16) & 0xFF;
+
+		return new Color(r, g, b);
+	}
+
 	private Color(int hue, double saturation, double value, boolean isHSV) {
 		this.hue = clampDeg(hue);
 		this.saturation = clamp(saturation);

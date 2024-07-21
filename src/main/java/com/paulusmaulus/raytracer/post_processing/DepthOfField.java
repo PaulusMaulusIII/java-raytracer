@@ -1,8 +1,8 @@
 package com.paulusmaulus.raytracer.post_processing;
 
+import com.paulusmaulus.raytracer.core.GlobalSettings;
 import com.paulusmaulus.raytracer.core.interfaces.Effect;
 import com.paulusmaulus.raytracer.utilities.Color;
-import com.paulusmaulus.raytracer.utilities.GlobalSettings;
 import com.paulusmaulus.raytracer.utilities.data.PixelData;
 
 public class DepthOfField implements Effect {

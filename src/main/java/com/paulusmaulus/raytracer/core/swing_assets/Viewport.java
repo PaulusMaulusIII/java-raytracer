@@ -103,7 +103,7 @@ public class Viewport extends JPanel {
 
 	private BufferedImage renderFrame() {
 		BufferedImage renderedFrame = Renderer.render(scene, getWidth(), getHeight(), resolution, false, effects,
-				distance);
+				distance, true);
 		return renderedFrame;
 	}
 
@@ -119,8 +119,8 @@ public class Viewport extends JPanel {
 				if (lookingAt != null) {
 					frame.getGraphics()
 							.drawString("Looking at: " + lookingAt.getHitPoint() + ", " + lookingAt.getShape() + ", "
-									+ lookingAt.getShape().getMaterial().getShader().shade(lookingAt, scene.getLights(),
-											scene.getObjects(), lookingAt.getShape().getMaterial(), 0),
+									+ lookingAt.getShape().getMaterial().getShader().shade(lookingAt, scene,
+											lookingAt.getShape().getMaterial(), 0),
 									10, 40);
 				}
 				if (hud > 2) {
@@ -259,6 +259,7 @@ public class Viewport extends JPanel {
 			switch (e.getButton()) {
 			case MouseEvent.BUTTON2 -> setCaptureCursor(false);
 			}
+			axis = new Vector3(0, 0, 0);
 		}
 	};
 

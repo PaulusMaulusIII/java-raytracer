@@ -2,13 +2,14 @@ package com.paulusmaulus.raytracer.shaders;
 
 import java.util.List;
 
+import com.paulusmaulus.raytracer.core.GlobalSettings;
 import com.paulusmaulus.raytracer.core.interfaces.Shader;
 import com.paulusmaulus.raytracer.geometries.additional.Arrow;
 import com.paulusmaulus.raytracer.lights.Light;
 import com.paulusmaulus.raytracer.utilities.Color;
-import com.paulusmaulus.raytracer.utilities.GlobalSettings;
 import com.paulusmaulus.raytracer.utilities.Material;
 import com.paulusmaulus.raytracer.utilities.Object3D;
+import com.paulusmaulus.raytracer.utilities.Scene;
 import com.paulusmaulus.raytracer.utilities.Shape;
 import com.paulusmaulus.raytracer.utilities.data.PixelData;
 import com.paulusmaulus.raytracer.utilities.math.Ray;
@@ -18,9 +19,9 @@ import com.paulusmaulus.raytracer.utilities.math.Vector3;
 public class PhongShader implements Shader {
 
 	@Override
-	public Color shade(RayHit rayHit, List<Light> lights, List<Object3D> objects, Material material, int depth) {
+	public Color shade(RayHit rayHit, Scene scene, Material material, int depth) {
 		if (depth > GlobalSettings.MAX_REFLECTION_DEPTH) {
-			return GlobalSettings.SKY_BOX_COLOR;
+			return scene.getSkybox().getColor(rayHit.getRay().getDirection());
 		}
 
 		Color baseColor = material.getColor(rayHit.getHitPoint());
@@ -29,6 +30,9 @@ public class PhongShader implements Shader {
 		Color diffuseComponent = new Color(0, 0, 0);
 		Color specularComponent = new Color(0, 0, 0);
 		double diffuseFactor = 0;
+
+		List<Light> lights = scene.getLights();
+		List<Object3D> objects = scene.getObjects();
 
 		for (Light light : lights) {
 			if (!isInShadow(rayHit, light, objects)) {
@@ -52,7 +56,7 @@ public class PhongShader implements Shader {
 		diffuseComponent = diffuseComponent.multiply(1 - reflectivity);
 		specularComponent = specularComponent.multiply(reflectivity);
 
-		PixelData reflection = calculateReflection(rayHit, lights, objects, material, depth);
+		PixelData reflection = calculateReflection(rayHit, scene, material, depth);
 		// PixelData transparentComponent = calculateTransparency(rayHit, lights,
 		// objects, material, depth);
 
@@ -125,11 +129,7 @@ public class PhongShader implements Shader {
 				* rayHit.getShape().getMaterial().getReflectivityAt(rayHit.getHitPoint());
 	}
 
-	protected PixelData calculateReflection(RayHit rayHit, List<Light> lights, List<Object3D> objects,
-			Material material, int depth) {
-		if (depth > GlobalSettings.MAX_REFLECTION_DEPTH || material.getReflectivityAt(rayHit.getHitPoint()) <= 0) {
-			return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);
-		}
+	protected PixelData calculateReflection(RayHit rayHit, Scene scene, Material material, int depth) {
 
 		Vector3 hitPoint = rayHit.getHitPoint();
 		Vector3 normal = material.getNormal(hitPoint);
@@ -137,16 +137,22 @@ public class PhongShader implements Shader {
 		Vector3 reflectedDirection = incident.subtract(normal.scale(2 * incident.dot(normal))).normalize();
 		Ray reflectedRay = new Ray(hitPoint.add(reflectedDirection.scale(1e-4)), reflectedDirection);
 
-		RayHit reflectedHit = reflectedRay.cast(objects);
+		if (depth > GlobalSettings.MAX_REFLECTION_DEPTH || material.getReflectivityAt(rayHit.getHitPoint()) <= 0) {
+			return new PixelData(scene.getSkybox().getColor(reflectedDirection), Double.POSITIVE_INFINITY,
+					GlobalSettings.SKY_EMISSION);
+		}
+
+		RayHit reflectedHit = reflectedRay.cast(scene.getObjects());
 		if (reflectedHit != null && reflectedHit.getObject() instanceof Shape
 				&& !(reflectedHit.getShape() instanceof Arrow)) {
 			return new PixelData(
-					reflectedHit.getShape().getMaterial().getShader().shade(reflectedHit, lights, objects,
+					reflectedHit.getShape().getMaterial().getShader().shade(reflectedHit, scene,
 							reflectedHit.getShape().getMaterial(), depth + 1),
 					reflectedRay.getOrigin().distance(reflectedHit.getHitPoint())
 							+ (rayHit.getHitPoint().distance(rayHit.getRay().getOrigin())),
 					reflectedHit.getShape().getMaterial().getEmissionAt(reflectedHit.getHitPoint()));
 		}
-		return new PixelData(GlobalSettings.SKY_BOX_COLOR, Double.POSITIVE_INFINITY, GlobalSettings.SKY_EMISSION);
+		return new PixelData(scene.getSkybox().getColor(reflectedDirection), Double.POSITIVE_INFINITY,
+				GlobalSettings.SKY_EMISSION);
 	}
 }

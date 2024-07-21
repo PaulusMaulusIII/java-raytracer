@@ -2,11 +2,12 @@ package com.paulusmaulus.raytracer.shaders;
 
 import java.util.List;
 
+import com.paulusmaulus.raytracer.core.GlobalSettings;
 import com.paulusmaulus.raytracer.lights.Light;
 import com.paulusmaulus.raytracer.utilities.Color;
-import com.paulusmaulus.raytracer.utilities.GlobalSettings;
 import com.paulusmaulus.raytracer.utilities.Material;
 import com.paulusmaulus.raytracer.utilities.Object3D;
+import com.paulusmaulus.raytracer.utilities.Scene;
 import com.paulusmaulus.raytracer.utilities.data.PixelData;
 import com.paulusmaulus.raytracer.utilities.math.RayHit;
 
@@ -16,13 +17,16 @@ public class BloomShader extends PhongShader {
 	private double bloomFactor = 1.5;
 
 	@Override
-	public Color shade(RayHit rayHit, List<Light> lights, List<Object3D> objects, Material material, int depth) {
+	public Color shade(RayHit rayHit, Scene scene, Material material, int depth) {
 		Color baseColor = rayHit.getShape().getMaterial().getColor(rayHit.getHitPoint());
 
 		Color ambientComponent = baseColor.multiply(GlobalSettings.AMBIENT_BRIGHTNESS);
 
 		Color diffuseComponent = new Color(0, 0, 0);
 		Color specularComponent = new Color(0, 0, 0);
+
+		List<Light> lights = scene.getLights();
+		List<Object3D> objects = scene.getObjects();
 
 		for (Light light : lights) {
 			if (!isInShadow(rayHit, light, objects)) {
@@ -42,7 +46,7 @@ public class BloomShader extends PhongShader {
 		double reflectivity = material.getReflectivityAt(rayHit.getHitPoint());
 		diffuseComponent = diffuseComponent.multiply(1 - reflectivity);
 
-		PixelData reflection = calculateReflection(rayHit, lights, objects, material, depth);
+		PixelData reflection = calculateReflection(rayHit, scene, material, depth);
 
 		Color finalColor = Color.lerp(ambientComponent, reflection.getColor(), reflectivity) // Reflected color
 				.multiply(diffuseComponent) // Diffuse lighting
