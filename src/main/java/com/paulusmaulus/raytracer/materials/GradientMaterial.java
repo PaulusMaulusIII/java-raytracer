@@ -10,4 +10,9 @@ public class GradientMaterial extends Material {
 		super(shader, color1);
 	}
 
+	@Override
+	protected String getName() {
+		return "Gradient";
+	}
+
 }

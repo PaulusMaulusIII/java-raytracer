@@ -45,4 +45,9 @@ public class SphereMaterial extends Material {
 		return super.getNormal(hitPoint).add(
 				new Vector3(noise.noise(hitPoint.x / 10), noise.noise(hitPoint.y / 10), noise.noise(hitPoint.z / 10)));
 	}
+
+	@Override
+	protected String getName() {
+		return "Sphere";
+	}
 }

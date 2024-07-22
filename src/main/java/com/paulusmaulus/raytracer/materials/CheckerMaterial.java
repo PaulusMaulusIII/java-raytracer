@@ -46,4 +46,9 @@ public class CheckerMaterial extends Material {
 	public void setGridsize(double gridsize) {
 		this.gridsize = gridsize;
 	}
+
+	@Override
+	protected String getName() {
+		return "Checker";
+	}
 }

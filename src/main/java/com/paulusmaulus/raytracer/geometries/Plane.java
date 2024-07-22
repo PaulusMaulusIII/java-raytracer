@@ -56,7 +56,6 @@ public class Plane extends Shape {
 
     @Override
     public double distanceToEdge(Vector3 point) {
-        // Lines do not have edges
         return Double.POSITIVE_INFINITY;
     }
 }

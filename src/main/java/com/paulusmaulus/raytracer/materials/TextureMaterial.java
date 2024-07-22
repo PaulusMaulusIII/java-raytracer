@@ -22,4 +22,9 @@ public class TextureMaterial extends Material {
 	public Texture getTexture() {
 		return texture;
 	}
+
+	@Override
+	protected String getName() {
+		return "Texture";
+	}
 }

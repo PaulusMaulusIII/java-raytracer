@@ -46,4 +46,9 @@ public class CubeMaterial extends Material {
 			return colors[side];
 		return null;
 	}
+
+	@Override
+	protected String getName() {
+		return "Cube";
+	}
 }

@@ -24,4 +24,9 @@ public class EdgeMaterial extends Material {
 		}
 		return Color.BLACK; // Black
 	}
+
+	@Override
+	protected String getName() {
+		return "Edge";
+	}
 }

@@ -7,6 +7,7 @@ import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.List;
 
 import javax.swing.JDialog;
@@ -22,19 +23,17 @@ import com.paulusmaulus.raytracer.materials.CheckerMaterial;
 import com.paulusmaulus.raytracer.shaders.PhongShader;
 import com.paulusmaulus.raytracer.utilities.Camera;
 import com.paulusmaulus.raytracer.utilities.Color;
+import com.paulusmaulus.raytracer.utilities.OBJParser;
 import com.paulusmaulus.raytracer.utilities.Object3D;
 import com.paulusmaulus.raytracer.utilities.Scene;
 import com.paulusmaulus.raytracer.utilities.Shape;
 import com.paulusmaulus.raytracer.utilities.math.Vector3;
 
 public class App {
-    List<Vector3> vertices = List.of(new Vector3(-2, 0, -2), new Vector3(2, 0, -2), new Vector3(2, 0, 2),
-            new Vector3(-2, 0, 2), new Vector3(-2, 4, -2), new Vector3(2, 4, -2), new Vector3(2, 4, 2),
-            new Vector3(-2, 4, 2));
-
     Scene scene = new Scene(new Camera(new Vector3(0, 0, 0), Math.toRadians(40)),
             List.of(new Plane(new Vector3(0, -2, 0),
-                    new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4), new Vector3(0, 1, 0))),
+                    new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4), new Vector3(0, 1, 0)),
+                    new OBJParser().parse(new File("src\\main\\resources\\models\\sphere.obj"))),
             List.of(new Light(new Vector3(7.5, 5, 20), new Color(255, 255, 72), 50),
                     new Light(new Vector3(-7.5, 5, 20), new Color(255, 0, 72), 50)));
 

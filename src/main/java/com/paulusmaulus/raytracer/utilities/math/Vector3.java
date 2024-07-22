@@ -106,4 +106,26 @@ public class Vector3 {
     public void setZ(double z) {
         this.z = z;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Vector3)
+            if (((Vector3) obj).x == x && ((Vector3) obj).y == y && ((Vector3) obj).z == z)
+                return true;
+        return false;
+    }
+
+    public Vector3 min(Vector3 pos) {
+        if (pos.length() < length()) {
+            return pos;
+        }
+        return this;
+    }
+
+    public Vector3 max(Vector3 pos) {
+        if (pos.length() > length()) {
+            return pos;
+        }
+        return this;
+    }
 }

@@ -9,4 +9,9 @@ public class MirrorMaterial extends Material {
 		super(shader, Color.BLACK);
 		reflectivity = 1;
 	}
+
+	@Override
+	protected String getName() {
+		return "Mirror";
+	}
 }

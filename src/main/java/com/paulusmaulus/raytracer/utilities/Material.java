@@ -93,4 +93,6 @@ public abstract class Material {
     public void setEmission(double emission) {
         this.emission = emission;
     }
+
+    protected abstract String getName();
 }

@@ -10,4 +10,9 @@ public class BasicMaterial extends Material {
 		super(shader, color);
 	}
 
+	@Override
+	protected String getName() {
+		return "Basic";
+	}
+
 }

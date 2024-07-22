@@ -23,4 +23,9 @@ public class WaveMaterial extends Material {
 		}
 		return normal;
 	}
+
+	@Override
+	protected String getName() {
+		return "Wave";
+	}
 }
