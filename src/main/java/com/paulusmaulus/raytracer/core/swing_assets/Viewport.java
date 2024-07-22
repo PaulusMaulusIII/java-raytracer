@@ -194,11 +194,13 @@ public class Viewport extends JPanel {
 		case KeyEvent.VK_3 -> resolution = 0.25;
 		case KeyEvent.VK_4 -> resolution = 0.125;
 		case KeyEvent.VK_5 -> resolution = 0.0625;
+		case KeyEvent.VK_6 -> resolution = 0.03125;
+		case KeyEvent.VK_7 -> resolution = 0.015625;
 		case KeyEvent.VK_Q -> tilt = Math.toRadians(1);
 		case KeyEvent.VK_E -> tilt = -Math.toRadians(1);
 		case KeyEvent.VK_F12 -> {
 			try {
-				Renderer.renderToImage(scene, 3840, 2160, effects, distance);
+				Renderer.renderToImage(scene, 1920, 1080, effects, distance);
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}

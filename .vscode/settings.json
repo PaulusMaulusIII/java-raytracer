@@ -5,7 +5,7 @@
     "editor.insertSpaces": false,
     "editor.tabSize": 4
   },
-  "editor.fontFamily": "Consolas, 'Courier New', monospace",
+  "editor.fontFamily": "Geist Mono",
   // "editor.fontFamily": "Papyrus,Impact,Geist Mono,OCR A",
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.completion.filteredTypes": [

@@ -33,7 +33,7 @@ public class App {
     Scene scene = new Scene(new Camera(new Vector3(0, 0, 0), Math.toRadians(40)),
             List.of(new Plane(new Vector3(0, -2, 0),
                     new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 4), new Vector3(0, 1, 0)),
-                    new OBJParser().parse(new File("src\\main\\resources\\models\\sphere.obj"))),
+                    new OBJParser().parse(new File("src\\main\\resources\\models\\common-3d-test-models\\data\\cow.obj"))),
             List.of(new Light(new Vector3(7.5, 5, 20), new Color(255, 255, 72), 50),
                     new Light(new Vector3(-7.5, 5, 20), new Color(255, 0, 72), 50)));
 
