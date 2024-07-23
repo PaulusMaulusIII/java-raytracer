@@ -85,6 +85,7 @@ public class OBJParser {
 		}
 
 		Polygon polygon = new Polygon(new Vector3(0, 0, 0), currentMaterial, points, faces);
+		polygon.setAnchor(new Vector3(0, 10, 0));
 
 		System.out.println("Successfully parsed " + objFile.getName());
 

@@ -110,29 +110,30 @@ public class Viewport extends JPanel {
 	// Display HUD and other overlays
 	private void displayHUD(Camera cam, RayHit lookingAt, long startTime) {
 		if (hud > 0) {
-			frame.getGraphics().drawString("+", getWidth() / 2, getHeight() / 2);
+			Graphics gfx = frame.getGraphics();
+			gfx.setColor(Color.BLACK.toAWT());
+			gfx.drawString("+", getWidth() / 2, getHeight() / 2);
 			if (hud > 1) {
-				frame.getGraphics()
-						.drawString("CameraPos: " + cam.getAnchor() + ", " + Math.toDegrees(cam.getPitch()) + "°, "
+				gfx.drawString(
+						"CameraPos: " + cam.getAnchor() + ", " + Math.toDegrees(cam.getPitch()) + "°, "
 								+ Math.toDegrees(cam.getYaw()) + "°, " + Math.toDegrees(cam.getTilt()) + "°, " + speed,
-								10, 20);
+						10, 20);
 				if (lookingAt != null) {
-					frame.getGraphics()
-							.drawString("Looking at: " + lookingAt.getHitPoint() + ", " + lookingAt.getShape() + ", "
-									+ lookingAt.getShape().getMaterial().getShader().shade(lookingAt, scene,
-											lookingAt.getShape().getMaterial(), 0),
-									10, 40);
+					gfx.drawString("Looking at: " + lookingAt.getHitPoint() + ", " + lookingAt.getShape() + ", "
+							+ lookingAt.getShape().getMaterial().getShader().shade(lookingAt, scene,
+									lookingAt.getShape().getMaterial(), 0),
+							10, 40);
 				}
 				if (hud > 2) {
-					frame.getGraphics().drawLine(0, getHeight() / 3, getWidth(), getHeight() / 3);
-					frame.getGraphics().drawLine(0, (getHeight() / 3) * 2, getWidth(), (getHeight() / 3) * 2);
-					frame.getGraphics().drawLine(getWidth() / 3, 0, getWidth() / 3, getHeight());
-					frame.getGraphics().drawLine((getWidth() / 3) * 2, 0, (getWidth() / 3) * 2, getHeight());
+					gfx.drawLine(0, getHeight() / 3, getWidth(), getHeight() / 3);
+					gfx.drawLine(0, (getHeight() / 3) * 2, getWidth(), (getHeight() / 3) * 2);
+					gfx.drawLine(getWidth() / 3, 0, getWidth() / 3, getHeight());
+					gfx.drawLine((getWidth() / 3) * 2, 0, (getWidth() / 3) * 2, getHeight());
 				}
 			}
 			long deltaTime = System.currentTimeMillis() - startTime;
-			frame.getGraphics().drawString("FPS: " + 1000 / (deltaTime + 1) + " @ " + (int) (getWidth() * resolution)
-					+ "x" + (int) (getHeight() * resolution), getWidth() - 150, 20);
+			gfx.drawString("FPS: " + 1000 / (deltaTime + 1) + " @ " + (int) (getWidth() * resolution) + "x"
+					+ (int) (getHeight() * resolution), getWidth() - 150, 20);
 		}
 	}
 
@@ -200,7 +201,7 @@ public class Viewport extends JPanel {
 		case KeyEvent.VK_E -> tilt = -Math.toRadians(1);
 		case KeyEvent.VK_F12 -> {
 			try {
-				Renderer.renderToImage(scene, 1920, 1080, effects, distance);
+				Renderer.renderToImage(scene, 848, 480, effects, distance);
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}

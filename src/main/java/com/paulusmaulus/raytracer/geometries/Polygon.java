@@ -1,11 +1,13 @@
 package com.paulusmaulus.raytracer.geometries;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.LinkedHashSet;
 
 import com.paulusmaulus.raytracer.geometries.additional.Face;
+import com.paulusmaulus.raytracer.geometries.additional.Face.BoundingBox;
+import com.paulusmaulus.raytracer.geometries.additional.Face.Vertex;
 import com.paulusmaulus.raytracer.utilities.Material;
 import com.paulusmaulus.raytracer.utilities.Shape;
 import com.paulusmaulus.raytracer.utilities.math.Ray;
@@ -13,9 +15,9 @@ import com.paulusmaulus.raytracer.utilities.math.Vector3;
 
 public class Polygon extends Shape {
 
-	private List<Vector3> vertices = new LinkedList<>();
-	private List<Face> faces = new LinkedList<>();
-	private List<Vector3> surfaceNormals = new LinkedList<>();
+	private List<Vector3> vertices;
+	private List<Face> faces;
+	private BoundingBox boundingBox;
 
 	public Polygon(Vector3 anchor, Material material, Face... faces) {
 		this(anchor, material, List.of(faces));
@@ -23,33 +25,26 @@ public class Polygon extends Shape {
 
 	public Polygon(Vector3 anchor, Material material, List<Face> faces) {
 		super(anchor, material);
-		Set<Vector3> vertexSet = new HashSet<>();
-		for (Face face : faces) {
-			for (Face.Vertex vertex : face.getVertices()) {
-				vertexSet.add(vertex.getPosition());
-			}
-		}
-		this.vertices = new LinkedList<>(vertexSet);
 		this.faces = faces;
-		for (Face face : faces) {
-			surfaceNormals.add(face.getNormal());
-		}
+		this.vertices = extractUniqueVertices(faces);
+		this.boundingBox = new Face.BoundingBox(faces);
 	}
 
 	public Polygon(Vector3 anchor, Material material, List<Vector3> points, List<Face> faces) {
 		super(anchor, material);
 		this.vertices = points;
 		this.faces = faces;
-		for (Face face : faces) {
-			surfaceNormals.add(face.getNormal());
-		}
+		this.boundingBox = new Face.BoundingBox(faces);
 	}
 
-	public Polygon(Vector3 anchor, Material material, List<Vector3> points, List<Face> faces, List<Vector3> normals) {
-		super(anchor, material);
-		this.vertices = points;
-		this.faces = faces;
-		this.surfaceNormals = normals;
+	private List<Vector3> extractUniqueVertices(List<Face> faces) {
+		Set<Vector3> vertexSet = new LinkedHashSet<>();
+		for (Face face : faces) {
+			for (Face.Vertex vertex : face.getVertices()) {
+				vertexSet.add(vertex.getPosition());
+			}
+		}
+		return List.copyOf(vertexSet);
 	}
 
 	@Override
@@ -59,24 +54,22 @@ public class Polygon extends Shape {
 
 	@Override
 	public Vector3 getIntersectionPoint(Ray ray) {
+		if (!boundingBox.intersectsBoundingBox(ray))
+			return null;
 		for (Face face : faces) {
 			Vector3 hit = face.getIntersectionPoint(ray);
-			if (hit != null) {
+			if (hit != null)
 				return hit;
-			}
 		}
 		return null;
 	}
 
 	@Override
 	public Vector3 getNormal(Vector3 hitPoint) {
-		// Find the face containing the hit point
-		for (Face face : faces) {
-			if (face.isPointInside(hitPoint)) {
+		for (Face face : faces)
+			if (face.isPointInside(hitPoint))
 				return face.getNormal();
-			}
-		}
-		return new Vector3(0, 0, 0); // Return a default normal if no face contains the hit point
+		return new Vector3(0, 0, 0); // Return a default normal if not found
 	}
 
 	@Override
@@ -89,5 +82,28 @@ public class Polygon extends Shape {
 			}
 		}
 		return minDistance;
+	}
+
+	public void recalculateBoundingBox() {
+		boundingBox = new BoundingBox(faces);
+	}
+
+	@Override
+	public void setAnchor(Vector3 anchor) {
+		if (getAnchor() != null) {
+			Vector3 diff = anchor.subtract(getAnchor());
+			for (Face face : faces) {
+				for (Vertex vertex : face.getVertices()) {
+					vertex.setPosition(vertex.getPosition().add(diff));
+				}
+				face.recalculateBoundingBox();
+			}
+			recalculateBoundingBox();
+		}
+		super.setAnchor(anchor);
+	}
+
+	public List<Face> getFaces() {
+		return faces;
 	}
 }

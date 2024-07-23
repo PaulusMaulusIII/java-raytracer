@@ -26,8 +26,8 @@ public class Texture {
 		if (image == null)
 			return Color.BLACK;
 
-		double u = .5 + (d.x / (Math.sqrt((d.x * d.x) + (d.y * d.y) + (d.z * d.z))));
-		double v = .5 - (d.y / (Math.sqrt((d.x * d.x) + (d.y * d.y) + (d.z * d.z))));
+		float u = (float) (0.5 + Math.atan2(d.z, d.x) / (2 * Math.PI));
+		float v = (float) (0.5 - Math.asin(d.y) / Math.PI);
 		try {
 			return Color.fromInt(image.getRGB((int) (u * (image.getWidth() - 1)), (int) (v * (image.getHeight() - 1))));
 		} catch (Exception e) {

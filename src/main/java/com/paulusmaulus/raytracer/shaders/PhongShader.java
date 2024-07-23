@@ -130,7 +130,6 @@ public class PhongShader implements Shader {
 	}
 
 	protected PixelData calculateReflection(RayHit rayHit, Scene scene, Material material, int depth) {
-
 		Vector3 hitPoint = rayHit.getHitPoint();
 		Vector3 normal = material.getNormal(hitPoint);
 		Vector3 incident = rayHit.getRay().getDirection();

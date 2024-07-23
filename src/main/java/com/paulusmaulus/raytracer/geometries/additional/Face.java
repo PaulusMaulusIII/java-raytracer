@@ -9,9 +9,9 @@ import com.paulusmaulus.raytracer.utilities.math.Vector3;
 public class Face {
 
 	public static class Vertex {
-		private final Vector3 position;
-		private final Vector3 texCoord;
-		private final Vector3 normal;
+		private Vector3 position;
+		private Vector3 texCoord;
+		private Vector3 normal;
 
 		public Vertex(Vector3 position, Vector3 texCoord, Vector3 normal) {
 			this.position = position;
@@ -19,12 +19,24 @@ public class Face {
 			this.normal = normal;
 		}
 
+		public void setPosition(Vector3 position) {
+			this.position = position;
+		}
+
 		public Vector3 getPosition() {
 			return position;
 		}
 
+		public void setTexCoord(Vector3 texCoord) {
+			this.texCoord = texCoord;
+		}
+
 		public Vector3 getTexCoord() {
 			return texCoord;
+		}
+
+		public void setNormal(Vector3 normal) {
+			this.normal = normal;
 		}
 
 		public Vector3 getNormal() {
@@ -32,16 +44,120 @@ public class Face {
 		}
 	}
 
-	private final List<Vertex> vertices;
-	private final Material material;
+	public static class BoundingBox {
+		final Vector3 min;
+		final Vector3 max;
+
+		public BoundingBox(List<Face> faces) {
+			min = calculateMin(faces);
+			max = calculateMax(faces);
+		}
+
+		public Vector3 getMin() {
+			return min;
+		}
+
+		public Vector3 getMax() {
+			return max;
+		}
+
+		private Vector3 calculateMin(List<Face> faces) {
+			double minX = Double.POSITIVE_INFINITY;
+			double minY = Double.POSITIVE_INFINITY;
+			double minZ = Double.POSITIVE_INFINITY;
+
+			for (Face face : faces) {
+				for (Vertex vertex : face.getVertices()) {
+					Vector3 vertexPos = vertex.getPosition();
+					if (vertexPos.x < minX)
+						minX = vertexPos.x;
+					if (vertexPos.y < minY)
+						minY = vertexPos.y;
+					if (vertexPos.z < minZ)
+						minZ = vertexPos.z;
+				}
+			}
+
+			return new Vector3(minX, minY, minZ);
+		}
+
+		private Vector3 calculateMax(List<Face> faces) {
+			double maxX = Double.NEGATIVE_INFINITY;
+			double maxY = Double.NEGATIVE_INFINITY;
+			double maxZ = Double.NEGATIVE_INFINITY;
+
+			for (Face face : faces) {
+				for (Vertex vertex : face.getVertices()) {
+					Vector3 vertexPos = vertex.getPosition();
+					if (vertexPos.x > maxX)
+						maxX = vertexPos.x;
+					if (vertexPos.y > maxY)
+						maxY = vertexPos.y;
+					if (vertexPos.z > maxZ)
+						maxZ = vertexPos.z;
+				}
+			}
+
+			return new Vector3(maxX, maxY, maxZ);
+		}
+
+		public boolean isInsideBoundingBox(Vector3 point) {
+			double[] pointXYZ = point.toArray();
+			double[] minXYZ = min.toArray();
+			double[] maxXYZ = max.toArray();
+			for (int i = 0; i < point.toArray().length; i++)
+				if (pointXYZ[i] < minXYZ[i] || pointXYZ[i] > maxXYZ[i])
+					return false;
+			return true;
+		}
+
+		public boolean intersectsBoundingBox(Ray ray) {
+			Vector3 invDir = new Vector3(1.0 / ray.getDirection().x, 1.0 / ray.getDirection().y,
+					1.0 / ray.getDirection().z);
+
+			double t1 = (min.x - ray.getOrigin().x) * invDir.x;
+			double t2 = (max.x - ray.getOrigin().x) * invDir.x;
+			double t3 = (min.y - ray.getOrigin().y) * invDir.y;
+			double t4 = (max.y - ray.getOrigin().y) * invDir.y;
+			double t5 = (min.z - ray.getOrigin().z) * invDir.z;
+			double t6 = (max.z - ray.getOrigin().z) * invDir.z;
+
+			double tmin = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6));
+			double tmax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
+
+			if (tmax < 0)
+				return false;
+			if (tmin > tmax)
+				return false;
+			return true;
+		}
+
+	}
+
+	private List<Vertex> vertices;
+	private Material material;
+	private Vector3 normal;
+	private Vector3 center;
+	private BoundingBox boundingBox;
 
 	public Face(Material material, Vertex... vertices) {
 		this(material, List.of(vertices));
 	}
 
 	public Face(Material material, List<Vertex> vertices) {
+		if (vertices.size() < 3) {
+			throw new IllegalArgumentException("A face must have at least 3 vertices.");
+		}
+
 		this.material = material;
 		this.vertices = vertices;
+		this.normal = computeNormal();
+		this.center = computeCenter();
+		this.boundingBox = new BoundingBox(List.of(this));
+	}
+
+	public void recalculateBoundingBox() {
+		boundingBox = new BoundingBox(List.of(this));
 	}
 
 	public List<Vertex> getVertices() {
@@ -54,32 +170,45 @@ public class Face {
 
 	@Override
 	public String toString() {
-		StringBuilder string = new StringBuilder("[");
-		for (int i = 0; i < vertices.size() - 1; i++)
-			string.append(vertices.get(i).getPosition().toString()).append(", ");
-		string.append(vertices.get(vertices.size() - 1).getPosition().toString()).append("]");
-		return string.toString();
+		StringBuilder sb = new StringBuilder("[");
+		for (int i = 0; i < vertices.size() - 1; i++) {
+			sb.append(vertices.get(i).getPosition().toString()).append(", ");
+		}
+		sb.append(vertices.get(vertices.size() - 1).getPosition().toString()).append("]");
+		return sb.toString();
+	}
+
+	private Vector3 computeCenter() {
+		Vector3 sum = new Vector3(0, 0, 0);
+		for (Vertex vertex : vertices) {
+			sum = sum.add(vertex.getPosition());
+		}
+		return sum.scale(1.0 / vertices.size());
 	}
 
 	public Vector3 getCenter() {
-		Vector3 center = new Vector3(0, 0, 0);
-		for (Vertex vertex : vertices) {
-			center = center.add(vertex.getPosition());
-		}
-		center = center.scale(1.0 / vertices.size());
 		return center;
 	}
 
-	public Vector3 getNormal() {
-		if (vertices.size() < 3) {
-			throw new IllegalStateException("A face must have at least 3 vertices to calculate a normal.");
+	private Vector3 computeNormal() {
+		if (vertices.get(2) != null && vertices.get(1) != null) {
+			Vector3 ab = vertices.get(1).getPosition().subtract(vertices.get(0).getPosition());
+			Vector3 ac = vertices.get(2).getPosition().subtract(vertices.get(0).getPosition());
+			return ab.cross(ac).normalize();
 		}
-		Vector3 ab = vertices.get(1).getPosition().subtract(vertices.get(0).getPosition());
-		Vector3 ac = vertices.get(2).getPosition().subtract(vertices.get(0).getPosition());
-		return ab.cross(ac).normalize();
+		return new Vector3(0, 0, 0);
+	}
+
+	public Vector3 getNormal() {
+		if (normal == null)
+			return new Vector3(0, 0, 0);
+		return normal;
 	}
 
 	public boolean isPointInside(Vector3 point) {
+		if (!boundingBox.isInsideBoundingBox(point))
+			return false;
+
 		Vector3 normal = getNormal();
 		Vector3 axis1, axis2;
 
@@ -96,11 +225,9 @@ public class Face {
 			axis2 = new Vector3(0, 1, 0);
 		}
 
-		// Project the point onto the 2D plane
 		double px = point.dot(axis1);
 		double py = point.dot(axis2);
 
-		// Project all vertices onto the 2D plane
 		double[] xVertices = new double[vertices.size()];
 		double[] yVertices = new double[vertices.size()];
 
@@ -110,7 +237,6 @@ public class Face {
 			yVertices[i] = vertex.dot(axis2);
 		}
 
-		// Perform the point-in-polygon test
 		boolean inside = false;
 		int j = vertices.size() - 1;
 
@@ -127,17 +253,14 @@ public class Face {
 	}
 
 	public Vector3 getIntersectionPoint(Ray ray) {
-		Plane plane = new Plane(getCenter(), material, getNormal());
-		Vector3 pointOnPlane = plane.getIntersectionPoint(ray);
-		if (pointOnPlane == null) {
+		if (normal.dot(ray.getDirection()) >= 0)
 			return null;
-		}
 
-		if (isPointInside(pointOnPlane)) {
-			return pointOnPlane;
-		}
-
-		return null;
+		Plane plane = new Plane(center, material, normal);
+		Vector3 pointOnPlane = plane.getIntersectionPoint(ray);
+		if (pointOnPlane == null)
+			return null;
+		return isPointInside(pointOnPlane) ? pointOnPlane : null;
 	}
 
 	public double distanceToEdge(Vector3 point) {
@@ -145,10 +268,7 @@ public class Face {
 		for (int i = 0; i < vertices.size(); i++) {
 			Vector3 a = vertices.get(i).getPosition();
 			Vector3 b = vertices.get((i + 1) % vertices.size()).getPosition();
-			double distance = pointToSegmentDistance(point, a, b);
-			if (distance < minDistance) {
-				minDistance = distance;
-			}
+			minDistance = Math.min(minDistance, pointToSegmentDistance(point, a, b));
 		}
 		return minDistance;
 	}
@@ -160,5 +280,9 @@ public class Face {
 		t = Math.max(0, Math.min(1, t));
 		Vector3 projection = a.add(ab.scale(t));
 		return p.subtract(projection).magnitude();
+	}
+
+	public void setVertices(List<Vertex> updatedVertices) {
+		vertices = updatedVertices;
 	}
 }

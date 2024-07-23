@@ -8,7 +8,7 @@ import com.paulusmaulus.raytracer.geometries.additional.Skybox;
 import com.paulusmaulus.raytracer.lights.Light;
 
 public class Scene {
-    private Skybox skybox = new Skybox(new File("src\\main\\resources\\textures\\test.png"));
+    private Skybox skybox = new Skybox(new File("src\\main\\resources\\textures\\Sky.jpg"));
     private Camera camera;
     private List<Shape> shapes = new LinkedList<>();
     private List<Light> lights = new LinkedList<>();
