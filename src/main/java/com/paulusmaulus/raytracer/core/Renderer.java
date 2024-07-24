@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 
 import com.paulusmaulus.raytracer.core.interfaces.Effect;
 import com.paulusmaulus.raytracer.utilities.Camera;
+import com.paulusmaulus.raytracer.utilities.Color;
 import com.paulusmaulus.raytracer.utilities.Scene;
 import com.paulusmaulus.raytracer.utilities.data.PixelData;
 import com.paulusmaulus.raytracer.utilities.math.Ray;
@@ -34,12 +35,10 @@ public class Renderer {
                 double[] screenUV = getNormalizedScreenCoordinates(x / resolution, y / resolution, width, height);
                 pixelBuffer[y][x] = getPixelData(scene, screenUV[0], screenUV[1], showArrows);
             }
-            if (verbose && y != 0 && y % (resHeight / 100) == 0)
-                System.out.print("#");
         }
 
         if (verbose)
-            System.out.println("\nApplying FX");
+            System.out.println("Applying FX");
 
         for (Effect effect : effects) {
             if (verbose)
@@ -68,11 +67,7 @@ public class Renderer {
                 gfx.setColor(pixelBuffer[pixelY][pixelX].getColor().toAWT());
                 gfx.fillRect(x, y, blockSize, blockSize);
             }
-            if (verbose && y != 0 && y % (height / 100) == 0)
-                System.out.print("#");
         }
-        if (verbose)
-            System.out.println();
 
         return temp;
     }
@@ -121,10 +116,17 @@ public class Renderer {
         if (ray.getOrigin().distance(hit.getHitPoint()) > GlobalSettings.MAX_RENDER_DISTANCE)
             return new PixelData(scene.getSkybox().getColor(rayDir), Double.POSITIVE_INFINITY,
                     GlobalSettings.SKY_EMISSION);
-        return new PixelData(
-                hit.getShape().getMaterial().getShader().shade(hit, scene, hit.getShape().getMaterial(), 0),
-                ray.getOrigin().distance(hit.getHitPoint()),
-                hit.getShape().getMaterial().getEmissionAt(hit.getHitPoint()));
+        try {
+            Color shadedColor = hit.getShape().getMaterial().getShader().shade(hit, scene, hit.getShape().getMaterial(),
+                    0);
+            double distance = ray.getOrigin().distance(hit.getHitPoint());
+            double emission = hit.getShape().getMaterial().getEmissionAt(hit.getHitPoint());
+            return new PixelData(shadedColor, distance, emission);
+        } catch (java.lang.NullPointerException e) {
+            System.err.println("Encoutered error rendering: " + hit.getShape() + " at: " + hit.getHitPoint()
+                    + ", Normal: " + hit.getShape().getNormal(hit.getHitPoint()));
+        }
+        return null;
     }
 
     public static RayHit getLookingAt(Scene scene, int width, int height) {

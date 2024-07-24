@@ -11,6 +11,7 @@ public class Camera extends Object3D {
     public Camera(Vector3 position, double fov) {
         super(position);
         this.fov = (double) fov;
+        setName(toString());
     }
 
     public Camera(Vector3 position, double fov, double pitch, double yaw) {

@@ -11,7 +11,6 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class OBJParser {
-	private final Map<String, Material> materials = new HashMap<>();
 	private Material currentMaterial = new BasicMaterial(new BasicShader(), Color.WHITE);
 
 	public Polygon parse(File objFile) {
@@ -19,6 +18,7 @@ public class OBJParser {
 		List<Vector3> textureCoords = new LinkedList<>();
 		List<Vector3> normals = new LinkedList<>();
 		List<Face> faces = new LinkedList<>();
+		String name = "";
 
 		System.out.println("Parsing " + objFile.getName());
 		try (Scanner fs = new Scanner(objFile)) {
@@ -28,7 +28,10 @@ public class OBJParser {
 					continue; // Skip comments and empty lines
 				}
 
-				if (line.startsWith("v ")) {
+				if (line.startsWith("o")) {
+					name = line.split(" ")[1];
+				}
+				else if (line.startsWith("v ")) {
 					String[] xyz = line.split("\\s+");
 					double x = Double.parseDouble(xyz[1]);
 					double y = Double.parseDouble(xyz[2]);
@@ -69,57 +72,18 @@ public class OBJParser {
 					}
 					faces.add(new Face(currentMaterial, faceVertices));
 				}
-				else if (line.startsWith("mtllib ")) {
-					String mtlFile = line.substring(7).trim();
-					// Load materials from the .mtl file (assuming it's in the same directory)
-					loadMaterials(new File(objFile.getParentFile(), mtlFile));
-				}
-				else if (line.startsWith("usemtl ")) {
-					String materialName = line.substring(7).trim();
-					currentMaterial = materials.getOrDefault(materialName,
-							new BasicMaterial(new BasicShader(), Color.WHITE));
-				}
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 
 		Polygon polygon = new Polygon(new Vector3(0, 0, 0), currentMaterial, points, faces);
-		polygon.setAnchor(new Vector3(0, 10, 0));
+		polygon.setAnchor(new Vector3(0, 0, 0));
+		if (!name.equals(""))
+			polygon.setName(name);
 
 		System.out.println("Successfully parsed " + objFile.getName());
 
 		return polygon;
-	}
-
-	private void loadMaterials(File mtlFile) {
-		try (Scanner fs = new Scanner(mtlFile)) {
-			Material material = null;
-			while (fs.hasNextLine()) {
-				String line = fs.nextLine().trim();
-				if (line.isEmpty() || line.charAt(0) == '#') {
-					continue; // Skip comments and empty lines
-				}
-
-				if (line.startsWith("newmtl ")) {
-					String name = line.substring(7).trim();
-					material = new BasicMaterial(new BasicShader(), Color.WHITE); // Create default material
-					materials.put(name, material);
-				}
-				else if (line.startsWith("Kd ")) {
-					String[] parts = line.split("\\s+");
-					double r = Double.parseDouble(parts[1]);
-					double g = Double.parseDouble(parts[2]);
-					double b = Double.parseDouble(parts[3]);
-					if (material != null) {
-						material = new BasicMaterial(new BasicShader(),
-								new Color((int) (r * 255), (int) (g * 255), (int) (b * 255)));
-						materials.put(material.getName(), material); // Update material in the map
-					}
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
 	}
 }

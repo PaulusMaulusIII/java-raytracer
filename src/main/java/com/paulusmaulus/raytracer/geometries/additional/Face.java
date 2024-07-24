@@ -2,6 +2,9 @@ package com.paulusmaulus.raytracer.geometries.additional;
 
 import java.util.List;
 import com.paulusmaulus.raytracer.geometries.Plane;
+import com.paulusmaulus.raytracer.materials.BasicMaterial;
+import com.paulusmaulus.raytracer.shaders.BasicShader;
+import com.paulusmaulus.raytracer.utilities.Color;
 import com.paulusmaulus.raytracer.utilities.Material;
 import com.paulusmaulus.raytracer.utilities.math.Ray;
 import com.paulusmaulus.raytracer.utilities.math.Vector3;
@@ -200,9 +203,22 @@ public class Face {
 	}
 
 	public Vector3 getNormal() {
-		if (normal == null)
-			return new Vector3(0, 0, 0);
-		return normal;
+		Vector3 vertexAvgNormal = new Vector3(0, 0, 0);
+		int counter = 0;
+		for (Vertex vertex : vertices) {
+			if (vertex.getNormal() != null) {
+				vertexAvgNormal.add(vertex.getNormal());
+				counter++;
+			}
+		}
+		vertexAvgNormal = vertexAvgNormal.scale(1 / counter);
+		if (vertexAvgNormal.length() > 0)
+			normal = vertexAvgNormal;
+		if (normal != null)
+			normal = computeNormal();
+		if (normal != null)
+			return normal;
+		return new Vector3(0, 0, 0);
 	}
 
 	public boolean isPointInside(Vector3 point) {
@@ -211,7 +227,6 @@ public class Face {
 
 		Vector3 normal = getNormal();
 		Vector3 axis1, axis2;
-
 		if (Math.abs(normal.x) > Math.abs(normal.y) && Math.abs(normal.x) > Math.abs(normal.z)) {
 			axis1 = new Vector3(0, 1, 0);
 			axis2 = new Vector3(0, 0, 1);
@@ -224,22 +239,17 @@ public class Face {
 			axis1 = new Vector3(1, 0, 0);
 			axis2 = new Vector3(0, 1, 0);
 		}
-
 		double px = point.dot(axis1);
 		double py = point.dot(axis2);
-
 		double[] xVertices = new double[vertices.size()];
 		double[] yVertices = new double[vertices.size()];
-
 		for (int i = 0; i < vertices.size(); i++) {
 			Vector3 vertex = vertices.get(i).getPosition();
 			xVertices[i] = vertex.dot(axis1);
 			yVertices[i] = vertex.dot(axis2);
 		}
-
 		boolean inside = false;
 		int j = vertices.size() - 1;
-
 		for (int i = 0; i < vertices.size(); i++) {
 			if ((yVertices[i] > py) != (yVertices[j] > py)
 					&& (px < (xVertices[j] - xVertices[i]) * (py - yVertices[i]) / (yVertices[j] - yVertices[i])
@@ -248,15 +258,15 @@ public class Face {
 			}
 			j = i;
 		}
-
 		return inside;
+
 	}
 
 	public Vector3 getIntersectionPoint(Ray ray) {
 		if (normal.dot(ray.getDirection()) >= 0)
 			return null;
 
-		Plane plane = new Plane(center, material, normal);
+		Plane plane = new Plane(center, new BasicMaterial(new BasicShader(), Color.BLACK), normal);
 		Vector3 pointOnPlane = plane.getIntersectionPoint(ray);
 		if (pointOnPlane == null)
 			return null;

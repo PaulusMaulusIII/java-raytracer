@@ -21,10 +21,12 @@ public class Arrow extends Shape {
 
 	public Arrow(Vector3 anchor, Material material) {
 		this(anchor, material, new Vector3(0, 1, 0), 2, null);
+		setName(toString());
 	}
 
 	public Arrow(Vector3 anchor, Material material, Vector3 axis) {
 		this(anchor, material, axis, 2, null);
+		setName(toString());
 	}
 
 	public Arrow(Vector3 anchor, Material material, Vector3 axis, double length, Object3D object) {

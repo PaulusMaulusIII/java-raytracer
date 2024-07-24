@@ -15,6 +15,7 @@ public class Plane extends Shape {
     public Plane(Vector3 anchor, Material material, Vector3 axis) {
         super(anchor, material);
         this.axis = axis;
+        setName(toString());
     }
 
     @Override

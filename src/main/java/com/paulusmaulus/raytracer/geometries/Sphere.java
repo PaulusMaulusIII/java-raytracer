@@ -15,6 +15,7 @@ public class Sphere extends Shape {
     public Sphere(Vector3 anchor, Material material, double radius) {
         super(anchor, material);
         this.radius = radius;
+        setName(toString());
     }
 
     @Override

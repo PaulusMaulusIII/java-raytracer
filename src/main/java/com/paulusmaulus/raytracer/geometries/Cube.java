@@ -28,6 +28,7 @@ public class Cube extends Shape {
 
             points[i] = new Vector3(anchor.x + xOffset, anchor.y + yOffset, anchor.z + zOffset);
         }
+        setName(toString());
     }
 
     @Override

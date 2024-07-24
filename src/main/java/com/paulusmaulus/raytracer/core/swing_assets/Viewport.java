@@ -123,6 +123,7 @@ public class Viewport extends JPanel {
 							+ lookingAt.getShape().getMaterial().getShader().shade(lookingAt, scene,
 									lookingAt.getShape().getMaterial(), 0),
 							10, 40);
+					gfx.drawString("Normal: " + lookingAt.getShape().getNormal(lookingAt.getHitPoint()), 10, 60);
 				}
 				if (hud > 2) {
 					gfx.drawLine(0, getHeight() / 3, getWidth(), getHeight() / 3);
@@ -199,9 +200,10 @@ public class Viewport extends JPanel {
 		case KeyEvent.VK_7 -> resolution = 0.015625;
 		case KeyEvent.VK_Q -> tilt = Math.toRadians(1);
 		case KeyEvent.VK_E -> tilt = -Math.toRadians(1);
+		case KeyEvent.VK_V -> scene.getCamera().setAnchor(new Vector3(0, 0, 0));
 		case KeyEvent.VK_F12 -> {
 			try {
-				Renderer.renderToImage(scene, 848, 480, effects, distance);
+				Renderer.renderToImage(scene, 1920, 1080, effects, distance);
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}

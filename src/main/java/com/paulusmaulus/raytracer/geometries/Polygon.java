@@ -1,7 +1,6 @@
 package com.paulusmaulus.raytracer.geometries;
 
 import java.util.List;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.LinkedHashSet;
 
@@ -69,7 +68,7 @@ public class Polygon extends Shape {
 		for (Face face : faces)
 			if (face.isPointInside(hitPoint))
 				return face.getNormal();
-		return new Vector3(0, 0, 0); // Return a default normal if not found
+		return new Vector3(0, 0, 0); // Return null if no face contains the hitPoint
 	}
 
 	@Override
@@ -84,21 +83,22 @@ public class Polygon extends Shape {
 		return minDistance;
 	}
 
-	public void recalculateBoundingBox() {
-		boundingBox = new BoundingBox(faces);
-	}
-
 	@Override
 	public void setAnchor(Vector3 anchor) {
-		if (getAnchor() != null) {
-			Vector3 diff = anchor.subtract(getAnchor());
+		if (getAnchor() != null && faces.size() > 0) {
+			double xDiff = anchor.x - getAnchor().x;
+			double yDiff = anchor.y - getAnchor().y;
+			double zDiff = anchor.z - getAnchor().z;
+
 			for (Face face : faces) {
 				for (Vertex vertex : face.getVertices()) {
-					vertex.setPosition(vertex.getPosition().add(diff));
+					Vector3 newPosition = new Vector3(xDiff + vertex.getPosition().x, yDiff + vertex.getPosition().y,
+							zDiff + vertex.getPosition().z);
+					vertex.setPosition(newPosition);
 				}
 				face.recalculateBoundingBox();
 			}
-			recalculateBoundingBox();
+			boundingBox = new BoundingBox(faces);
 		}
 		super.setAnchor(anchor);
 	}

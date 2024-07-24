@@ -11,6 +11,7 @@ public class Light extends Object3D {
     public Light(Vector3 anchor, Color color) {
         super(anchor);
         this.color = color;
+        setName(toString());
     }
 
     public Light(Vector3 anchor) {

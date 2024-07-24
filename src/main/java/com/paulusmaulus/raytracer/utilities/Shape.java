@@ -13,6 +13,7 @@ public abstract class Shape extends Object3D {
         setAnchor(anchor);
         setMaterial(material);
         this.material.setShape(this);
+        setName(toString());
     }
 
     public boolean hasMaterial() {

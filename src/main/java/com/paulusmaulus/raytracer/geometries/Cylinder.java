@@ -19,6 +19,7 @@ public class Cylinder extends Shape {
 		this.axis = axis.normalize();
 		this.radius = radius;
 		this.height = height;
+		setName(toString());
 	}
 
 	@Override

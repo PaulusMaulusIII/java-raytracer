@@ -11,6 +11,7 @@ public abstract class Object3D {
 
 	Vector3 anchor;
 	List<PositionChangeListener> listeners = new LinkedList<>();
+	private String name = toString();
 
 	public Object3D() {
 		super();
@@ -43,5 +44,13 @@ public abstract class Object3D {
 
 	public void addChangeListener(PositionChangeListener changeListener) {
 		listeners.add(changeListener);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }
