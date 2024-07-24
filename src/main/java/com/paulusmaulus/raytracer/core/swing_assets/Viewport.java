@@ -203,7 +203,7 @@ public class Viewport extends JPanel {
 		case KeyEvent.VK_V -> scene.getCamera().setAnchor(new Vector3(0, 0, 0));
 		case KeyEvent.VK_F12 -> {
 			try {
-				Renderer.renderToImage(scene, 1920, 1080, effects, distance);
+				Renderer.renderToImage(scene, 848, 480, effects, distance);
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}

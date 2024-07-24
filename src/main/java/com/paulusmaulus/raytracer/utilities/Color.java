@@ -59,6 +59,8 @@ public class Color {
 
 	public void setRed(int red) {
 		this.red = red;
+		toHSV();
+		toRGB();
 	}
 
 	public int getGreen() {
@@ -67,6 +69,8 @@ public class Color {
 
 	public void setGreen(int green) {
 		this.green = green;
+		toHSV();
+		toRGB();
 	}
 
 	public int getBlue() {
@@ -75,6 +79,8 @@ public class Color {
 
 	public void setBlue(int blue) {
 		this.blue = blue;
+		toHSV();
+		toRGB();
 	}
 
 	public double getHue() {
@@ -83,6 +89,8 @@ public class Color {
 
 	public void setHue(double hue) {
 		this.hue = hue;
+		toHSV();
+		toRGB();
 	}
 
 	public double getSaturation() {
@@ -91,6 +99,8 @@ public class Color {
 
 	public void setSaturation(double saturation) {
 		this.saturation = saturation;
+		toHSV();
+		toRGB();
 	}
 
 	public double getValue() {
@@ -99,6 +109,8 @@ public class Color {
 
 	public void setValue(double value) {
 		this.value = value;
+		toHSV();
+		toRGB();
 	}
 
 	public void toHSV() {
@@ -183,9 +195,9 @@ public class Color {
 	}
 
 	public Color brighten(double factor) {
-		int red = (int) (getRed() * (factor + 1));
-		int green = (int) (getGreen() * (factor + 1));
-		int blue = (int) (getBlue() * (factor + 1));
+		int red = (int) ((getRed() + 1) * (factor + 1));
+		int green = (int) ((getGreen() + 1) * (factor + 1));
+		int blue = (int) ((getBlue() + 1) * (factor + 1));
 
 		return new Color(clamp(red), clamp(green), clamp(blue));
 	}

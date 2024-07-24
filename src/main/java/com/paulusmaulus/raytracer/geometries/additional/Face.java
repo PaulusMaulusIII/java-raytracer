@@ -193,6 +193,10 @@ public class Face {
 		return center;
 	}
 
+	public void setCenter(Vector3 center) {
+		this.center = center;
+	}
+
 	private Vector3 computeNormal() {
 		if (vertices.get(2) != null && vertices.get(1) != null) {
 			Vector3 ab = vertices.get(1).getPosition().subtract(vertices.get(0).getPosition());
@@ -211,9 +215,10 @@ public class Face {
 				counter++;
 			}
 		}
-		vertexAvgNormal = vertexAvgNormal.scale(1 / counter);
-		if (vertexAvgNormal.length() > 0)
+		if (counter > 0) {
+			vertexAvgNormal = vertexAvgNormal.scale(1 / counter);
 			normal = vertexAvgNormal;
+		}
 		if (normal != null)
 			normal = computeNormal();
 		if (normal != null)

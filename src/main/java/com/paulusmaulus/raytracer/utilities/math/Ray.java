@@ -34,13 +34,7 @@ public class Ray {
             if (object3d instanceof Shape && !(object3d instanceof Arrow)) {
                 Vector3 hitPoint = ((Shape) object3d).getIntersectionPoint(this);
                 if (hitPoint != null) {
-                    RayHit hit2 = new RayHit(this, object3d, (Shape) object3d, hitPoint);
-                    if (hit == null) {
-                        hit = hit2;
-                    }
-                    else if (getOrigin().distance(hit.getHitPoint()) > getOrigin().distance(hitPoint)) {
-                        hit = hit2;
-                    }
+                    hit = new RayHit(this, object3d, (Shape) object3d, hitPoint);
                 }
             }
         }
@@ -53,13 +47,7 @@ public class Ray {
             if (object3d instanceof Shape && object3d instanceof Arrow) {
                 Vector3 hitPoint = ((Shape) object3d).getIntersectionPoint(this);
                 if (hitPoint != null) {
-                    RayHit hit2 = new RayHit(this, object3d, (Shape) object3d, hitPoint);
-                    if (hit == null) {
-                        hit = hit2;
-                    }
-                    else if (getOrigin().distance(hit.getHitPoint()) > getOrigin().distance(hitPoint)) {
-                        hit = hit2;
-                    }
+                    hit = new RayHit(this, object3d, (Shape) object3d, hitPoint);
                 }
             }
         }

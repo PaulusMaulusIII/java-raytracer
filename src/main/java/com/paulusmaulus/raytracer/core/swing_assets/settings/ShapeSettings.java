@@ -144,12 +144,12 @@ public class ShapeSettings extends Settings {
 		private Material material = shape.getMaterial();
 		private Label label = new Label(material.getClass().toString());
 		private JComboBox<? extends Material> materialSelector = new JComboBox<>(new Material[] {
-				new BasicMaterial(new BasicShader(), Color.WHITE),
-				new CheckerMaterial(new BasicShader(), Color.WHITE, Color.BLACK, 2),
-				new CubeMaterial(new BasicShader()), new EdgeMaterial(new BasicShader(), Color.WHITE, .1),
-				new GradientMaterial(new BasicShader(), Color.WHITE, Color.BLACK),
-				new MirrorMaterial(new BasicShader()), new SphereMaterial(new BasicShader()),
-				new WaveMaterial(new BasicShader()), new TextureMaterial(new Texture(), new BasicShader())
+				new BasicMaterial(new PhongShader(), Color.WHITE),
+				new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 2),
+				new CubeMaterial(new PhongShader()), new EdgeMaterial(new PhongShader(), Color.WHITE, .1),
+				new GradientMaterial(new PhongShader(), Color.WHITE, Color.BLACK),
+				new MirrorMaterial(new PhongShader()), new SphereMaterial(new PhongShader()),
+				new WaveMaterial(new PhongShader()), new TextureMaterial(new Texture(), new PhongShader())
 		});
 		private ColorInput mainColorInput = new ColorInput(material.getColor());
 		private InputField reflectivity = new InputField("Refl", material.getReflectivity());

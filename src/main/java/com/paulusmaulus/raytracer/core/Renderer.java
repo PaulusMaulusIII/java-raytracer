@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JDialog;
 
 import com.paulusmaulus.raytracer.core.interfaces.Effect;
+import com.paulusmaulus.raytracer.core.swing_assets.Graph;
 import com.paulusmaulus.raytracer.utilities.Camera;
 import com.paulusmaulus.raytracer.utilities.Color;
 import com.paulusmaulus.raytracer.utilities.Scene;
@@ -26,27 +28,50 @@ public class Renderer {
         int resWidth = (int) (width * resolution);
         int resHeight = (int) (height * resolution);
         PixelData[][] pixelBuffer = new PixelData[resHeight][resWidth];
+        long[][] renderTime = new long[resHeight][resWidth];
+        int totalPixels = resWidth * resHeight;
 
         if (verbose)
             System.out.println("Casting rays");
 
         for (int y = 0; y < resHeight; y++) {
             for (int x = 0; x < resWidth; x++) {
+                long startTime = System.currentTimeMillis();
                 double[] screenUV = getNormalizedScreenCoordinates(x / resolution, y / resolution, width, height);
                 pixelBuffer[y][x] = getPixelData(scene, screenUV[0], screenUV[1], showArrows);
+
+                if (verbose) {
+                    int currentPixel = y * resWidth + x + 1;
+                    int progress = (currentPixel * 10) / totalPixels;
+                    System.out.print("\rCasting: " + "#".repeat(progress));
+                }
+                renderTime[y][x] = System.currentTimeMillis() - startTime;
             }
         }
+        if (verbose)
+            System.out.println();
 
         if (verbose)
             System.out.println("Applying FX");
 
+        int effectIndex = 0;
         for (Effect effect : effects) {
             if (verbose)
                 System.out.println("Applying " + effect.getName());
+
             pixelBuffer = effect.apply(pixelBuffer, resolution);
+
+            if (verbose) {
+                effectIndex++;
+                int progress = (effectIndex * 10) / effects.size();
+                System.out.print("\rApplying FX: " + "#".repeat(progress));
+            }
+
             if (verbose)
-                System.out.println("Applied " + effect.getName());
+                System.out.println("\nApplied " + effect.getName());
         }
+        if (verbose)
+            System.out.println();
 
         if (verbose)
             System.out.println("Drawing image");
@@ -68,6 +93,13 @@ public class Renderer {
                 gfx.fillRect(x, y, blockSize, blockSize);
             }
         }
+
+        /*
+         * if (verbose) { JDialog graphDialog = new JDialog();
+         * graphDialog.setContentPane(new Graph(pixelBuffer, renderTime));
+         * graphDialog.setSize(width, height); graphDialog.setTitle("Graph");
+         * graphDialog.setVisible(true); graphDialog.repaint(); }
+         */
 
         return temp;
     }

@@ -85,22 +85,21 @@ public class Polygon extends Shape {
 
 	@Override
 	public void setAnchor(Vector3 anchor) {
-		if (getAnchor() != null && faces.size() > 0) {
-			double xDiff = anchor.x - getAnchor().x;
-			double yDiff = anchor.y - getAnchor().y;
-			double zDiff = anchor.z - getAnchor().z;
-
+		if (getAnchor() != null) {
+			Vector3 difference = anchor.subtract(getAnchor());
 			for (Face face : faces) {
 				for (Vertex vertex : face.getVertices()) {
-					Vector3 newPosition = new Vector3(xDiff + vertex.getPosition().x, yDiff + vertex.getPosition().y,
-							zDiff + vertex.getPosition().z);
-					vertex.setPosition(newPosition);
+					vertex.setPosition(vertex.getPosition().add(difference));
 				}
+				face.setCenter(face.getCenter().add(difference));
 				face.recalculateBoundingBox();
 			}
 			boundingBox = new BoundingBox(faces);
+			super.setAnchor(getAnchor().add(difference));
 		}
-		super.setAnchor(anchor);
+		else {
+			super.setAnchor(anchor);
+		}
 	}
 
 	public List<Face> getFaces() {
