@@ -7,6 +7,7 @@ import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.List;
 
 import javax.swing.JDialog;
@@ -15,13 +16,11 @@ import javax.swing.JFrame;
 import com.paulusmaulus.raytracer.core.swing_assets.SettingPanel;
 import com.paulusmaulus.raytracer.core.swing_assets.Viewport;
 import com.paulusmaulus.raytracer.core.swing_assets.additional.CreateObjectDialog;
-import com.paulusmaulus.raytracer.geometries.Sphere;
 import com.paulusmaulus.raytracer.geometries.additional.Arrow;
 import com.paulusmaulus.raytracer.lights.Light;
-import com.paulusmaulus.raytracer.materials.BasicMaterial;
-import com.paulusmaulus.raytracer.shaders.PhongShader;
 import com.paulusmaulus.raytracer.utilities.Camera;
 import com.paulusmaulus.raytracer.utilities.Color;
+import com.paulusmaulus.raytracer.utilities.OBJParser;
 import com.paulusmaulus.raytracer.utilities.Object3D;
 import com.paulusmaulus.raytracer.utilities.Scene;
 import com.paulusmaulus.raytracer.utilities.Shape;
@@ -29,14 +28,15 @@ import com.paulusmaulus.raytracer.utilities.math.Vector3;
 
 public class App {
     Scene scene = new Scene(new Camera(new Vector3(0, 0, -4), Math.toRadians(40)),
-            List.of(new Sphere(new Vector3(0, 0, 0), new BasicMaterial(new PhongShader(), Color.BLACK), 2)),
+            List.of(new OBJParser()
+                    .parse(new File("src\\main\\resources\\models\\common-3d-test-models\\data\\teapot.obj"))),
             List.of(new Light(new Vector3(7.5, 5, 20), new Color(255, 255, 72), 50),
                     new Light(new Vector3(-7.5, 5, 20), new Color(255, 0, 72), 50)));
 
     public App() {
 
         JFrame main = new JFrame();
-        main.setSize(1280, 745);
+        main.setSize(1280, 720);
         main.setTitle("Java Ray-Tracer");
         main.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
