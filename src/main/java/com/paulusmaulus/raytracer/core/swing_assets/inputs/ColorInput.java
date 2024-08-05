@@ -7,14 +7,14 @@ import com.paulusmaulus.raytracer.utilities.Color;
 import com.paulusmaulus.raytracer.utilities.Object3D;
 
 public class ColorInput extends JPanel {
-	private InputField redField;
-	private InputField greenField;
-	private InputField blueField;
+	private InputField<Integer> redField;
+	private InputField<Integer> greenField;
+	private InputField<Integer> blueField;
 
 	public ColorInput(Color color) {
-		redField = new InputField("Red", color.getRed());
-		greenField = new InputField("Green", color.getGreen());
-		blueField = new InputField("Blue", color.getBlue());
+		redField = new InputField<>("Red", color.getRed());
+		greenField = new InputField<>("Green", color.getGreen());
+		blueField = new InputField<>("Blue", color.getBlue());
 
 		redField.setBackground(Color.RED.toAWT());
 		greenField.setBackground(Color.GREEN.toAWT());

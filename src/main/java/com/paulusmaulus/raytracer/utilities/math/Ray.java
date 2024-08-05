@@ -30,11 +30,13 @@ public class Ray {
 
     public RayHit cast(List<Object3D> objects) {
         RayHit hit = null;
+        double distance = Double.POSITIVE_INFINITY;
         for (Object3D object3d : objects) {
             if (object3d instanceof Shape && !(object3d instanceof Arrow)) {
                 Vector3 hitPoint = ((Shape) object3d).getIntersectionPoint(this);
-                if (hitPoint != null) {
+                if (hitPoint != null && hitPoint.distance(getOrigin()) < distance) {
                     hit = new RayHit(this, object3d, (Shape) object3d, hitPoint);
+                    distance = hitPoint.distance(getOrigin());
                 }
             }
         }

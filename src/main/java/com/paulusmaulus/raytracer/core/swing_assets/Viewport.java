@@ -13,6 +13,7 @@ import com.paulusmaulus.raytracer.core.Renderer;
 import com.paulusmaulus.raytracer.core.interfaces.Effect;
 import com.paulusmaulus.raytracer.core.swing_assets.additional.CreateObjectDialog;
 import com.paulusmaulus.raytracer.geometries.additional.Arrow;
+import com.paulusmaulus.raytracer.lights.Light;
 import com.paulusmaulus.raytracer.post_processing.DepthOfField;
 import com.paulusmaulus.raytracer.utilities.Camera;
 import com.paulusmaulus.raytracer.utilities.Color;
@@ -119,9 +120,11 @@ public class Viewport extends JPanel {
 								+ Math.toDegrees(cam.getYaw()) + "°, " + Math.toDegrees(cam.getTilt()) + "°, " + speed,
 						10, 20);
 				if (lookingAt != null) {
-					gfx.drawString("Looking at: " + lookingAt.getHitPoint() + ", " + lookingAt.getShape() + ", "
-							+ lookingAt.getShape().getMaterial().getShader().shade(lookingAt, scene,
-									lookingAt.getShape().getMaterial(), 0),
+					gfx.drawString(
+							"Looking at: " + lookingAt.getHitPoint() + ", " + lookingAt.getObject().getName() + ", "
+									+ lookingAt.getShape().getMaterial().getShader().shade(lookingAt, scene,
+											lookingAt.getShape().getMaterial(), 0)
+									+ ", " + lookingAt.getHitPoint().distance(cam.getAnchor()),
 							10, 40);
 					gfx.drawString("Normal: " + lookingAt.getShape().getNormal(lookingAt.getHitPoint()), 10, 60);
 				}
@@ -203,7 +206,7 @@ public class Viewport extends JPanel {
 		case KeyEvent.VK_V -> scene.getCamera().setAnchor(new Vector3(0, 0, 0));
 		case KeyEvent.VK_F12 -> {
 			try {
-				Renderer.renderToImage(scene, 848, 480, effects, distance);
+				Renderer.renderToImage(scene, 1920, 1080, effects, distance);
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
@@ -222,6 +225,25 @@ public class Viewport extends JPanel {
 			ctrl = true;
 		}
 		case KeyEvent.VK_C -> new CreateObjectDialog(((JFrame) container), settingsDialog, settings);
+		case KeyEvent.VK_DELETE -> {
+			if (selectedObject != null) {
+				Menu menu = null;
+				if (selectedObject instanceof Shape) {
+					menu = ((JFrame) container).getMenuBar().getMenu(2);
+					settings.getScene().getShapes().remove(selectedObject);
+				}
+				else if (selectedObject instanceof Light) {
+					menu = ((JFrame) container).getMenuBar().getMenu(3);
+					settings.getScene().getLights().remove(selectedObject);
+				}
+				for (int i = 0; i < menu.getItemCount(); i++) {
+					if (((MenuItem) menu.getItem(i)).getLabel().equals(selectedObject.getName())) {
+						menu.remove(i);
+						break;
+					}
+				}
+			}
+		}
 		}
 	}
 
@@ -287,15 +309,15 @@ public class Viewport extends JPanel {
 	}
 
 	private void handleRightClick(MouseEvent e) {
-		RayHit lookingAt = Renderer.getLookingAt(scene, getWidth(), getHeight());
+		RayHit atCursor = Renderer.getAt(scene, e.getX(), e.getY(), getWidth(), getHeight());
 		List<Shape> shapes = new LinkedList<>(scene.getShapes());
 		shapes.removeIf(shape -> shape instanceof Arrow);
-		if (lookingAt != null && lookingAt.getObject() instanceof Shape && !(lookingAt.getShape() instanceof Arrow)) {
-			if (lookingAt.getShape() == selectedObject) {
+		if (atCursor != null && atCursor.getObject() instanceof Shape && !(atCursor.getShape() instanceof Arrow)) {
+			if (atCursor.getShape() == selectedObject) {
 				selectedObject = null;
 			}
 			else {
-				selectedObject = lookingAt.getShape();
+				selectedObject = atCursor.getShape();
 				selectedObject.addChangeListener((origPos, newPos) -> {
 					for (Shape shape : scene.getShapes()) {
 						if (shape instanceof Arrow)

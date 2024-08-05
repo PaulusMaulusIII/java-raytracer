@@ -12,7 +12,7 @@ public class CameraSettings extends Settings {
 	private Camera cam;
 	private Slider pitchSlider = new Slider("Pitch", -10, 10);
 	private Slider yawSlider = new Slider("Yaw", -10, 10);
-	private InputField fovField;
+	private InputField<Double> fovField;
 
 	private ObjectModification setCameraPosition = (Object3D currentItem) -> ((Camera) currentItem)
 			.setAnchor(new Vector3(xSlider.getValue(), ySlider.getValue(), zSlider.getValue()));
@@ -23,7 +23,7 @@ public class CameraSettings extends Settings {
 		super();
 		this.settingPanel = parent;
 		cam = (Camera) settingPanel.getCurrentItemDisplay().getCurrentItem();
-		fovField = new InputField("FOV", Math.toDegrees(cam.getFOV()), "°");
+		fovField = new InputField<>("FOV", Math.toDegrees(cam.getFOV()), "°");
 
 		xSlider.setValue(cam.getAnchor().x);
 		ySlider.setValue(cam.getAnchor().y);

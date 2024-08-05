@@ -12,7 +12,7 @@ public class LightSettings extends Settings {
 
 	private Light light;
 	private ColorInput colorInput;
-	private InputField intensity = new InputField("Intensity", 1.0);
+	private InputField<Double> intensity = new InputField<>("Intensity", 1.0);
 
 	private ObjectModification setLightPosition = (Object3D currentItem) -> ((Light) currentItem)
 			.setAnchor(new Vector3(xSlider.getValue(), ySlider.getValue(), zSlider.getValue()));;

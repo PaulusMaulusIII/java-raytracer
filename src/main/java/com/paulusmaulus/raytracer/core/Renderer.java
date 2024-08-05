@@ -9,10 +9,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.JDialog;
-
 import com.paulusmaulus.raytracer.core.interfaces.Effect;
-import com.paulusmaulus.raytracer.core.swing_assets.Graph;
 import com.paulusmaulus.raytracer.utilities.Camera;
 import com.paulusmaulus.raytracer.utilities.Color;
 import com.paulusmaulus.raytracer.utilities.Scene;
@@ -28,24 +25,25 @@ public class Renderer {
         int resWidth = (int) (width * resolution);
         int resHeight = (int) (height * resolution);
         PixelData[][] pixelBuffer = new PixelData[resHeight][resWidth];
-        long[][] renderTime = new long[resHeight][resWidth];
         int totalPixels = resWidth * resHeight;
 
         if (verbose)
             System.out.println("Casting rays");
 
+        int currentProgress = -1;
         for (int y = 0; y < resHeight; y++) {
             for (int x = 0; x < resWidth; x++) {
-                long startTime = System.currentTimeMillis();
                 double[] screenUV = getNormalizedScreenCoordinates(x / resolution, y / resolution, width, height);
                 pixelBuffer[y][x] = getPixelData(scene, screenUV[0], screenUV[1], showArrows);
 
                 if (verbose) {
                     int currentPixel = y * resWidth + x + 1;
-                    int progress = (currentPixel * 10) / totalPixels;
-                    System.out.print("\rCasting: " + "#".repeat(progress));
+                    int progress = (currentPixel * 100) / totalPixels;
+                    if (progress > currentProgress) {
+                        System.out.print("\rCasting: " + "(" + progress + " %)" + "#".repeat(progress));
+                        currentProgress = progress;
+                    }
                 }
-                renderTime[y][x] = System.currentTimeMillis() - startTime;
             }
         }
         if (verbose)
@@ -94,13 +92,6 @@ public class Renderer {
             }
         }
 
-        /*
-         * if (verbose) { JDialog graphDialog = new JDialog();
-         * graphDialog.setContentPane(new Graph(pixelBuffer, renderTime));
-         * graphDialog.setSize(width, height); graphDialog.setTitle("Graph");
-         * graphDialog.setVisible(true); graphDialog.repaint(); }
-         */
-
         return temp;
     }
 
@@ -148,17 +139,11 @@ public class Renderer {
         if (ray.getOrigin().distance(hit.getHitPoint()) > GlobalSettings.MAX_RENDER_DISTANCE)
             return new PixelData(scene.getSkybox().getColor(rayDir), Double.POSITIVE_INFINITY,
                     GlobalSettings.SKY_EMISSION);
-        try {
-            Color shadedColor = hit.getShape().getMaterial().getShader().shade(hit, scene, hit.getShape().getMaterial(),
-                    0);
-            double distance = ray.getOrigin().distance(hit.getHitPoint());
-            double emission = hit.getShape().getMaterial().getEmissionAt(hit.getHitPoint());
-            return new PixelData(shadedColor, distance, emission);
-        } catch (java.lang.NullPointerException e) {
-            System.err.println("Encoutered error rendering: " + hit.getShape() + " at: " + hit.getHitPoint()
-                    + ", Normal: " + hit.getShape().getNormal(hit.getHitPoint()));
-        }
-        return null;
+                    
+        Color shadedColor = hit.getShape().getMaterial().getShader().shade(hit, scene, hit.getShape().getMaterial(), 0);
+        double distance = ray.getOrigin().distance(hit.getHitPoint());
+        double emission = hit.getShape().getMaterial().getEmissionAt(hit.getHitPoint());
+        return new PixelData(shadedColor, distance, emission);
     }
 
     public static RayHit getLookingAt(Scene scene, int width, int height) {

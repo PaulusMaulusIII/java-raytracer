@@ -28,7 +28,7 @@ public class CurrentItemDisplay extends VBox {
 	public void setCurrentItem(Object3D currentItem) {
 		this.currentItem = currentItem;
 		if (currentItem != null) {
-			label.setText(currentItem.toString());
+			label.setText(currentItem.getName());
 			try {
 				remove(1);
 			} catch (Exception e) {

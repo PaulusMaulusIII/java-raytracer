@@ -16,26 +16,38 @@ import javax.swing.JFrame;
 import com.paulusmaulus.raytracer.core.swing_assets.SettingPanel;
 import com.paulusmaulus.raytracer.core.swing_assets.Viewport;
 import com.paulusmaulus.raytracer.core.swing_assets.additional.CreateObjectDialog;
+import com.paulusmaulus.raytracer.geometries.Plane;
+import com.paulusmaulus.raytracer.geometries.Sphere;
 import com.paulusmaulus.raytracer.geometries.additional.Arrow;
+import com.paulusmaulus.raytracer.geometries.additional.Skybox;
 import com.paulusmaulus.raytracer.lights.Light;
+import com.paulusmaulus.raytracer.materials.BasicMaterial;
+import com.paulusmaulus.raytracer.materials.CheckerMaterial;
+import com.paulusmaulus.raytracer.shaders.PhongShader;
 import com.paulusmaulus.raytracer.utilities.Camera;
 import com.paulusmaulus.raytracer.utilities.Color;
-import com.paulusmaulus.raytracer.utilities.OBJParser;
 import com.paulusmaulus.raytracer.utilities.Object3D;
 import com.paulusmaulus.raytracer.utilities.Scene;
 import com.paulusmaulus.raytracer.utilities.Shape;
 import com.paulusmaulus.raytracer.utilities.math.Vector3;
 
-public class App {
+public class App implements Runnable {
     Scene scene = new Scene(new Camera(new Vector3(0, 0, -4), Math.toRadians(40)),
-            List.of(new OBJParser()
-                    .parse(new File("src\\main\\resources\\models\\common-3d-test-models\\data\\teapot.obj"))),
+            List.of(new Sphere(new Vector3(0, 0, 0), new BasicMaterial(new PhongShader(), Color.PINK), 2),
+                    new Plane(new Vector3(0, -2, 0),
+                            new CheckerMaterial(new PhongShader(), Color.BLACK, Color.WHITE, 4), new Vector3(0, 1, 0))),
             List.of(new Light(new Vector3(7.5, 5, 20), new Color(255, 255, 72), 50),
-                    new Light(new Vector3(-7.5, 5, 20), new Color(255, 0, 72), 50)));
+                    new Light(new Vector3(-7.5, 5, 20), new Color(255, 0, 72), 50)),
+            new Skybox(Color.WHITE));
+
+    JFrame main;
+    JDialog settingsDialog;
+    SettingPanel settings;
+    MenuBar menuBar;
+    Viewport viewport;
 
     public App() {
-
-        JFrame main = new JFrame();
+        main = new JFrame();
         main.setSize(1280, 720);
         main.setTitle("Java Ray-Tracer");
         main.addWindowListener(new WindowAdapter() {
@@ -44,10 +56,10 @@ public class App {
             }
         });
 
-        JDialog settingsDialog = new JDialog(main, "Settings");
-        SettingPanel settings = new SettingPanel(main, scene);
-        MenuBar menuBar = createMenuBar(main, settings, settingsDialog, scene);
-        Viewport viewport = new Viewport(main, settings, settingsDialog, main.getWidth(), main.getHeight());
+        settingsDialog = new JDialog(main, "Settings");
+        settings = new SettingPanel(main, scene);
+        menuBar = createMenuBar(main, settings, settingsDialog, scene);
+        viewport = new Viewport(main, settings, settingsDialog, main.getWidth(), main.getHeight());
 
         settingsDialog.add(settings);
         settingsDialog.setSize(settings.getSize());
@@ -58,7 +70,6 @@ public class App {
         main.setVisible(true);
         main.setMenuBar(menuBar);
         main.add(viewport);
-        viewport.run();
     }
 
     private MenuBar createMenuBar(JFrame main, SettingPanel settings, JDialog settingsDialog, Scene scene) {
@@ -69,15 +80,16 @@ public class App {
         Menu shapes = new Menu("Shapes");
         Menu lights = new Menu("Lights");
 
+        MenuItem reloadMenu = new MenuItem("Reload MenuBar");
+        reloadMenu.addActionListener(
+                (ActionEvent e) -> main.setMenuBar(createMenuBar(main, settings, settingsDialog, scene)));
+
         MenuItem openSettings = new MenuItem("Open Settings");
-        openSettings.addActionListener((ActionEvent e) -> {
-            settingsDialog.setVisible(true);
-        });
+        openSettings.addActionListener((ActionEvent e) -> settingsDialog.setVisible(true));
 
         MenuItem addObject = new MenuItem("Add Object");
-        addObject.addActionListener((ActionEvent e) -> {
-            new CreateObjectDialog(main, settingsDialog, settings).setVisible(true);
-        });
+        addObject.addActionListener(
+                (ActionEvent e) -> new CreateObjectDialog(main, settingsDialog, settings).setVisible(true));
 
         MenuItem removeObject = new MenuItem("Remove Object");
         removeObject.addActionListener((ActionEvent e) -> {
@@ -93,7 +105,7 @@ public class App {
                     settings.getScene().getLights().remove(currentItem);
                 }
                 for (int i = 0; i < menu.getItemCount(); i++) {
-                    if (((MenuItem) menu.getItem(i)).getLabel().equals(currentItem.toString())) {
+                    if (((MenuItem) menu.getItem(i)).getLabel().equals(currentItem.getName())) {
                         menu.remove(i);
                         break;
                     }
@@ -102,6 +114,7 @@ public class App {
         });
 
         label.add(openSettings);
+        label.add(reloadMenu);
         label.add(addObject);
         label.add(removeObject);
 
@@ -115,7 +128,7 @@ public class App {
 
         for (Shape shape : scene.getShapes()) {
             if (!(shape instanceof Arrow)) {
-                MenuItem menuItem = new MenuItem(shape.toString());
+                MenuItem menuItem = new MenuItem(shape.getName());
                 menuItem.addActionListener((ActionEvent e) -> {
                     settings.getCurrentItemDisplay().setCurrentItem(shape);
                     if (!settingsDialog.isVisible())
@@ -126,7 +139,7 @@ public class App {
         }
 
         for (Light light : scene.getLights()) {
-            MenuItem menuItem = new MenuItem(light.toString());
+            MenuItem menuItem = new MenuItem(light.getName());
             menuItem.addActionListener((ActionEvent e) -> {
                 settings.getCurrentItemDisplay().setCurrentItem(light);
                 if (!settingsDialog.isVisible())
@@ -143,8 +156,13 @@ public class App {
         return menuBar;
     }
 
+    @Override
+    public void run() {
+        viewport.run();
+    }
+
     public static void main(String[] args) {
-        new App();
+        new App().run();
     }
 
 }

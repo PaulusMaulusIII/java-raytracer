@@ -10,12 +10,12 @@ import javax.swing.JPanel;
 import com.paulusmaulus.raytracer.core.interfaces.ObjectModification;
 import com.paulusmaulus.raytracer.utilities.Object3D;
 
-public class InputField extends JPanel {
+public class InputField<V> extends JPanel {
 	private Label label = new Label();
-	private TextField field = new TextField(1);
+	private TextField field = new TextField();
 	private Label unit = new Label();
 
-	public InputField(String labelText, Number value) {
+	public InputField(String labelText, V value) {
 		super();
 		label.setText(labelText);
 		add(label);
@@ -24,12 +24,12 @@ public class InputField extends JPanel {
 		add(unit);
 	}
 
-	public InputField(String labelText, Number value, String unitText) {
+	public InputField(String labelText, V value, String unitText) {
 		this(labelText, value);
 		unit.setText(unitText);
 	}
 
-	public void setValue(Number value) {
+	public void setValue(V value) {
 		field.setText("" + value);
 	}
 

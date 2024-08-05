@@ -9,9 +9,10 @@ import com.paulusmaulus.raytracer.utilities.math.Vector3;
 
 public class Skybox {
 	Texture texture;
+	Color alternate;
 
 	public Skybox(File file) {
-		super();
+		this(Color.MAGENTA);
 		try {
 			texture = new Texture(file);
 		} catch (IOException e) {
@@ -19,7 +20,15 @@ public class Skybox {
 		}
 	}
 
+	public Skybox(Color alternate) {
+		super();
+		this.alternate = alternate;
+	}
+
 	public Color getColor(Vector3 d) {
-		return texture.getColor(d);
+		if (texture != null)
+
+			return texture.getColor(d);
+		return alternate;
 	}
 }

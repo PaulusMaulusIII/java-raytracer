@@ -46,14 +46,14 @@ public class Cylinder extends Shape {
 		}
 
 		List<Vector3> capIntersections = new LinkedList<>();
-		Plane bottomCap = new Plane(anchor, getMaterial(), axis);
+		Circle bottomCap = new Circle(anchor, getMaterial(), axis, radius);
 		Vector3 bottomCapIntersection = bottomCap.getIntersectionPoint(ray);
-		if (bottomCapIntersection != null && anchor.distance(bottomCapIntersection) <= radius)
+		if (bottomCapIntersection != null)
 			capIntersections.add(bottomCapIntersection);
 
-		Plane topCap = new Plane(anchor.add(axis.scale(height)), getMaterial(), axis);
+		Circle topCap = new Circle(anchor.add(axis.scale(height)), getMaterial(), axis, radius);
 		Vector3 topCapIntersection = topCap.getIntersectionPoint(ray);
-		if (topCapIntersection != null && anchor.add(axis.scale(height)).distance(topCapIntersection) <= radius)
+		if (topCapIntersection != null)
 			capIntersections.add(topCapIntersection);
 
 		double t1 = (-b - Math.sqrt(discriminant)) / (2 * a);

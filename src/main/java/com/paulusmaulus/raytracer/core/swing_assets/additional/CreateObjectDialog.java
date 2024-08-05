@@ -9,6 +9,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 import com.paulusmaulus.raytracer.core.swing_assets.SettingPanel;
+import com.paulusmaulus.raytracer.geometries.Circle;
 import com.paulusmaulus.raytracer.geometries.Cube;
 import com.paulusmaulus.raytracer.geometries.Cylinder;
 import com.paulusmaulus.raytracer.geometries.Plane;
@@ -16,6 +17,7 @@ import com.paulusmaulus.raytracer.geometries.Sphere;
 import com.paulusmaulus.raytracer.lights.Light;
 import com.paulusmaulus.raytracer.materials.BasicMaterial;
 import com.paulusmaulus.raytracer.shaders.PhongShader;
+import com.paulusmaulus.raytracer.utilities.Camera;
 import com.paulusmaulus.raytracer.utilities.Color;
 import com.paulusmaulus.raytracer.utilities.Object3D;
 import com.paulusmaulus.raytracer.utilities.Shape;
@@ -25,14 +27,15 @@ public class CreateObjectDialog extends JDialog {
 
 	public CreateObjectDialog(JFrame owner, JDialog settingsDialog, SettingPanel settingPanel) {
 		super(owner);
+		Camera camera = settingPanel.getScene().getCamera();
+		Vector3 inFrontOfCam = camera.getAnchor()
+				.add(new Vector3(0, 0, 1).rotate(camera.getPitch(), camera.getYaw(), camera.getTilt()).scale(10));
+		Vector3 axis = new Vector3(0, 1, 0);
+		BasicMaterial whitePhongShader = new BasicMaterial(new PhongShader(), Color.WHITE);
 		JComboBox<? extends Object3D> objectSelector = new JComboBox<>(new Object3D[] {
-				new Cylinder(new Vector3(0, 0, 0), new BasicMaterial(new PhongShader(), Color.WHITE),
-						new Vector3(0, 1, 0), 2, 5),
-				new Cube(new Vector3(0, 0, 0), new BasicMaterial(new PhongShader(), Color.WHITE), 4),
-				new Plane(new Vector3(0, 0, 0), new BasicMaterial(new PhongShader(), Color.WHITE),
-						new Vector3(0, 1, 0)),
-				new Sphere(new Vector3(0, 0, 0), new BasicMaterial(new PhongShader(), Color.WHITE), 2),
-				new Light(new Vector3(0, 0, 0))
+				new Cylinder(inFrontOfCam, whitePhongShader, axis, 2, 5), new Cube(inFrontOfCam, whitePhongShader, 4),
+				new Plane(inFrontOfCam, whitePhongShader, axis), new Sphere(inFrontOfCam, whitePhongShader, 2),
+				new Circle(inFrontOfCam, whitePhongShader, axis, 3), new Light(inFrontOfCam)
 		});
 		setTitle("Select Shape To Add");
 		setSize(400, 100);

@@ -18,6 +18,7 @@ import com.paulusmaulus.raytracer.core.swing_assets.additional.VBox;
 import com.paulusmaulus.raytracer.core.swing_assets.inputs.ColorInput;
 import com.paulusmaulus.raytracer.core.swing_assets.inputs.InputField;
 import com.paulusmaulus.raytracer.core.swing_assets.inputs.Slider;
+import com.paulusmaulus.raytracer.geometries.Circle;
 import com.paulusmaulus.raytracer.geometries.Cube;
 import com.paulusmaulus.raytracer.geometries.Cylinder;
 import com.paulusmaulus.raytracer.geometries.Plane;
@@ -63,9 +64,14 @@ public class ShapeSettings extends Settings {
 		ySlider.setAction(setCameraPosition, settingPanel.getCurrentItemDisplay().getCurrentItem());
 		zSlider.setAction(setCameraPosition, settingPanel.getCurrentItemDisplay().getCurrentItem());
 
+		InputField<String> name = new InputField<String>("Name", shape.getName());
+		name.setAction((Object3D object) -> object.setName(name.getValue()),
+				settingPanel.getCurrentItemDisplay().getCurrentItem());
+		add(name);
+
 		if (shape instanceof Cube) {
 			Cube cube = ((Cube) shape);
-			InputField sideLengthInputField = new InputField("Sidelength", cube.getSideLength());
+			InputField<Double> sideLengthInputField = new InputField<>("Sidelength", cube.getSideLength());
 			sideLengthInputField.setAction(
 					(Object3D object) -> ((Cube) object)
 							.setSideLength(Double.parseDouble(sideLengthInputField.getValue())),
@@ -74,7 +80,7 @@ public class ShapeSettings extends Settings {
 		}
 		else if (shape instanceof Sphere) {
 			Sphere sphere = ((Sphere) shape);
-			InputField radiusInputField = new InputField("Radius", sphere.getRadius());
+			InputField<Double> radiusInputField = new InputField<>("Radius", sphere.getRadius());
 			radiusInputField.setAction(
 					(Object3D object) -> ((Sphere) object).setRadius(Double.parseDouble(radiusInputField.getValue())),
 					settingPanel.getCurrentItemDisplay().getCurrentItem());
@@ -120,11 +126,11 @@ public class ShapeSettings extends Settings {
 			yDirectionSlider.setAction(setAxis, settingPanel.getCurrentItemDisplay().getCurrentItem());
 			zDirectionSlider.setAction(setAxis, settingPanel.getCurrentItemDisplay().getCurrentItem());
 
-			InputField height = new InputField("Height", cylinder.getHeight());
+			InputField<Double> height = new InputField<>("Height", cylinder.getHeight());
 			height.setAction((Object3D object) -> ((Cylinder) object).setHeight(Double.parseDouble(height.getValue())),
 					settingPanel.getCurrentItemDisplay().getCurrentItem());
 
-			InputField radius = new InputField("Radius", cylinder.getRadius());
+			InputField<Double> radius = new InputField<>("Radius", cylinder.getRadius());
 			radius.setAction((Object3D object) -> ((Cylinder) object).setRadius(Double.parseDouble(radius.getValue())),
 					settingPanel.getCurrentItemDisplay().getCurrentItem());
 
@@ -133,7 +139,14 @@ public class ShapeSettings extends Settings {
 			add(zDirectionSlider);
 			add(height);
 			add(radius);
+		}
+		else if (shape instanceof Circle) {
+			Circle circle = (Circle) shape;
+			InputField<Double> radius = new InputField<>("Radius", circle.getRadius());
+			radius.setAction((Object3D object) -> ((Circle) object).setRadius(Double.parseDouble(radius.getValue())),
+					settingPanel.getCurrentItemDisplay().getCurrentItem());
 
+			add(radius);
 		}
 		add(new MaterialSettingsPanel());
 		add(new ShaderSettingPanel());
@@ -143,22 +156,23 @@ public class ShapeSettings extends Settings {
 
 		private Material material = shape.getMaterial();
 		private Label label = new Label(material.getClass().toString());
-		private JComboBox<? extends Material> materialSelector = new JComboBox<>(new Material[] {
-				new BasicMaterial(new PhongShader(), Color.WHITE),
-				new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 2),
-				new CubeMaterial(new PhongShader()), new EdgeMaterial(new PhongShader(), Color.WHITE, .1),
-				new GradientMaterial(new PhongShader(), Color.WHITE, Color.BLACK),
-				new MirrorMaterial(new PhongShader()), new SphereMaterial(new PhongShader()),
-				new WaveMaterial(new PhongShader()), new TextureMaterial(new Texture(), new PhongShader())
-		});
+		private JComboBox<? extends Material> materialSelector;
 		private ColorInput mainColorInput = new ColorInput(material.getColor());
-		private InputField reflectivity = new InputField("Refl", material.getReflectivity());
-		private InputField transparency = new InputField("Trans", material.getTransparency());
+		private InputField<Double> reflectivity = new InputField<>("Refl", material.getReflectivity());
+		private InputField<Double> transparency = new InputField<>("Trans", material.getTransparency());
 
 		public MaterialSettingsPanel() {
 			super();
 			label.setAlignment(1);
 			add(label);
+			materialSelector = new JComboBox<>(new Material[] {
+					new BasicMaterial(new PhongShader(), Color.WHITE),
+					new CheckerMaterial(new PhongShader(), Color.WHITE, Color.BLACK, 2),
+					new CubeMaterial(new PhongShader()), new EdgeMaterial(new PhongShader(), Color.WHITE, .1),
+					new GradientMaterial(new PhongShader(), Color.WHITE, Color.BLACK),
+					new MirrorMaterial(new PhongShader()), new SphereMaterial(new PhongShader()),
+					new WaveMaterial(new PhongShader()), new TextureMaterial(new Texture(), new PhongShader())
+			});
 			materialSelector.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -185,7 +199,8 @@ public class ShapeSettings extends Settings {
 								.setSecColor(secColorInput.getColor()),
 						settingPanel.getCurrentItemDisplay().getCurrentItem());
 				add(secColorInput);
-				InputField gridSizeField = new InputField("Gridsize", ((CheckerMaterial) material).getGridsize());
+				InputField<Double> gridSizeField = new InputField<>("Gridsize",
+						((CheckerMaterial) material).getGridsize());
 				gridSizeField.setAction(
 						(Object3D object) -> ((CheckerMaterial) ((Shape) object).getMaterial())
 								.setGridsize(Double.parseDouble(gridSizeField.getValue())),
@@ -230,7 +245,7 @@ public class ShapeSettings extends Settings {
 				new BasicShader(), new BloomShader(), new DistanceShader(), new PhongShader(), new RainbowShader()
 		});
 
-		private InputField emission = new InputField("Emission", 1);
+		private InputField<Double> emission = new InputField<>("Emission", 1d);
 
 		public ShaderSettingPanel() {
 			super();

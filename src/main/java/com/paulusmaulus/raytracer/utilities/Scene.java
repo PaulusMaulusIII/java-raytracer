@@ -2,13 +2,12 @@ package com.paulusmaulus.raytracer.utilities;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.io.File;
 
 import com.paulusmaulus.raytracer.geometries.additional.Skybox;
 import com.paulusmaulus.raytracer.lights.Light;
 
 public class Scene {
-    private Skybox skybox = new Skybox(new File("src\\main\\resources\\textures\\Sky.jpg"));
+    private Skybox skybox;
     private Camera camera;
     private List<Shape> shapes = new LinkedList<>();
     private List<Light> lights = new LinkedList<>();
@@ -25,6 +24,12 @@ public class Scene {
     public Scene(Camera camera, List<Shape> children, List<Light> lights) {
         this(camera, children);
         this.lights = new LinkedList<>(lights);
+    }
+
+    public Scene(Camera camera, List<Shape> children, List<Light> lights, Skybox skybox) {
+        this(camera, children);
+        this.lights = new LinkedList<>(lights);
+        this.skybox = skybox;
     }
 
     public void setShapes(List<Shape> shapes) {
@@ -52,6 +57,10 @@ public class Scene {
             objects.add(shape);
         }
         return objects;
+    }
+
+    public void setSkybox(Skybox skybox) {
+        this.skybox = skybox;
     }
 
     public Skybox getSkybox() {
