@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -16,13 +15,11 @@ import javax.swing.JFrame;
 import com.paulusmaulus.raytracer.core.swing_assets.SettingPanel;
 import com.paulusmaulus.raytracer.core.swing_assets.Viewport;
 import com.paulusmaulus.raytracer.core.swing_assets.additional.CreateObjectDialog;
-import com.paulusmaulus.raytracer.geometries.Plane;
 import com.paulusmaulus.raytracer.geometries.Sphere;
 import com.paulusmaulus.raytracer.geometries.additional.Arrow;
 import com.paulusmaulus.raytracer.geometries.additional.Skybox;
 import com.paulusmaulus.raytracer.lights.Light;
 import com.paulusmaulus.raytracer.materials.BasicMaterial;
-import com.paulusmaulus.raytracer.materials.CheckerMaterial;
 import com.paulusmaulus.raytracer.shaders.PhongShader;
 import com.paulusmaulus.raytracer.utilities.Camera;
 import com.paulusmaulus.raytracer.utilities.Color;
@@ -32,13 +29,7 @@ import com.paulusmaulus.raytracer.utilities.Shape;
 import com.paulusmaulus.raytracer.utilities.math.Vector3;
 
 public class App implements Runnable {
-    Scene scene = new Scene(new Camera(new Vector3(0, 0, -4), Math.toRadians(40)),
-            List.of(new Sphere(new Vector3(0, 0, 0), new BasicMaterial(new PhongShader(), Color.PINK), 2),
-                    new Plane(new Vector3(0, -2, 0),
-                            new CheckerMaterial(new PhongShader(), Color.BLACK, Color.WHITE, 4), new Vector3(0, 1, 0))),
-            List.of(new Light(new Vector3(7.5, 5, 20), new Color(255, 255, 72), 50),
-                    new Light(new Vector3(-7.5, 5, 20), new Color(255, 0, 72), 50)),
-            new Skybox(Color.WHITE));
+    Scene scene = new Scene(new Camera(new Vector3(0, 0, -4), Math.toRadians(40)));
 
     JFrame main;
     JDialog settingsDialog;
@@ -55,6 +46,13 @@ public class App implements Runnable {
                 System.exit(0);
             }
         });
+
+        scene.addObject(
+                new Sphere(new Vector3(0, 0, 3), new BasicMaterial(new PhongShader(), new Color(243, 196, 207)), 2));
+
+        scene.addObject(new Light(new Vector3(-35, 100, 50), Color.WHITE, 100));
+
+        scene.setSkybox(new Skybox(new File("src\\main\\resources\\textures\\Sky.jpg")));
 
         settingsDialog = new JDialog(main, "Settings");
         settings = new SettingPanel(main, scene);

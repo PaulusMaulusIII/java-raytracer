@@ -14,6 +14,7 @@ public class Scene {
 
     public Scene(Camera camera) {
         this.camera = camera;
+        this.skybox = new Skybox(Color.MAGENTA);
     }
 
     public Scene(Camera camera, List<Shape> children) {
@@ -65,5 +66,14 @@ public class Scene {
 
     public Skybox getSkybox() {
         return skybox;
+    }
+
+    public void addObject(Object3D object) {
+        if (object instanceof Shape) {
+            shapes.add((Shape) object);
+        }
+        else if (object instanceof Light) {
+            lights.add((Light) object);
+        }
     }
 }
