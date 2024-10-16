@@ -50,7 +50,7 @@ public class App implements Runnable {
         scene.addObject(
                 new Sphere(new Vector3(0, 0, 3), new BasicMaterial(new PhongShader(), new Color(243, 196, 207)), 2));
 
-        scene.addObject(new Light(new Vector3(-35, 100, 50), Color.WHITE, 100));
+        scene.addObject(new Light(new Vector3(50, 1, 0), Color.WHITE, 100));
 
         scene.setSkybox(new Skybox(new File("src\\main\\resources\\textures\\Sky.jpg")));
 

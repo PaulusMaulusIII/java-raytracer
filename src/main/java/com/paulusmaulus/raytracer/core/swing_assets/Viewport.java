@@ -162,8 +162,7 @@ public class Viewport extends JPanel {
 			int centerX = container.getX() + getWidth() / 2;
 			int centerY = container.getY() + getHeight() / 2;
 			robot.mouseMove(centerX, centerY);
-		}
-		else {
+		} else {
 			setCursor(Cursor.getDefaultCursor());
 		}
 	}
@@ -188,87 +187,87 @@ public class Viewport extends JPanel {
 
 	private void handleKeyPress(KeyEvent e) {
 		switch (e.getKeyCode()) {
-		case KeyEvent.VK_D -> deltaCamera.setX((ctrl) ? 2 : 0.2);
-		case KeyEvent.VK_A -> deltaCamera.setX((ctrl) ? -2 : -0.2);
-		case KeyEvent.VK_W -> deltaCamera.setZ((ctrl) ? 2 : 0.2);
-		case KeyEvent.VK_S -> deltaCamera.setZ((ctrl) ? -2 : -0.2);
-		case KeyEvent.VK_SPACE -> deltaCamera.setY((ctrl) ? 2 : 0.2);
-		case KeyEvent.VK_SHIFT -> deltaCamera.setY((ctrl) ? -2 : -0.2);
-		case KeyEvent.VK_1 -> resolution = 1;
-		case KeyEvent.VK_2 -> resolution = 0.5;
-		case KeyEvent.VK_3 -> resolution = 0.25;
-		case KeyEvent.VK_4 -> resolution = 0.125;
-		case KeyEvent.VK_5 -> resolution = 0.0625;
-		case KeyEvent.VK_6 -> resolution = 0.03125;
-		case KeyEvent.VK_7 -> resolution = 0.015625;
-		case KeyEvent.VK_Q -> tilt = Math.toRadians(1);
-		case KeyEvent.VK_E -> tilt = -Math.toRadians(1);
-		case KeyEvent.VK_V -> scene.getCamera().setAnchor(new Vector3(0, 0, 0));
-		case KeyEvent.VK_F12 -> {
-			try {
-				Renderer.renderToImage(scene, 1920, 1080, effects, distance);
-			} catch (IOException ex) {
-				ex.printStackTrace();
+			case KeyEvent.VK_D -> deltaCamera.setX((ctrl) ? 2 : 0.2);
+			case KeyEvent.VK_A -> deltaCamera.setX((ctrl) ? -2 : -0.2);
+			case KeyEvent.VK_W -> deltaCamera.setZ((ctrl) ? 2 : 0.2);
+			case KeyEvent.VK_S -> deltaCamera.setZ((ctrl) ? -2 : -0.2);
+			case KeyEvent.VK_SPACE -> deltaCamera.setY((ctrl) ? 2 : 0.2);
+			case KeyEvent.VK_SHIFT -> deltaCamera.setY((ctrl) ? -2 : -0.2);
+			case KeyEvent.VK_1 -> resolution = 1;
+			case KeyEvent.VK_2 -> resolution = 0.5;
+			case KeyEvent.VK_3 -> resolution = 0.25;
+			case KeyEvent.VK_4 -> resolution = 0.125;
+			case KeyEvent.VK_5 -> resolution = 0.0625;
+			case KeyEvent.VK_6 -> resolution = 0.03125;
+			case KeyEvent.VK_7 -> resolution = 0.015625;
+			case KeyEvent.VK_Q -> tilt = Math.toRadians(1);
+			case KeyEvent.VK_E -> tilt = -Math.toRadians(1);
+			case KeyEvent.VK_V -> scene.getCamera().setAnchor(new Vector3(0, 0, 0));
+			case KeyEvent.VK_F12 -> {
+				try {
+					Renderer.renderToImage(scene, 1920, 1080, effects, distance);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
 			}
-		}
-		case KeyEvent.VK_H -> hud = (hud < 3) ? hud + 1 : 0;
-		case KeyEvent.VK_F -> {
-			if (!effects.contains(dof))
-				effects.add(dof);
-			else
-				effects.remove(dof);
-		}
-		case KeyEvent.VK_PLUS -> distance += 0.1;
-		case KeyEvent.VK_MINUS -> distance = Math.max(0.1, distance - 0.1);
-		case KeyEvent.VK_R -> autoDOF = !autoDOF;
-		case KeyEvent.VK_CONTROL -> {
-			ctrl = true;
-		}
-		case KeyEvent.VK_C -> new CreateObjectDialog(((JFrame) container), settingsDialog, settings);
-		case KeyEvent.VK_DELETE -> {
-			if (selectedObject != null) {
-				Menu menu = null;
-				if (selectedObject instanceof Shape) {
-					menu = ((JFrame) container).getMenuBar().getMenu(2);
-					settings.getScene().getShapes().remove(selectedObject);
-				}
-				else if (selectedObject instanceof Light) {
-					menu = ((JFrame) container).getMenuBar().getMenu(3);
-					settings.getScene().getLights().remove(selectedObject);
-				}
-				for (int i = 0; i < menu.getItemCount(); i++) {
-					if (((MenuItem) menu.getItem(i)).getLabel().equals(selectedObject.getName())) {
-						menu.remove(i);
-						break;
+			case KeyEvent.VK_H -> hud = (hud < 3) ? hud + 1 : 0;
+			case KeyEvent.VK_F -> {
+				if (!effects.contains(dof))
+					effects.add(dof);
+				else
+					effects.remove(dof);
+			}
+			case KeyEvent.VK_PLUS -> distance += 0.1;
+			case KeyEvent.VK_MINUS -> distance = Math.max(0.1, distance - 0.1);
+			case KeyEvent.VK_R -> autoDOF = !autoDOF;
+			case KeyEvent.VK_X -> speed = 0;
+			case KeyEvent.VK_CONTROL -> {
+				ctrl = true;
+			}
+			case KeyEvent.VK_C -> new CreateObjectDialog(((JFrame) container), settingsDialog, settings);
+			case KeyEvent.VK_DELETE -> {
+				if (selectedObject != null) {
+					Menu menu = null;
+					if (selectedObject instanceof Shape) {
+						menu = ((JFrame) container).getMenuBar().getMenu(2);
+						settings.getScene().getShapes().remove(selectedObject);
+					} else if (selectedObject instanceof Light) {
+						menu = ((JFrame) container).getMenuBar().getMenu(3);
+						settings.getScene().getLights().remove(selectedObject);
+					}
+					for (int i = 0; i < menu.getItemCount(); i++) {
+						if (((MenuItem) menu.getItem(i)).getLabel().equals(selectedObject.getName())) {
+							menu.remove(i);
+							break;
+						}
 					}
 				}
 			}
-		}
+			case KeyEvent.VK_ALT -> setCaptureCursor(true);
 		}
 	}
 
 	private void handleKeyRelease(KeyEvent e) {
 		switch (e.getKeyCode()) {
-		case KeyEvent.VK_D, KeyEvent.VK_A -> deltaCamera.setX(0);
-		case KeyEvent.VK_SPACE, KeyEvent.VK_SHIFT -> deltaCamera.setY(0);
-		case KeyEvent.VK_W, KeyEvent.VK_S -> deltaCamera.setZ(0);
-		case KeyEvent.VK_Q, KeyEvent.VK_E -> tilt = 0;
-		case KeyEvent.VK_ESCAPE -> handleEscapeKey();
-		case KeyEvent.VK_CONTROL -> ctrl = false;
+			case KeyEvent.VK_D, KeyEvent.VK_A -> deltaCamera.setX(0);
+			case KeyEvent.VK_SPACE, KeyEvent.VK_SHIFT -> deltaCamera.setY(0);
+			case KeyEvent.VK_W, KeyEvent.VK_S -> deltaCamera.setZ(0);
+			case KeyEvent.VK_Q, KeyEvent.VK_E -> tilt = 0;
+			case KeyEvent.VK_ESCAPE -> handleEscapeKey();
+			case KeyEvent.VK_CONTROL -> ctrl = false;
+			case KeyEvent.VK_ALT -> setCaptureCursor(false);
 		}
 	}
 
 	private void handleEscapeKey() {
 		if (captureCursor) {
 			setCaptureCursor(false);
-		}
-		else {
+		} else {
 			if (settingsDialog.isVisible()) {
 				int i = JOptionPane.showConfirmDialog(null, "Beenden?");
 				if (i == 0)
 					System.exit(0);
-			}
-			else {
+			} else {
 				settingsDialog.setVisible(true);
 			}
 		}
@@ -284,7 +283,7 @@ public class Viewport extends JPanel {
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			switch (e.getButton()) {
-			case MouseEvent.BUTTON2 -> setCaptureCursor(false);
+				case MouseEvent.BUTTON2 -> setCaptureCursor(false);
 			}
 			axis = new Vector3(0, 0, 0);
 		}
@@ -292,9 +291,9 @@ public class Viewport extends JPanel {
 
 	private void handleMousePress(MouseEvent e) {
 		switch (e.getButton()) {
-		case MouseEvent.BUTTON1 -> handleLeftClick(e);
-		case MouseEvent.BUTTON2 -> setCaptureCursor(true);
-		case MouseEvent.BUTTON3 -> handleRightClick(e);
+			case MouseEvent.BUTTON1 -> handleLeftClick(e);
+			case MouseEvent.BUTTON2 -> setCaptureCursor(true);
+			case MouseEvent.BUTTON3 -> handleRightClick(e);
 		}
 
 	}
@@ -315,8 +314,7 @@ public class Viewport extends JPanel {
 		if (atCursor != null && atCursor.getObject() instanceof Shape && !(atCursor.getShape() instanceof Arrow)) {
 			if (atCursor.getShape() == selectedObject) {
 				selectedObject = null;
-			}
-			else {
+			} else {
 				selectedObject = atCursor.getShape();
 				selectedObject.addChangeListener((origPos, newPos) -> {
 					for (Shape shape : scene.getShapes()) {
@@ -332,8 +330,7 @@ public class Viewport extends JPanel {
 					if (settingsDialog.isVisible()) {
 						settingsDialog.setVisible(false);
 						setCaptureCursor(true);
-					}
-					else {
+					} else {
 						settingsDialog.setVisible(true);
 						setCaptureCursor(false);
 					}
@@ -361,14 +358,12 @@ public class Viewport extends JPanel {
 		public void mouseDragged(MouseEvent e) {
 			if (captureCursor) {
 				mouseMoved(e);
-			}
-			else if (selectedObject != null && axis != null) {
+			} else if (selectedObject != null && axis != null) {
 				double scale = ctrl ? 1 : 0.1;
 				if (axis.x > 0 || axis.z > 0) {
 					selectedObject.setAnchor(
 							selectedObject.getAnchor().add(axis.scale(e.getX() - origX > 0 ? scale : -scale)));
-				}
-				else {
+				} else {
 					selectedObject.setAnchor(
 							selectedObject.getAnchor().add(axis.scale(origY - e.getY() > 0 ? scale : -scale)));
 				}
