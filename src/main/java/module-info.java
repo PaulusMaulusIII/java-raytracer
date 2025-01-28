@@ -1,5 +1,5 @@
-module com.paulusmaulus.raytracer {
+module com.paulusmaulus.editor {
     requires java.desktop;
 
-    exports com.paulusmaulus.raytracer;
+    exports com.paulusmaulus.editor;
 }
